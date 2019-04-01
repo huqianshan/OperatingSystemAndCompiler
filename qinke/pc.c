@@ -17,18 +17,20 @@ void * Producer(void *arg)
 {
 	int i=0;
 	int in=0;
+	srand((unsigned int)time(NULL));
 	while(i<100)
 	{
 		sem_wait(&Empty);
 		sem_wait(&Mutex);
 
 		Buf[in]=i;
-		printf("Producing...Buf[%d]=[%d]\n",in,Buf[in]);
+		printf("Pushing...Buf[%d]=[%d]\n",in,Buf[in]);
 		in=(in+1)%MAX;
 		i++;
 	
 		sem_post(&Full);
 		sem_post(&Mutex);
+		sleep(rand() % MAX);
 	}
 	return((void *)0);
 }
@@ -37,6 +39,7 @@ void * Consumer(void *arg)
 {
 	int j=0;
 	int out=0;
+	srand((unsigned int)time(NULL));
 	while(j<100)
 	{
 		sem_wait(&Full);
@@ -49,7 +52,7 @@ void * Consumer(void *arg)
 		
 		sem_post(&Empty);
 		sem_post(&Mutex);
-		sleep(1);		
+		sleep(rand()%MAX);		
 	}
 	return ((void *)0);
 }

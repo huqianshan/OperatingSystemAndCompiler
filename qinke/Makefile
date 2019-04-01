@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -g -Wall
 LDFLAGS = -lpthread
 
-all: philo
+all: philo pc
 
 philo.o: philo.c
 	$(CC) $(CFLAGS) -c philo.c

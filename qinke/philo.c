@@ -42,6 +42,7 @@ void *sophi(void *j){
     V(&chick[i]);
     V(&chick[(i + 1) % NUM]);
     }
+    return (void*)NULL;
 }
 
 int main()
