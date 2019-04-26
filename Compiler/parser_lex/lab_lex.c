@@ -1,7 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define TOKENSIZE 256
+#define MAXSIZE 2048
+#define MAXLINE 128
+#define CODE_FILE_NAME "src.txt"
+#define DYD_FILE_NAME "out.dyd"
 
 char word;
 char *num2word[24] = {"0", "$BEGIN", "$END", "$INTER", "$IF",
@@ -10,14 +15,16 @@ char *num2word[24] = {"0", "$BEGIN", "$END", "$INTER", "$IF",
                       "$WRITE", "$SYMBOL", "$CONST"
                                            "$EQ",
                       "$NE", "$LE", "$L", "$GE", "$G"};
-char *project = "   abs = 3; abs<=5";
+char code[MAXSIZE] = "";
+char *project = code;
 char token[TOKENSIZE] = "";
+char dyd_file[MAXSIZE] = "";
 
 void getchar1()
 {
     word = *(project++);
-    //			printf(word);
 }
+
 void getnbc()
 {
     while (word == ' ')
@@ -80,43 +87,40 @@ int reserved()
     else
         return 0;
 }
-/*
-int deter(char *str){
-    if(*str=="symbol"){
-        return 10;
-    }else if(*str=="const"){
-        return 11;
-    }
-    else if(*str=='g'){
-        return 15;
-    }
-    else if (*str=="ge"){
-        return 16;
-    }
-}*/
+
 
 // error helper function
 
-int error(int line, int err)
+int error(int line, char *info)
 {
+    fprintf(stderr, "**LINE:%d %s\n", line, info);
 }
 
 int Print(char *str, int num)
 {
-
-    printf("%16s %2d\n", str, num);
+    char *tem = malloc(MAXLINE * sizeof(char));
+    sprintf(tem, "%16s %2d\n", str, num);
+    strcat(dyd_file, tem);
+    printf("%s",tem);
+    free(tem);
+    return 1;
 }
-
 
 int LexAnalyze(){
     
     int num;
+    static int line = 1;
     memset(token, '\0', TOKENSIZE);
     getchar1();
     getnbc();
     switch (word)
     {
+        case '\n':
+            Print("$EOLN", 24);
+            line++;
+            break;
         case EOF:
+            Print("$EOF", 25);
             return 0;
         case '\0':
             return 0;
@@ -281,17 +285,58 @@ int LexAnalyze(){
             break;
 
         default:
-
+            error(line, "ILLEGAL_CHAR_ERR");
             break;
     }
     return 1;
 }
 
+int read(){
+    FILE *fp = NULL;
+
+    fp = fopen(CODE_FILE_NAME, "r");
+    if(fp==NULL){
+        fprintf(stderr, "Open src file failedd \n");
+        return -1;
+    }
+
+    char *buf = malloc(MAXLINE * sizeof(char));
+    memset(code, '\0', MAXSIZE);
+    while (fgets(buf, MAXLINE, fp) != NULL)
+    {
+        strcat(code, buf);
+    }
+    project = code;
+    fclose(fp);
+    return 0;
+}
+
+int write(){
+    FILE *fp = NULL;
+
+    fp = fopen(DYD_FILE_NAME, "w+");
+    if(fp==NULL){
+        fprintf(stderr, "Create dyd file failedd \n");
+        return -1;
+    }
+
+    if(fprintf(fp, "%s",dyd_file)!=0){
+        fclose(fp);
+        return 0;
+    }else{
+        fprintf(stderr, "write dyd file  failed");
+        fclose(fp);
+        return -1;
+    }
+    
+}
+
 int main()
 {
-
-
+    //while(LexAnalyze());
+    read();
+    printf("%s\n", project);
     while(LexAnalyze())
         ;
-
+    write();
 }
