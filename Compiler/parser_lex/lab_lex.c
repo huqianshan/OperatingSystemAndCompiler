@@ -7,18 +7,18 @@
 #define MAXLINE 128
 #define CODE_FILE_NAME "src.txt"
 #define DYD_FILE_NAME "out.dyd"
+#define ERR_FILE_NAME "out.err"
 
 char word;
 char *num2word[24] = {"0", "$BEGIN", "$END", "$INTER", "$IF",
                       "$IF", "$THEN", "$ELSE", "$FUNCTION"
-                                               "$READ",
-                      "$WRITE", "$SYMBOL", "$CONST"
-                                           "$EQ",
-                      "$NE", "$LE", "$L", "$GE", "$G"};
+                      "$READ","$WRITE", "$SYMBOL", "$CONST"
+                     "$EQ", "$NE", "$LE", "$L", "$GE", "$G"};
 char code[MAXSIZE] = "";
 char *project = code;
 char token[TOKENSIZE] = "";
 char dyd_file[MAXSIZE] = "";
+char err_file[MAXSIZE] = "";
 
 void getchar1()
 {
@@ -88,12 +88,16 @@ int reserved()
         return 0;
 }
 
-
 // error helper function
 
 int error(int line, char *info)
-{
-    fprintf(stderr, "**LINE:%d %s\n", line, info);
+{   
+    char *tem = malloc(MAXLINE * sizeof(char));
+    sprintf(tem, "**LINE:%d %s\n", line, info);
+    strcat(err_file, tem);
+    fprintf(stderr,"%s",tem);
+    free(tem);
+    return 1;
 }
 
 int Print(char *str, int num)
@@ -101,201 +105,148 @@ int Print(char *str, int num)
     char *tem = malloc(MAXLINE * sizeof(char));
     sprintf(tem, "%16s %2d\n", str, num);
     strcat(dyd_file, tem);
-    printf("%s",tem);
+    printf("%s", tem);
     free(tem);
     return 1;
 }
 
-int LexAnalyze(){
-    
+int LexAnalyze()
+{
+
     int num;
     static int line = 1;
     memset(token, '\0', TOKENSIZE);
     getchar1();
     getnbc();
-    switch (word)
+
+    if (letter())
     {
-        case '\n':
-            Print("$EOLN", 24);
-            line++;
-            break;
-        case EOF:
-            Print("$EOF", 25);
-            return 0;
-        case '\0':
-            return 0;
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
+        // word is alpha and digit
+        while (digit() || letter())
+        {
+            concat();
+            getchar1();
+        }
 
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-            // word is alpha and digit
-            while (digit() || letter())
-            {
-                concat();
-                getchar1();
-            }
+        // TOKEN
+        retract();
+        if ((num = reserved()) != 0)
+        {
+            Print(num2word[num], num);
+        }
+        else
+        {
+            Print("$SYMBOL", 11);
+        }
+        return 1;
+    }
 
-            // TOKEN
-            retract();
-            if ((num = reserved()) != 0)
-            {
-                Print(num2word[num], num);
-            }
-            else
-            {
-                Print("$SYMBOL", 11);
-            }
-            break;
-
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-
-            while (digit())
+    if(digit()){
+       while (digit())
             {
                 concat();
                 getchar1();
             }
             retract();
             Print("$CONSTANT", 11);
-            break;
+            return 1;
+    }
 
-        case '=':
+    switch (word)
+    {
+    case '\n':
+        Print("$EOLN", 24);
+        line++;
+        break;
 
-            Print("$E", 12);
-            break;
+    case EOF:
+        Print("$EOF", 25);
+        return 0;
 
-        case '<':
-            getchar1();
-            if (word == '>')
-            {
-                Print("$NE", 13);
-            }
-            else if (word == '=')
-            {
-                Print("$LE", 14);
-            }
-            else
-            {
-                retract();
-                Print("$L", 15);
-            }
-            break;
+    case '\0':
+        return 0;
 
-        case '>':
-            getchar1();
-            if (word == '=')
-            {
-                Print("$GE", 16);
-            }
-            else
-            {
-                retract();
-                Print("$G", 17);
-            }
-            break;
+    case '=':
+        Print("$E", 12);
+        break;
 
-        case '-':
+    case '<':
+        getchar1();
+        if (word == '>')
+        {
+            Print("$NE", 13);
+        }
+        else if (word == '=')
+        {
+            Print("$LE", 14);
+        }
+        else
+        {
+            retract();
+            Print("$L", 15);
+        }
+        break;
 
-            Print("$MINUS", 18);
-            break;
+    case '>':
+        getchar1();
+        if (word == '=')
+        {
+            Print("$GE", 16);
+        }
+        else
+        {
+            retract();
+            Print("$G", 17);
+        }
+        break;
 
-        case '*':
+    case '-':
 
-            Print("$MUTIPLY", 19);
+        Print("$MINUS", 18);
+        break;
 
-        case ':':
-            getchar1();
-            if (word == '=')
-            {
-                Print("$ASSIGN", 20);
-            }
-            else
-            {
-                retract();
-            }
-            break;
+    case '*':
 
-        case '(':
-            Print("$LBRACKET", 21);
-            break;
+        Print("$MUTIPLY", 19);
 
-        case ')':
-            Print("$RBRACKET", 22);
-            break;
+    case ':':
+        getchar1();
+        if (word == '=')
+        {
+            Print("$ASSIGN", 20);
+        }
+        else
+        {
+            retract();
+        }
+        break;
 
-        case ';':
-            Print("$SEMI", 23);
-            break;
+    case '(':
+        Print("$LBRACKET", 21);
+        break;
 
-        default:
-            error(line, "ILLEGAL_CHAR_ERR");
-            break;
+    case ')':
+        Print("$RBRACKET", 22);
+        break;
+
+    case ';':
+        Print("$SEMI", 23);
+        break;
+
+    default:
+        error(line, "ILLEGAL_CHAR_ERR");
+        break;
     }
     return 1;
 }
 
-int read(){
+int read()
+{
     FILE *fp = NULL;
 
     fp = fopen(CODE_FILE_NAME, "r");
-    if(fp==NULL){
+    if (fp == NULL)
+    {
         fprintf(stderr, "Open src file failedd \n");
         return -1;
     }
@@ -311,32 +262,43 @@ int read(){
     return 0;
 }
 
-int write(){
+int write_base(char *filename,char *buf)
+{
     FILE *fp = NULL;
 
-    fp = fopen(DYD_FILE_NAME, "w+");
-    if(fp==NULL){
-        fprintf(stderr, "Create dyd file failedd \n");
+    fp = fopen(filename, "w+");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Create %s file failedd \n",filename);
         return -1;
     }
 
-    if(fprintf(fp, "%s",dyd_file)!=0){
+    if (fprintf(fp, "%s", buf) != 0)
+    {
         fclose(fp);
         return 0;
-    }else{
-        fprintf(stderr, "write dyd file  failed");
+    }
+    else
+    {
+        fprintf(stderr, "write %s file  failed or no err log\n",filename);
         fclose(fp);
         return -1;
     }
-    
+}
+
+
+
+int write(){
+    write_base(DYD_FILE_NAME,dyd_file);
+    write_base(ERR_FILE_NAME,err_file);
 }
 
 int main()
 {
-    //while(LexAnalyze());
+
     read();
     printf("%s\n", project);
-    while(LexAnalyze())
+    while (LexAnalyze())
         ;
     write();
 }
