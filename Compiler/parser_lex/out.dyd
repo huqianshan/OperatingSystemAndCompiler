@@ -1,40 +1,40 @@
           $BEGIN  1
            $EOLN 24
           $INTER  3
-         $SYMBOL 11
+               k 10
            $SEMI 23
            $EOLN 24
           $INTER  3
-           $ELSE  7
-         $SYMBOL 11
+       $FUNCTION  7
+               F 10
        $LBRACKET 21
-         $SYMBOL 11
+               n 10
        $RBRACKET 22
            $SEMI 23
            $EOLN 24
           $BEGIN  1
            $EOLN 24
           $INTER  3
-         $SYMBOL 11
+               n 10
            $SEMI 23
            $EOLN 24
              $IF  4
-         $SYMBOL 11
+               n 10
              $LE 14
        $CONSTANT 11
-             $IF  5
-         $SYMBOL 11
+           $THEN  5
+               F 10
          $ASSIGN 20
        $CONSTANT 11
            $EOLN 24
-           $THEN  6
-         $SYMBOL 11
+           $ELSE  6
+               F 10
          $ASSIGN 20
-         $SYMBOL 11
+               n 10
         $MUTIPLY 19
-         $SYMBOL 11
+               F 10
        $LBRACKET 21
-         $SYMBOL 11
+               n 10
           $MINUS 18
        $CONSTANT 11
        $RBRACKET 22
@@ -42,24 +42,27 @@
             $END  2
            $SEMI 23
            $EOLN 24
-  $FUNCTION$READ  8
+           $READ  8
        $LBRACKET 21
-         $SYMBOL 11
+               m 10
        $RBRACKET 22
            $SEMI 23
            $EOLN 24
-         $SYMBOL 11
+               k 10
          $ASSIGN 20
-         $SYMBOL 11
+               F 10
        $LBRACKET 21
-         $SYMBOL 11
+               m 10
        $RBRACKET 22
            $SEMI 23
+           $EOLN 24
+         dsfsfsg 10
            $EOLN 24
           $WRITE  9
        $LBRACKET 21
-         $SYMBOL 11
+               k 10
        $RBRACKET 22
+           $SEMI 23
            $EOLN 24
             $END  2
            $EOLN 24

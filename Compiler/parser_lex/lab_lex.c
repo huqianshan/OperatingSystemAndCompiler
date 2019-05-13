@@ -11,9 +11,11 @@
 
 char word;
 char *num2word[24] = {"0", "$BEGIN", "$END", "$INTER", "$IF",
-                      "$IF", "$THEN", "$ELSE", "$FUNCTION"
-                      "$READ","$WRITE", "$SYMBOL", "$CONST"
-                     "$EQ", "$NE", "$LE", "$L", "$GE", "$G"};
+                      "$THEN", "$ELSE", "$FUNCTION", "$READ",
+                      "$WRITE", "$SYMBOL", "$CONST", "= $EQ",
+                      "!= $NE", "<= $LE", "< $L", ">= $GE",
+                      "> $G", "_ $", "* $", ":= $", "(", ")",
+                      ";"};
 char code[MAXSIZE] = "";
 char *project = code;
 char token[TOKENSIZE] = "";
@@ -103,7 +105,7 @@ int error(int line, char *info)
 int Print(char *str, int num)
 {
     char *tem = malloc(MAXLINE * sizeof(char));
-    sprintf(tem, "%16s %2d\n", str, num);
+    sprintf(tem, "%16s %2d\n",str, num);
     strcat(dyd_file, tem);
     printf("%s", tem);
     free(tem);
@@ -131,12 +133,12 @@ int LexAnalyze()
         // TOKEN
         retract();
         if ((num = reserved()) != 0)
-        {
-            Print(num2word[num], num);
+        {   
+            Print(num2word[num],num);
         }
         else
         {
-            Print("$SYMBOL", 11);
+            Print(token,10);
         }
         return 1;
     }

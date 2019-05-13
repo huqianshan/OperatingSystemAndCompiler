@@ -8,5 +8,5 @@ begin
     end;
   read(m);
   k:=F(m);
-  write(k)
+  write(k);
 end
