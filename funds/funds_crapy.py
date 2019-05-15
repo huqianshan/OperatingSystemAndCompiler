@@ -187,9 +187,11 @@ def get_name_new(code, para):
     try:
         i = requests.get(url)
         sub = '"%s":"' % (para)
+        #print(i.text)
         name = url_info(i.text, sub)
     except Exception as e:
-        print(e)
+        #print(e)
+        return "No Name"
     finally:
         i.close()
 
@@ -199,7 +201,9 @@ def get_name_new(code, para):
 # get file last modify date
 def file_mdate(name):
     st = os.stat(name)
-    return time.strftime("%Y-%m-%d")
+    mtime=st.st_mtime
+    tl=time.localtime(mtime)
+    return time.strftime("%Y-%m-%d",tl)
 
 
 # In[182]:
@@ -335,10 +339,11 @@ for index, row in fund.iterrows():
     tem = os.path.isfile(fund_name)
     today = time.strftime("%Y-%m-%d")
 
+
     if tem == False:
         fun_main(fund_code)
         print("down ", fund_name, os.path.isfile(fund_name))
-    elif today != file_mdate(fund_name):
+    if today != file_mdate(fund_name):
         open(fund_name, "w").close()
         fun_main(fund_code)
         print("update ", fund_name)
