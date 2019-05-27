@@ -1,9 +1,5 @@
-#!/usr/bin/env python
-# coding: utf-8
 
-# In[349]:
-
-
+#%%
 import datetime
 import os
 import random
@@ -31,12 +27,12 @@ from bs4 import BeautifulSoup
 # 单个基金查询接口
 #
 #
-#
 # http://fund.eastmoney.com/js/jjjz_gs.js?dt=1463791574015
 #
 # 所有基金公司名称列表代码
 
-# In[411]:
+
+#%%
 
 
 def get_user_agent():
@@ -80,13 +76,16 @@ def save_txt(name, ans):
 def url_info(src, subsrc):
     index = src.index(subsrc) + len(subsrc)
     sym = ","
+    
     if subsrc == "curpage:":
         sym = "}"
         # get name
     elif subsrc == '"name":"':
         sym = '"'
+    elif subsrc == 'gztime':
+        sym='"'
+        
     end = src.index(sym, index)
-
     dest_src = src[index:end]
     return dest_src
 
@@ -206,21 +205,22 @@ def file_mdate(name):
     return time.strftime("%Y-%m-%d",tl)
 
 
-# In[182]:
+#%%
+
+#%%prun
+ #get_ipython().run_cell_magic('prun', '', "#downloading fund data\n")
+
+#fun_main('162411')
 
 
-# get_ipython().run_cell_magic('prun', '', "#downloading fund data\nfun_main('162411')")
-
-
-# In[397]:
-
+#%%
 
 file_name = os.getcwd() + "\\data\\162411.txt"
 data = read_data(file_name, 0)
 data.head()
 
 
-# In[412]:
+#%%
 
 
 data = reverse_data(data)
@@ -261,7 +261,7 @@ for i in range(0, len_data):
         sell_x.append(i)
 
 
-# In[414]:
+#%%
 
 
 begin_date = data.iloc[0, 0]
@@ -288,9 +288,7 @@ print("Total Profit is ${:.3f}".format(total_profit))
 print("Percentage : {:3.4f}%".format(100 * total_profit / cost))
 
 
-# In[427]:
-
-
+#%%
 plt.close("all")
 plt.figure()
 plt.style.use("ggplot")
@@ -311,9 +309,7 @@ plt.title(get_name_new(162411, "name") + " 162411")
 print(x)
 
 
-# In[211]:
-
-
+#%%
 def read(file):
     raw_data = pd.read_csv(
         file,
@@ -323,32 +319,108 @@ def read(file):
     )
     return raw_data
 
-
 def lost(cost, value, share):
     return (value - cost) * share
 
 
-# In[395]:
-
-
+#%%
 name = os.getcwd() + "\\trade\\fund-cost.txt"
 fund = read(name)
 for index, row in fund.iterrows():
+
     fund_code = str(row["fund"])
     fund_name = os.getcwd() + "\\data\\" + fund_code + ".txt"
     tem = os.path.isfile(fund_name)
     today = time.strftime("%Y-%m-%d")
 
-
     if tem == False:
         fun_main(fund_code)
         print("down ", fund_name, os.path.isfile(fund_name))
-    if today != file_mdate(fund_name):
+        
+    """
+        if today != file_mdate(fund_name):
         open(fund_name, "w").close()
         fun_main(fund_code)
         print("update ", fund_name)
+    """
 
-    # read first row of data
+    value,date=update_value(fund_code)
+    value=float(value)
+    if date=="No Value":
+        value,date=get_value_bytxt(fund_code)
+        
+    # read cost and share from trade/fund-cost.txt
+    share = float(row["share"])
+    cost = float(row["cost"])
+    change = (value - cost) / value
+    # print(share,cost,value)
+    print(
+        "{:22}{:8}{:<16}{:4.4f}  {:6.4f}   {:4.4%}".format(
+            date,
+            fund_code,
+            get_fund_name(fund_code)[2],
+            value,
+            lost(cost, value, share),
+            change)
+    )
+
+
+#%%
+
+
+def update_value(code):
+    """
+    Enter fund code
+    return value and its time 
+    get realtime value from base api 
+    some fund may return none
+    """
+    api = "http://fundgz.1234567.com.cn/js/"
+    # jsonpgz({"fundcode":"162411","name":"华宝标普油气上游股票",
+    # "jzrq":"2019-05-10","dwjz":"0.5060","gsz":"0.4946","gszzl"
+    #:"-2.24","gztime":"2019-05-14 04:00"})
+    url = api + str(code) + ".js"
+    gsz="gsz"
+    gztime="gztime"
+    base= '\"%s\":\"' 
+    try:
+        i = requests.get(url)
+        sub = base % (gsz)
+        name = find_str(i.text,sub,"\"")
+        sub= base % (gztime)
+        time= find_str(i.text,sub,"\"")
+    except Exception as e:
+        #print(e)
+        return 100,"No Value"
+    finally:
+        i.close()
+
+    return name,time
+
+def find_str(src,beginsrc,endsrc):
+    """
+    src beginsrc endsrc
+    """
+    begin=src.index(beginsrc)+len(beginsrc)
+    end=src.index(endsrc,begin)
+    return src[begin:end]
+
+def get_fund_name(code):
+    """
+    enter code return itsname
+    to be continume look up
+    """
+    filename=".\\data\\funds_name.txt"
+    ans=None
+    with open(filename,'r') as file:
+        for line in file:
+            line=line.split()
+            if  line[0]==str(code):
+                ans=line
+    return ans
+
+def get_value_bytxt(code):
+    fund_name = os.getcwd() + "\\data\\" + fund_code + ".txt"
     tem = pd.read_csv(
         fund_name,
         names=["date", "value", "rvalue", "change"],
@@ -357,21 +429,10 @@ for index, row in fund.iterrows():
     )
     date = tem.iloc[0, 0]
     value = float(tem.iloc[0, 1])
-
-    # read cost and share from trade/fund-cost.txt
-    share = float(row["share"])
-    cost = float(row["cost"])
-    change = (value - cost) / value
-    # print(share,cost,value)
-    print(
-        "{:12}{:8}{:<16} {:4.4f}  {:4.4%}".format(
-            date,
-            fund_code,
-            get_name_new(fund_code, "name"),
-            lost(cost, value, share),
-            change,
-        )
-    )
+    return value,date
 
 
 #%%
+#get_ipython().run_cell_magic('prun', '', 's=get_fund_name("960042")\nprint(s)')
+
+
