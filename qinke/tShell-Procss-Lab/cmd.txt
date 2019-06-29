@@ -1,0 +1,20 @@
+init      //系统initial，运行进程为init
+cr x 1 //创建新进程x，优先级为1，于是init调入ready，x运行
+cr p 1    //创建新进程p，优先级为1，依然运行x
+cr q 1    //创建新进程q，优先级为1，依然运行x
+cr r 1    //创建新进程r，优先级为1，依然运行x
+to       //x超时，调入就绪ready1，运行p
+req R2 1  //p占用一个R2，接着运行p
+to       //p超时，调入就绪ready1，运行q
+req R3 3  //q占用3个R3，接着运行q
+to       //q超时，调入就绪ready1，运行r
+req R4 3  //r占用3个R4，接着运行r
+to       //r超时，调入就绪ready1，运行x
+to       //x超时，调入就绪ready1，运行p
+req R3 1  //p请求一个R3，阻塞，进入block2队列，调用q
+req R4 2  //q请求2个R4，阻塞，进入block3队列，调用r
+req R2 2  //r请求2个R2，阻塞，进入block1队列，调用x
+to       //x超时，调入ready1队列，但是p、q、r全部阻塞，于是接着运行x
+de q     //销毁q，这时释放3个R3，p获得资源，进入ready1队列，接着运行x
+to       //x超时，调入就绪ready1，运行p
+to       //p超时，调入就绪ready1，运行x

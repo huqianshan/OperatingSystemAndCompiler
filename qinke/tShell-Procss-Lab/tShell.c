@@ -3,6 +3,13 @@
 #include <stdlib.h>
 
 /*
+* Todo
+* 1.Delete only find pcb in ReadyList not include waitinglist
+* 2.There is a lot of malloc but not properly free
+* 3. code can be written  less 
+*/
+
+/*
 * ------------- Global Var ------------------------
 * -------------------------------------------------
 */
@@ -346,7 +353,7 @@ int Create(char *name, char *pri)
 }
 
 /*
-* Destroy Pcb by pName
+* Destroy Pcb by pName bug Not find in waiting List
 */
 
 PCB *Find_Name_PCB(char *pName)
