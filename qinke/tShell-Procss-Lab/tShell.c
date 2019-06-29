@@ -6,7 +6,8 @@
 * Todo
 * 1.Delete only find pcb in ReadyList not include waitinglist
 * 2.There is a lot of malloc but not properly free
-* 3. code can be written  less 
+* 3.Release Resource only from current running process Not the resource' Owner so it must be dead-lock
+* 4. There is a lot of redundancy when finding  and insert  node and selecting 
 */
 
 /*
