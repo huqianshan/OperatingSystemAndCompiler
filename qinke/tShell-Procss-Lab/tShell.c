@@ -31,7 +31,7 @@ struct PCB
     char pid[16];
     int priority;
     int status;
-    struct RCB *blocked_list;
+    struct rcbNode *blocked_list;
     int blocked_num;
 
     struct PCB *parent;
@@ -44,7 +44,7 @@ typedef struct PCB PCB;
 struct pcbNode
 {
 
-    PCB pcb;
+    PCB *pcb;
     struct pcbNode *next;
 
     //PCB *last;
@@ -70,7 +70,7 @@ typedef struct RCB
 
 struct rcbNode
 {
-    RCB rcb;
+    RCB *rcb;
     struct rcbNode *next;
 };
 typedef struct rcbNode rcbNode, rcbList;
@@ -144,7 +144,25 @@ int Insert(pcbList *list, PCB *pcb)
     }
 
     pcbList *newNode = (pcbList *)malloc(sizeof(pcbList));
-    newNode->pcb = *pcb;
+    newNode->pcb = pcb;
+    newNode->next = NULL;
+
+    tem->next = newNode;
+    return 1;
+}
+
+int Insert_Rcb(rcbList *list, RCB *rcb)
+{
+
+    // find last pcb
+    rcbList *tem = list;
+    while (tem->next != NULL)
+    {
+        tem = tem->next;
+    }
+
+    rcbList *newNode = (rcbList *)malloc(sizeof(rcbList));
+    newNode->rcb = rcb;
     newNode->next = NULL;
 
     tem->next = newNode;
@@ -170,7 +188,7 @@ void Insert_Priority(PCB *pcb)
 void Resource_Alloc(RCB *rcb, PCB *pcb)
 {
     rcbNode *rNode = (rcbList *)malloc(sizeof(rcbNode));
-    rNode->rcb = *rcb;
+    rNode->rcb = rcb;
     rNode->next = NULL;
 
     // add RCB to Pcb's resourceList's end
@@ -181,9 +199,37 @@ void Resource_Alloc(RCB *rcb, PCB *pcb)
     }
     tem->next = rNode;
 }
-
+/*
+* Delete Resource From Pcb's rcblist
+*/
 void Resource_Free(RCB *rcb, PCB *pcb, int n)
 {
+    rcbNode *beforeRcbNode = pcb->resours;
+    rcbNode *tem = beforeRcbNode->next;
+
+    if (tem == NULL)
+    {
+        fprintf(stderr, "Resource Free Failed in Pcb %s for R%d of %d\n",
+                pcb->pid, rcb->RID, n);
+        exit(0);
+    }
+
+    while (tem != NULL && n > 0)
+    {
+        if (tem->rcb->RID == rcb->RID)
+        {
+            beforeRcbNode->next = tem->next;
+            tem->next = NULL;
+            //Todo Bug free delete resource Node
+            
+            tem = beforeRcbNode->next;
+            n--;
+        }else{
+            beforeRcbNode = tem;
+            tem = tem->next;
+        }
+    }
+
     return;
 }
 
@@ -191,10 +237,10 @@ void Remove_Ready_Single(pcbList *list, PCB *pcb)
 {
     pcbNode *before_node = list;
     pcbNode *temNode = before_node->next;
-    PCB temPcb = temNode->pcb;
+    PCB *temPcb = temNode->pcb;
 
     // Todo
-    while (temNode != NULL && strcmp(temPcb.pid, pcb->pid) != 0)
+    while (temNode != NULL && strcmp(temPcb->pid, pcb->pid) != 0)
     {
         before_node = temNode;
         temNode = temNode->next;
@@ -231,7 +277,7 @@ PCB *Remove_Waiting(pcbList *waitList)
     }
 
     //Todo Bug
-    PCB *first_wait_pcb = &(waitList->next->pcb);
+    PCB *first_wait_pcb = waitList->next->pcb;
     return first_wait_pcb;
 }
 
@@ -241,17 +287,18 @@ PCB *Find_PCB()
     pcbNode *tem = System->next;
     if (tem != NULL)
     {
-        return &(tem->pcb);
+        return tem->pcb;
     }
+
     tem = User->next;
     if (tem != NULL)
     {
-        return &(tem->pcb);
+        return tem->pcb;
     }
     tem = Init->next;
     if (tem != NULL)
     {
-        return &(tem->pcb);
+        return tem->pcb;
     }
     return NULL;
 }
@@ -271,7 +318,9 @@ int Create(char *name, char *pri)
     pcb->status = READY;
 
     // Not blocked by any Resource
-    pcb->blocked_list = NULL;
+    rcbNode *rcbBlockList = (rcbNode *)malloc(sizeof(rcbNode));
+    rcbBlockList->next = NULL;
+    pcb->blocked_list = rcbBlockList;
     pcb->blocked_num = 0;
 
     // resource Node init to 0 not allocated
@@ -285,18 +334,137 @@ int Create(char *name, char *pri)
     // Todo current process' parent
     pcb->parent = CURRENT_RUNNING_PCB;
 
+    if (CURRENT_RUNNING_PCB != NULL)
+    {
+        Insert(CURRENT_RUNNING_PCB->child, pcb);
+    }
+
     //3. insert(RL, PCB)//插入相应优先级队列的尾部
     Insert_Priority(pcb);
     //4. Scheduler()
     Scheduler();
 }
 
+/*
+* Destroy Pcb by pName
+*/
+
+PCB *Find_Name_PCB(char *pName)
+{
+    pcbNode *tem = System->next;
+
+    while (tem != NULL)
+    {
+        if (strcmp(tem->pcb->pid, pName) == 0)
+        {
+            return tem->pcb;
+        }
+        tem = tem->next;
+    }
+
+    tem = User->next;
+    while (tem != NULL)
+    {
+        if (strcmp(tem->pcb->pid, pName) == 0)
+        {
+            return tem->pcb;
+        }
+        tem = tem->next;
+    }
+
+    tem = Init->next;
+    while (tem != NULL)
+    {
+        if (strcmp(tem->pcb->pid, pName) == 0)
+        {
+            return tem->pcb;
+        }
+        tem = tem->next;
+    }
+    return NULL;
+}
+
+void Destroy(char *pName)
+{
+    PCB *toDestroy = Find_Name_PCB(pName);
+    if (toDestroy == NULL)
+    {
+        fprintf(stderr, "Not find %s pcb\n", pName);
+        return;
+    }
+    Kill_Tree(toDestroy);
+    Scheduler();
+}
+/*
+* list is the Header of List Not real
+*/
+
+void Delete_Node_List(pcbList* list,PCB* pcb){
+    if(list->next==NULL){
+        return;
+    }
+
+    pcbNode *beforeNode = list;
+    pcbNode *tem = beforeNode->next;
+    while (tem != NULL)
+    {
+        if (strcmp(tem->pcb->pid,pcb->pid) == 0)
+        {
+            beforeNode->next = tem->next;
+            tem->next = NULL;
+            free(tem);
+            return;
+        }
+        beforeNode = tem;
+        tem = tem->next;
+    }
+    return;
+}
+
+void Kill_Tree(PCB *pcb)
+{
+    pcbNode *childList = pcb->child;
+    childList = childList->next;
+    while (childList != NULL)
+    {
+        PCB *sonChild = childList->pcb;
+        // Bug Todo
+        Kill_Tree(sonChild);
+        childList = childList->next;
+    }
+
+    // Find Occupied resource
+    rcbNode *occResourceHeader = pcb->resours;
+    rcbNode *occResource = occResourceHeader->next;
+    while (occResource != NULL)
+    {
+        //Bug Todo
+        occResource->rcb->status += 1;
+        occResource = occResource->next;
+    }
+    occResourceHeader->next = NULL;
+
+    // Delete form ReadyList and Waiting List
+    if(pcb->priority==0){
+        Delete_Node_List(Init, pcb);
+    }    
+    else if(pcb->priority==1){
+        Delete_Node_List(User, pcb);
+    }else  if(pcb->priority==2){
+        Delete_Node_List(System, pcb);
+    }
+    // Bug Todo Block List
+    //while(pcb->blocked_list->next!=NULL){}
+}
+
+
+
 void Request(RCB *rid, PCB *pid, int n)
 {
     // Alloc
-    if ((rid->status - n) >= 0)
+    if (((rid->status) - n) >= 0)
     {
-        rid->status = rid->status - n;
+        (rid->status) = (rid->status) - n;
 
         int t = n;
         while ((t--) > 0)
@@ -318,8 +486,8 @@ void Request(RCB *rid, PCB *pid, int n)
         // set process Blocked and the blocked list
         pid->status = BLOCKED;
 
-        // Todo Bug
-        pid->blocked_list = rid;
+        // Bug
+        Insert_Rcb(pid->blocked_list, rid);
         pid->blocked_num = n;
 
         // remove from Ready List
@@ -340,13 +508,13 @@ void Release(RCB *rcb, PCB *pcb, int n)
     rcb->status += n;
     //  Some Pcb is waiting for current Resource
     pcbList *waitList = rcb->waitListHeader->next;
-    while (waitList != NULL && rcb->status >= waitList->pcb.blocked_num)
+    while (waitList != NULL && rcb->status >= waitList->pcb->blocked_num)
     {
-        rcb->status -= waitList->pcb.blocked_num;
+        rcb->status -= waitList->pcb->blocked_num;
         PCB *q = Remove_Waiting(rcb->waitListHeader);
         q->status = READY;
         // q->Status.List = RL;//就绪队列 Todo Bug
-        int t = waitList->pcb.blocked_num;
+        int t = waitList->pcb->blocked_num;
         while ((t--) > 0)
         {
             Resource_Alloc(rcb, pcb);
@@ -381,25 +549,18 @@ void preempt(PCB *curr)
 {
     CURRENT_RUNNING_PCB = curr;
 
-    printf("PID %s Running at Priority %d \n", curr->pid, curr->priority);
+    printf("\nPID %s Running at Priority %d \n", curr->pid, curr->priority);
     printf("Occupied Resource :");
     rcbList *cur = curr->resours;
     cur = cur->next;
 
-    if (cur == NULL)
+    while (cur != NULL)
     {
-        printf("None\n");
+        printf("  R%d  left:%d", cur->rcb->RID, cur->rcb->status);
+        cur = cur->next;
     }
-    else
-    {
-        int lef = cur->rcb.status;
-        while (cur != NULL)
-        {
-            printf("  %d  ", cur->rcb.RID);
-            cur = cur->next;
-        }
-        printf("Left: %d\n", lef);
-    }
+
+    printf("\n");
 }
 
 void init_resource()
@@ -455,13 +616,17 @@ int main()
 
     char *buffer = (char *)malloc(BUFFER_LEN * sizeof(char));
     char *command = (char *)malloc(4 * sizeof(char));
+
+    char *pName = (char *)malloc(sizeof(char) * 16);
+    char *rNum = (char *)malloc(sizeof(char));
+
     printf("tShell>");
     //1. gets command line
     while (NULL != fgets(buffer, BUFFER_LEN, stdin))
     {
         //2. gets command type
         printf("tShell>");
-        
+
         char *tem = parser(command, buffer);
         //printf("Command is %s\ntype: %d\n", command, cmd_type(command));
 
@@ -471,79 +636,77 @@ int main()
         // Create name priority
         if (Type == CR)
         {
-            //3.1 get initialization parameters
-            char *pName = (char *)malloc(sizeof(char) * 16);
+            // get initialization parameters
             tem = parser(pName, tem);
-
-            char *pPriority = (char *)malloc(sizeof(char));
-            parser(pPriority, tem);
-            //printf("commd is %s  Name is %s, Pri : %s\n", command, pName, pPriority);
-
-            Create(pName, pPriority);
+            parser(rNum, tem);
+            Create(pName, rNum);
         }
         // Request rid
         else if (Type == REQ)
         {
-            char *rName = (char *)malloc(sizeof(char) * 4);
-            tem = parser(rName, tem);
+            tem = parser(pName, tem);
             //printf("res is %s\n", rName);
-            char *rNum = (char *)malloc(sizeof(char));
             parser(rNum, tem);
             int num = (int)((*rNum) - '0');
 
-            if (strcmp(rName, "R1")==0)
+            if (strcmp(pName, "R1") == 0)
             {
-                Request(R1,CURRENT_RUNNING_PCB, num);
+                Request(R1, CURRENT_RUNNING_PCB, num);
             }
-            if (strcmp(rName, "R2")==0)
+            if (strcmp(pName, "R2") == 0)
             {
-                Request(R2,CURRENT_RUNNING_PCB,num);
+                Request(R2, CURRENT_RUNNING_PCB, num);
             }
-            if (strcmp(rName, "R3")==0)
+            if (strcmp(pName, "R3") == 0)
             {
-                Request(R3,CURRENT_RUNNING_PCB,num);
+                Request(R3, CURRENT_RUNNING_PCB, num);
             }
-            if (strcmp(rName, "R4")==0)
+            if (strcmp(pName, "R4") == 0)
             {
-                Request(R4,CURRENT_RUNNING_PCB,num);
+                Request(R4, CURRENT_RUNNING_PCB, num);
             }
+        }
+        else if (Type == REL)
+        {
+            tem = parser(pName, tem);
+            parser(rNum, tem);
+            int num = (int)((*rNum) - '0');
+
+            if (strcmp(pName, "R1") == 0)
+            {
+                Release(R1, CURRENT_RUNNING_PCB, num);
+            }
+            if (strcmp(pName, "R2") == 0)
+            {
+                Release(R2, CURRENT_RUNNING_PCB, num);
+            }
+            if (strcmp(pName, "R3") == 0)
+            {
+                Release(R3, CURRENT_RUNNING_PCB, num);
+            }
+            if (strcmp(pName, "R4") == 0)
+            {
+                Release(R4, CURRENT_RUNNING_PCB, num);
+            }
+        }
+        else if (Type == DE)
+        {
+            parser(pName, tem);
+            Destroy(pName);
         }
         // Time Out
         else if (Type == TO)
         {
             Time_Out();
         }
-        //
-        else if (Type = REL)
-        {
-            char *rName = (char *)malloc(sizeof(char) * 4);
-            tem = parser(rName, tem);
-            //printf("res is %s\n", rName);
-            char *rNum = (char *)malloc(sizeof(char));
-            parser(rNum, tem);
-            int num = (int)((*rNum) - '0');
 
-            if (strcmp(rName, "R1")==0)
-            {
-                Release(R1,CURRENT_RUNNING_PCB,num);
-            }
-            if (strcmp(rName, "R2")==0)
-            {
-                Release(R2,CURRENT_RUNNING_PCB,num);
-            }
-            if (strcmp(rName, "R3")==0)
-            {
-                Release(R3,CURRENT_RUNNING_PCB,num);
-            }
-            if (strcmp(rName, "R4")==0)
-            {
-               Release(R4,CURRENT_RUNNING_PCB,num);
-            }
-        }else{
-            printf("\n");
-        }
-        memset(buffer, 0, sizeof(char)*BUFFER_LEN);
-        memset(command, 0, sizeof(char)*4);
+        memset(buffer, 0, sizeof(char) * BUFFER_LEN);
+        memset(command, 0, sizeof(char) * 4);
+        memset(pName, 0, sizeof(char) * 16);
+        memset(rNum, 0, sizeof(char));
     }
     free(buffer);
+    free(command);
+    free(pName);
+    free(rNum);
 }
