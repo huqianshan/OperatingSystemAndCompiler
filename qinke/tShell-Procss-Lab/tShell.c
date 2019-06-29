@@ -174,7 +174,7 @@ void Resource_Alloc(RCB *rcb, PCB *pcb)
     rNode->next = NULL;
 
     // add RCB to Pcb's resourceList's end
-    rcbNode *tem = pcb->resours;
+    rcbList *tem = pcb->resours;
     while (tem->next != NULL)
     {
         tem = tem->next;
@@ -184,7 +184,7 @@ void Resource_Alloc(RCB *rcb, PCB *pcb)
 
 void Resource_Free(RCB *rcb, PCB *pcb, int n)
 {
-    
+    return;
 }
 
 void Remove_Ready_Single(pcbList *list, PCB *pcb)
@@ -235,23 +235,23 @@ PCB *Remove_Waiting(pcbList *waitList)
     return first_wait_pcb;
 }
 
-pcbNode *Find_PCB()
+PCB *Find_PCB()
 {
 
     pcbNode *tem = System->next;
     if (tem != NULL)
     {
-        return tem;
+        return &(tem->pcb);
     }
     tem = User->next;
     if (tem != NULL)
     {
-        return tem;
+        return &(tem->pcb);
     }
     tem = Init->next;
     if (tem != NULL)
     {
-        return tem;
+        return &(tem->pcb);
     }
     return NULL;
 }
@@ -288,7 +288,6 @@ int Create(char *name, char *pri)
     //3. insert(RL, PCB)//插入相应优先级队列的尾部
     Insert_Priority(pcb);
     //4. Scheduler()
-
     Scheduler();
 }
 
@@ -311,7 +310,7 @@ void Request(RCB *rid, PCB *pid, int n)
         // request too many
         if (n > rid->RID)
         {
-            fprintf(stderr, "pid %s request %s for %d but ony have %d\n",
+            fprintf(stderr, "pid %s request %d for %d but ony have %d\n",
                     pid->pid, rid->RID, n, rid->RID);
             exit(0);
         }
@@ -362,20 +361,18 @@ void Release(RCB *rcb, PCB *pcb, int n)
 
 void Scheduler()
 {
-    pcbNode *curNode = Find_PCB();
-    // Bug Todo
-    PCB *curPCB = &(curNode->pcb);
+
+    // Bug Todo May get Null Return
+    PCB *curPCB = Find_PCB();
     PCB *pcb = CURRENT_RUNNING_PCB;
 
-    if (pcb->priority < curPCB->priority ||
-        pcb->status != RUNNING ||
-        pcb == NULL)
+    if (pcb == NULL || pcb->status != RUNNING)
     {
-        pcb->status = READY;
         preempt(curPCB);
     }
-    else if (pcb->status != RUNNING || pcb == NULL)
+    else if (pcb->priority < curPCB->priority)
     {
+        pcb->status = READY;
         preempt(curPCB);
     }
 }
@@ -386,7 +383,7 @@ void preempt(PCB *curr)
 
     printf("PID %s Running at Priority %d \n", curr->pid, curr->priority);
     printf("Occupied Resource :");
-    rcbList *cur=curr->resours;
+    rcbList *cur = curr->resours;
     cur = cur->next;
 
     if (cur == NULL)
@@ -395,12 +392,13 @@ void preempt(PCB *curr)
     }
     else
     {
+        int lef = cur->rcb.status;
         while (cur != NULL)
         {
-            printf("%d  Left: %d", cur->rcb.RID, cur->rcb.status);
+            printf("  %d  ", cur->rcb.RID);
             cur = cur->next;
         }
-        printf("\n");
+        printf("Left: %d\n", lef);
     }
 }
 
@@ -456,13 +454,16 @@ int main()
     init_process();
 
     char *buffer = (char *)malloc(BUFFER_LEN * sizeof(char));
+    char *command = (char *)malloc(4 * sizeof(char));
+    printf("tShell>");
     //1. gets command line
     while (NULL != fgets(buffer, BUFFER_LEN, stdin))
     {
         //2. gets command type
-        char *command = (char *)malloc(4 * sizeof(char));
+        printf("tShell>");
+        
         char *tem = parser(command, buffer);
-        printf("Command is %s\ntype: %d\n", command, cmd_type(command));
+        //printf("Command is %s\ntype: %d\n", command, cmd_type(command));
 
         // 3. Deal with command
         int Type = cmd_type(command);
@@ -476,7 +477,7 @@ int main()
 
             char *pPriority = (char *)malloc(sizeof(char));
             parser(pPriority, tem);
-            printf("commd is %s  Name is %s, Pri : %s\n", command, pName, pPriority);
+            //printf("commd is %s  Name is %s, Pri : %s\n", command, pName, pPriority);
 
             Create(pName, pPriority);
         }
@@ -485,8 +486,64 @@ int main()
         {
             char *rName = (char *)malloc(sizeof(char) * 4);
             tem = parser(rName, tem);
-            printf("res is %s\n", rName);
+            //printf("res is %s\n", rName);
+            char *rNum = (char *)malloc(sizeof(char));
+            parser(rNum, tem);
+            int num = (int)((*rNum) - '0');
+
+            if (strcmp(rName, "R1")==0)
+            {
+                Request(R1,CURRENT_RUNNING_PCB, num);
+            }
+            if (strcmp(rName, "R2")==0)
+            {
+                Request(R2,CURRENT_RUNNING_PCB,num);
+            }
+            if (strcmp(rName, "R3")==0)
+            {
+                Request(R3,CURRENT_RUNNING_PCB,num);
+            }
+            if (strcmp(rName, "R4")==0)
+            {
+                Request(R4,CURRENT_RUNNING_PCB,num);
+            }
         }
+        // Time Out
+        else if (Type == TO)
+        {
+            Time_Out();
+        }
+        //
+        else if (Type = REL)
+        {
+            char *rName = (char *)malloc(sizeof(char) * 4);
+            tem = parser(rName, tem);
+            //printf("res is %s\n", rName);
+            char *rNum = (char *)malloc(sizeof(char));
+            parser(rNum, tem);
+            int num = (int)((*rNum) - '0');
+
+            if (strcmp(rName, "R1")==0)
+            {
+                Release(R1,CURRENT_RUNNING_PCB,num);
+            }
+            if (strcmp(rName, "R2")==0)
+            {
+                Release(R2,CURRENT_RUNNING_PCB,num);
+            }
+            if (strcmp(rName, "R3")==0)
+            {
+                Release(R3,CURRENT_RUNNING_PCB,num);
+            }
+            if (strcmp(rName, "R4")==0)
+            {
+               Release(R4,CURRENT_RUNNING_PCB,num);
+            }
+        }else{
+            printf("\n");
+        }
+        memset(buffer, 0, sizeof(char)*BUFFER_LEN);
+        memset(command, 0, sizeof(char)*4);
     }
     free(buffer);
 }
