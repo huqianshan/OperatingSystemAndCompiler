@@ -1,2 +1,4 @@
+变量名 所属过程 分类 变量类型 变量层次 相对位置
 k main 0 integer 0 0 
-n F 1 integer 1 1 
+m main 0 integer 0 1 
+n F 1 integer 1 2 

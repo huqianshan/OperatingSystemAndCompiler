@@ -9,6 +9,9 @@ import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+import smtplib
+from email.mime.text import MIMEText
+
 
 def get_user_agent():
     user_agent = [
@@ -181,9 +184,6 @@ def file_mdate(name):
 
 
 def plot_fund(data,code=162411):
-  
-    plt.figure()
-    plt.style.use("ggplot")    
     
     plt = data.plot(
     x="date",
@@ -192,7 +192,7 @@ def plot_fund(data,code=162411):
     sort_columns=True,
     figsize=[7.75 * 1.5, 1.5 * 7.55],
     )
-    
+    plt.style.use("ggplot")  
     plt.rcParams["font.sans-serif"] = ["SimHei"]  # 用来正常显示中文标签
     plt.rcParams["axes.unicode_minus"] = False  # 用来正常显示负号
     fund_info_list=get_fund_name(code)
@@ -273,3 +273,48 @@ def read(file):
 
 def lost(cost, value, share):
     return (value - cost) * share
+
+
+# Mail Modular
+#%%
+def write_message(subject,content):
+    """
+    string = subject + content
+    """
+    #设置email信息
+    #邮件内容设置
+    message = MIMEText(content,'plain','utf-8')
+    #邮件主题       
+    message['Subject'] = subject 
+    return message
+
+def send_message(message):
+    #登录并发送邮件
+    #163邮箱服务器地址
+    mail_host = 'smtp.163.com'
+    #163用户名
+    mail_user = 'huqianshan_uestc'  
+    #密码(部分邮箱为授权码) 
+    mail_pass = 'easymail16'   
+    #邮件发送方邮箱地址
+    sender = 'huqianshan_uestc@163.com' 
+    #邮件接受方邮箱地址，注意需要[]包裹，这意味着你可以写多个邮件地址群发
+    receivers = ['1196455147@qq.com']  
+    #发送方信息
+    message['From'] = sender 
+    #接受方信息     
+    message['To'] = receivers[0] 
+    try:
+        smtpObj = smtplib.SMTP() 
+        #连接到服务器
+        smtpObj.connect(mail_host,25)
+        #登录到服务器
+        smtpObj.login(mail_user,mail_pass) 
+        #发送
+        smtpObj.sendmail(
+            sender,receivers,message.as_string()) 
+        #退出
+        smtpObj.quit() 
+        print('success')
+    except smtplib.SMTPException as e:
+        print('error',e) #打印错误
