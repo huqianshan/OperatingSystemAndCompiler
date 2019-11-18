@@ -18,7 +18,13 @@
 #define GLOBALMEM_MAJOR 230
 
 static int globalmem_major = GLOBALMEM_MAJOR;
+
+//#define __exit		__attribute__ ((__section__(".exit.text")))
 module_param(globalmem_major, int, S_IRUGO);
+
+
+
+
 
 struct globalmem_dev {
 	struct cdev cdev;
@@ -189,7 +195,7 @@ static int __init globalmem_init(void)
 	unregister_chrdev_region(devno, 1);
 	return ret;
 }
-module_init(globalmem_init);
+
 
 static void __exit globalmem_exit(void)
 {
@@ -197,6 +203,9 @@ static void __exit globalmem_exit(void)
 	kfree(globalmem_devp);
 	unregister_chrdev_region(MKDEV(globalmem_major, 0), 1);
 }
+
+module_init(globalmem_init);
+
 module_exit(globalmem_exit);
 
 MODULE_AUTHOR("Barry Song <baohua@kernel.org>");
