@@ -5,18 +5,20 @@
 #include <linux/slab.h>   // kmalloc
 #include <linux/moduleparam.h>
 #include <linux/uaccess.h>  // copy_to_user
-
-#define __exit __attribute__((__section__(".exit.text")))
+#include <linux/semaphore.h>
+//#define __exit __attribute__((__section__(".exit.text")))
 #define SIZE 0x1000
 #define TDLCD_MAJOR 230
 #define TDLCD_MINOR 0
 #define TDLCD_NAME "tdlcd"
+#define TDLCD_NUM 10
 #define CTRL_CLC 0x1
 
 struct tdlcd_dev
 {
     struct cdev cdev;
     unsigned char mem[SIZE];
+    struct semaphore sem;
 };
 
 static int tdlcd_major = TDLCD_MAJOR;
@@ -35,7 +37,8 @@ static int tdlcd_open(struct inode *inode, struct file *filp)
 
     // linux drivers follow an unspoken rule ,the private_data of
     // file is set to pointer to device struct
-    filp->private_data = tdlcd_devp;
+    struct tdlcd_dev *dev = container_of(inode->i_cdev, struct tdlcd_dev, cdev);
+    filp->private_data = dev;
     return 0;
 };
 static int  tdlcd_release(struct inode *inode, struct file *filp)
@@ -165,7 +168,8 @@ static const struct file_operations tdlcd_fops = {
 
 static void tdlcd_setup_cdev(struct tdlcd_dev *dev, int index)
 {
-    int err, dev_num = MKDEV(tdlcd_major, index);
+    int err;
+    int dev_num = MKDEV(tdlcd_major, index);
 
     cdev_init(&dev->cdev, &tdlcd_fops);
     dev->cdev.owner = THIS_MODULE;
@@ -187,11 +191,11 @@ static int __init tdlcd_init(void)
 
     if (tdlcd_major)
     {
-        ret = register_chrdev_region(dev_num, 1, TDLCD_NAME);
+        ret = register_chrdev_region(dev_num, TDLCD_NUM, TDLCD_NAME);
     }
     else
     {
-        ret = alloc_chrdev_region(&dev_num, 0, 1, TDLCD_NAME);
+        ret = alloc_chrdev_region(&dev_num, 0, TDLCD_NUM, TDLCD_NAME);
         tdlcd_major = MAJOR(dev_num);
     }
 
@@ -200,25 +204,34 @@ static int __init tdlcd_init(void)
         return ret;
     }
 
-    tdlcd_devp = kzalloc(sizeof(struct tdlcd_dev), GFP_KERNEL);
+    tdlcd_devp = kzalloc(sizeof(struct tdlcd_dev)*TDLCD_NUM, GFP_KERNEL);
     if (!tdlcd_devp)
     {
         ret = -ENOMEM;
         goto fail_malloc;
     }
 
-    tdlcd_setup_cdev(tdlcd_devp, 0);
+    int i;
+    for (i = 0; i < TDLCD_NUM; i++)
+    {
+        tdlcd_setup_cdev(tdlcd_devp + i, i);
+    }
     return 0;
 
 fail_malloc:
-    unregister_chrdev_region(dev_num, 1);
+    unregister_chrdev_region(dev_num, TDLCD_NUM);
     return ret;
 };
 static void __exit tdlcd_exit(void)
 {
+    int i;
+    for (i = 0; i < TDLCD_NUM; i++)
+    {
+        cdev_del(&(tdlcd_devp + i)->cdev);
+    }
     cdev_del(&tdlcd_devp->cdev);
     kfree(tdlcd_devp);
-    unregister_chrdev_region(MKDEV(tdlcd_major, 0), 1);
+    unregister_chrdev_region(MKDEV(tdlcd_major, 0), TDLCD_NUM);
 };
 
 
