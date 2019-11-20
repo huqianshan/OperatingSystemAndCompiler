@@ -64,7 +64,8 @@ static long globalfifo_ioctl(struct file *filp, unsigned int cmd,
 	return 0;
 }
 
-static unsigned int globalfifo_poll(struct file *filp, poll_table * wait)
+static unsigned int globalfifo_poll(struct file *filp,
+						 poll_table * wait)
 {
 	unsigned int mask = 0;
 	struct globalfifo_dev *dev = filp->private_data;

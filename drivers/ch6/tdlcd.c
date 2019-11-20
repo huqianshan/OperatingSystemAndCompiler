@@ -111,6 +111,7 @@ static ssize_t tdlcd_write(struct file *filp, const char __user *buf,
     int ret = 0;
     struct tdlcd_dev *dev = filp->private_data;
 
+    mutex_lock(&dev->mutex);
     if (pos > SIZE)
     {
         return 0;
@@ -120,7 +121,7 @@ static ssize_t tdlcd_write(struct file *filp, const char __user *buf,
         count = SIZE - pos;
     }
 
-    mutex_lock(&dev->mutex);
+    
     if (copy_from_user(dev->mem + pos, buf, count))
     {
         ret = -EFAULT;
