@@ -5,7 +5,10 @@
 #include <linux/slab.h>   // kmalloc
 #include <linux/moduleparam.h>
 #include <linux/uaccess.h>  // copy_to_user
-#include <linux/semaphore.h>
+
+#include <linux/mutex.h>
+//#include <linux/semaphore.h>
+
 //#define __exit __attribute__((__section__(".exit.text")))
 #define SIZE 0x1000
 #define TDLCD_MAJOR 230
@@ -18,7 +21,7 @@ struct tdlcd_dev
 {
     struct cdev cdev;
     unsigned char mem[SIZE];
-    struct semaphore sem;
+    struct mutex mutex;
 };
 
 static int tdlcd_major = TDLCD_MAJOR;
@@ -55,7 +58,10 @@ static long tdlcd_ioctl(struct file *filp,
     {
     case CTRL_CLC:
         /* code */
+
+        mutex_lock(&dev->mutex);
         memset(dev->mem, 0, SIZE);
+        mutex_unlock(&dev->mutex);
         printk(KERN_INFO "tdlcd has set mem to zero\n");
         break;
 
@@ -80,6 +86,8 @@ static ssize_t tdlcd_read(struct file *filp, char __user *buf, size_t size,
     {
         count = SIZE - pos;
     }
+
+    mutex_lock(&dev->mutex);
     if (copy_to_user(buf, dev->mem + pos, count))
     {
         ret = -EFAULT;
@@ -91,6 +99,8 @@ static ssize_t tdlcd_read(struct file *filp, char __user *buf, size_t size,
         ret = count;
         printk(KERN_INFO "read %u bytes from %lu\n", count, pos);
     }
+
+    mutex_unlock(&dev->mutex);
     return ret;
 };
 static ssize_t tdlcd_write(struct file *filp, const char __user *buf,
@@ -109,6 +119,8 @@ static ssize_t tdlcd_write(struct file *filp, const char __user *buf,
     {
         count = SIZE - pos;
     }
+
+    mutex_lock(&dev->mutex);
     if (copy_from_user(dev->mem + pos, buf, count))
     {
         ret = -EFAULT;
@@ -119,6 +131,8 @@ static ssize_t tdlcd_write(struct file *filp, const char __user *buf,
         ret = count;
         printk(KERN_INFO "write %u bytes from %lu\n", count, pos);
     }
+
+    mutex_unlock(&dev->mutex);
     return ret;
 };
 static loff_t tdlcd_llseek(struct file *filp, loff_t offset, int orig){
@@ -215,6 +229,7 @@ static int __init tdlcd_init(void)
     for (i = 0; i < TDLCD_NUM; i++)
     {
         tdlcd_setup_cdev(tdlcd_devp + i, i);
+        mutex_init(&(tdlcd_devp + i)->mutex);
     }
     return 0;
 
