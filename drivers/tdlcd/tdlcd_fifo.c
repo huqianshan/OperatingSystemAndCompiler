@@ -1,7 +1,6 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/cdev.h>
-#include <linux/fs.h>
 #include <linux/slab.h> // kmalloc
 #include <linux/moduleparam.h>
 #include <linux/uaccess.h> // copy_to_user
@@ -10,6 +9,7 @@
 #include <linux/wait.h>         //wait_que
 #include <linux/sched/signal.h> //signal_pending
 #include <linux/poll.h>         // select poll
+#include <linux/fs.h>           // async
 //#include <linux/semaphore.h>
 
 //#define __exit __attribute__((__section__(".exit.text")))
@@ -28,6 +28,7 @@ struct tdlcd_dev
     struct mutex mutex;
     wait_queue_head_t r_wait;
     wait_queue_head_t w_wait;
+    struct fasync_struct *async_queue;
 };
 
 static int tdlcd_major = TDLCD_MAJOR;
@@ -38,6 +39,12 @@ module_param(tdlcd_major, int, S_IRUGO);
 struct tdlcd_dev *tdlcd_devp;
 
 /* functions*/
+
+static int tdlcd_fasync(int fd, struct file *filp, int mode)
+{
+    struct tdlcd_dev *dev = filp->private_data;
+    return fasync_helper(fd, filp, mode, &dev->async_queue);
+}
 
 static int tdlcd_open(struct inode *inode, struct file *filp)
 {
@@ -50,6 +57,7 @@ static int tdlcd_open(struct inode *inode, struct file *filp)
 };
 static int tdlcd_release(struct inode *inode, struct file *filp)
 {
+    tdlcd_fasync(-1, filp, 0);
     return 0;
 };
 
@@ -67,7 +75,7 @@ static long tdlcd_ioctl(struct file *filp,
         dev->current_len = 0;
         memset(dev->mem, 0, SIZE);
         mutex_unlock(&dev->mutex);
-        
+
         printk(KERN_INFO "tdlcd has set mem to zero\n");
         break;
 
@@ -184,6 +192,11 @@ static ssize_t tdlcd_write(struct file *filp, const char __user *buf,
                dev->current_len);
         wake_up_interruptible(&dev->r_wait);
 
+        if (dev->async_queue)
+        {
+            kill_fasync(&dev->async_queue, SIGIO, POLL_IN);
+            printk(KERN_DEBUG "%s kill SIGIO\n", __func__);
+        }
         ret = count;
     }
 
@@ -195,7 +208,8 @@ out2:
     return ret;
 }
 
-static unsigned int tdlcd_poll(struct file *filp, poll_table *wait){
+static unsigned int tdlcd_poll(struct file *filp, poll_table *wait)
+{
     unsigned int mask = 0;
     struct tdlcd_dev *dev = filp->private_data;
 
@@ -204,11 +218,13 @@ static unsigned int tdlcd_poll(struct file *filp, poll_table *wait){
     poll_wait(filp, &dev->r_wait, wait);
     poll_wait(filp, &dev->w_wait, wait);
 
-    if(dev->current_len!=0){
+    if (dev->current_len != 0)
+    {
         mask |= POLLIN | POLLRDNORM;
     }
 
-    if(dev->current_len!=SIZE){
+    if (dev->current_len != SIZE)
+    {
         mask |= POLLOUT | POLLWRNORM;
     }
 
@@ -259,12 +275,13 @@ static loff_t tdlcd_llseek(struct file *filp, loff_t offset, int orig)
 /* file_operations */
 static const struct file_operations tdlcd_fops = {
     .owner = THIS_MODULE,
+    .fasync = tdlcd_fasync,
     .llseek = tdlcd_llseek,
     .read = tdlcd_read,
     .write = tdlcd_write,
     .unlocked_ioctl = tdlcd_ioctl,
     .open = tdlcd_open,
-    .poll=tdlcd_poll,
+    .poll = tdlcd_poll,
     .release = tdlcd_release,
 };
 
