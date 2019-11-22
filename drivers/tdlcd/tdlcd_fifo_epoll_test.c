@@ -8,6 +8,7 @@
 
 #define FIFO_CLEAR 0x1
 #define BUFFER_LEN 20
+
 void main(void)
 {
 	int fd;
