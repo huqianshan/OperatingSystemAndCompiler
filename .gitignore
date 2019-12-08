@@ -6,3 +6,4 @@
 *.o
 qinke/process-lab/Shell
 qinke/tShell-Procss-Lab/tShell
+/6.824/

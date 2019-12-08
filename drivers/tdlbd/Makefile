@@ -4,7 +4,7 @@ KVERS = $(shell uname -r)
 obj-m += tdlbd.o
 
 # Specify flags for the module compilation.
-#XTRA_CFLAGS=-g -O0
+#EXTRA_CFLAGS=-g -O0
 
 build: kernel_modules
 
