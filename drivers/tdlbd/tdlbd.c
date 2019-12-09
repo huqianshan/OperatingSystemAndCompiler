@@ -19,8 +19,6 @@
 #include <linux/bio.h>
 
 
-#include <linux/blkdev.h>  // new version for cmd_type
-
 /*Define Devices Parameter*/
 static int vmem_disk_major;
 module_param(vmem_disk_major, int, 0);
