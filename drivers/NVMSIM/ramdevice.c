@@ -14,8 +14,9 @@
  */
 static const struct block_device_operations nvmdev_fops = {
 	.owner = THIS_MODULE,
-};
-
+	.getgeo = nvm_disk_getgeo,
+}
+;
 
 /**
  * Allocate the NVM device
@@ -31,30 +32,42 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	if (!device)
 		goto out;
 	device->nvmdev_number = index;
-	device->nvmdev_capacity = capacity_mb << MB_PER_SECTOR_SHIFT; // in MB
+	device->nvmdev_capacity = capacity_mb << MB_PER_SECTOR_SHIFT; // in Sectors
 	spin_lock_init(&device->nvmdev_lock);
 
 	// Allocate the NVM model
 
-	//TODO 1
+	//TODO 1 MAY BE BUG
 	device->nvmdev_model = nvm_model_allocate(device->nvmdev_capacity);
 	if (!device->nvmdev_model)
 		goto out_free_struct;
 
 	// Allocate the backing store
 
-	device->nvmdev_data = vmalloc(capacity_mb << MB_PER_BYTES_SHIFT);
+	// BUG MAY BE WRONG IN SIZE ;ASSUME vmaloc allocate in size bytes
+	device->nvmdev_data = vmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
 	if (!device->nvmdev_data)
+	{
+		printk(KERN_WARNING "vmalloc for %d bytes has been failed\n", device->nvmdev_capacity << SECTOR_SHIFT);
 		goto out_free_model;
+	}
+	
 
 	// Allocate the block request queue by blk_alloc_queue without I/O scheduler
 
 	device->nvmdev_queue = blk_alloc_queue(GFP_KERNEL);
 	if (!device->nvmdev_queue)
+	{
 		goto out_free_dev;
-
+	}
 	// register nvmdev_queue,
-	blk_queue_make_request(device->nvmdev_queue, (make_request_fn*)nvm_make_request);
+	blk_queue_make_request(device->nvmdev_queue, (make_request_fn *)nvm_make_request);
+
+	//set max sectors for a request for this queue
+	blk_queue_max_hw_sectors(device->nvmdev_queue, 255);
+
+	//set logical block size for the queue
+	blk_queue_logical_block_size(device->nvmdev_queue, 512);
 
 	// the QUEUE_ORDERED_TAG HAS BEEN REMOVED
 	//http://www.jeepxie.net/article/505053.html
@@ -68,7 +81,6 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	/*blk_queue_max_sectors (device->nvmdev_queue, 1024);*/
 
 	// Allocate the disk device /* cannot be partitioned */
-
 	device->nvmdev_disk = alloc_disk(PARTION_PER_DISK);
 	disk = device->nvmdev_disk;
 	if (!disk)
@@ -80,12 +92,13 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	disk->queue = device->nvmdev_queue;
 	//disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
 	sprintf(disk->disk_name, "nvm%d", index);
+
+	// in sectors
 	set_capacity(disk, capacity_mb << MB_PER_SECTOR_SHIFT);
 
 	return device;
 
 	// Cleanup on error
-
 out_free_queue:
 	blk_cleanup_queue(device->nvmdev_queue);
 out_free_dev:
@@ -114,26 +127,27 @@ void nvm_free(struct nvm_device *device)
 /**
  * Process pending requests from the queue
  */
-static int nvm_make_request(struct request_queue *q, struct bio *bio)
+static void nvm_make_request(struct request_queue *q, struct bio *bio)
 {
 	// bio->bi_bdev has been discarded
 	//struct block_device *bdev = bio->bi_bdev;
 	//struct nvm_device *device = bdev->bd_disk->private_data;
 
-	struct gendisk *disk = bio->bi_disk;
-	struct nvm_device *nvm_dev = disk->private_data;
+	struct nvm_device *nvm_dev = bio->bi_disk->private_data;
+
 	int rw;
-	struct bio_vec *bvec;
-	sector_t sector;
-	int i;
 	int err = -EIO;
+	sector_t sector;
 	unsigned capacity;
+
+	struct bio_vec bvec;
+	struct bvec_iter iter;
 
 	// Check the device capacity
 	// bi_sector,bi_size has moved to bio->bi_iter.bi_sector
-	// TODO the judge condition
+	// TODO the judge condition and out information
 	sector = bio->bi_iter.bi_sector;
-	capacity = get_capacity(disk);
+	capacity = get_capacity(bio->bi_disk);
 	if (sector + (bio->bi_iter.bi_size >> SECTOR_SHIFT) > capacity)
 		goto out;
 
@@ -147,29 +161,28 @@ static int nvm_make_request(struct request_queue *q, struct bio *bio)
 	rw = bio_data_dir(bio);
 
 	// Perform each part of a request
-
-	bio_for_each_segment(bvec, bio, i)
+	bio_for_each_segment(bvec, bio, iter)
 	{
-		unsigned int len = bvec->bv_len;
-		err = nvm_do_bvec(nvm_dev, bvec->bv_page, len, bvec->bv_offset, rw, sector);
-		if (err)
+		unsigned int len = bvec.bv_len;
+		// Every biovec means a SEGMENT of a PAGE
+		err = nvm_do_bvec(nvm_dev, bvec.bv_page, len, bvec.bv_offset, rw, sector);
+		if (err){
+			printk(KERN_WARNING "Transfer data in Segments %x of address %x failed\n", len, bvec.bv_page);
 			break;
+		}
 		sector += len >> SECTOR_SHIFT;
+		//TODO BUT MAY BUG secotr not update
 	}
-
-	// Cleanup
-
 out:
 	bio_endio(bio);
-
-	return 0;
+	return ;
 }
 
 /**
  * Process a single request
  */
 static int nvm_do_bvec(struct nvm_device *device, struct page *page,
-						  unsigned int len, unsigned int off, int rw, sector_t sector)
+					   unsigned int len, unsigned int off, int rw, sector_t sector)
 {
 	void *mem;
 	int err = 0;
@@ -178,6 +191,7 @@ static int nvm_do_bvec(struct nvm_device *device, struct page *page,
 	if (rw == READ)
 	{
 		copy_from_nvm(mem + off, device, sector, len);
+		// if D-cache aliasing is not an issue
 		flush_dcache_page(page);
 	}
 	else
@@ -194,7 +208,7 @@ static int nvm_do_bvec(struct nvm_device *device, struct page *page,
  * Copy n bytes to from the NVM to dest starting at the given sector
  */
 void __always_inline copy_from_nvm(void *dest, struct nvm_device *device,
-									  sector_t sector, size_t n)
+								   sector_t sector, size_t n)
 {
 	const void *nvm;
 #ifndef NVM_RAMDISK_ONLY
@@ -221,7 +235,7 @@ void __always_inline copy_from_nvm(void *dest, struct nvm_device *device,
 }
 
 void __always_inline copy_to_nvm(struct nvm_device *device,
-									const void *src, sector_t sector, size_t n)
+								 const void *src, sector_t sector, size_t n)
 {
 	void *nvm;
 #ifndef NVM_RAMDISK_ONLY
@@ -232,11 +246,12 @@ void __always_inline copy_to_nvm(struct nvm_device *device,
 
 #ifndef NVM_RAMDISK_ONLY
 	o = 0;
-	while (n > 0) {
+	while (n > 0)
+	{
 		l = n;
-		if (l > NVMDEV_MEM_MAX_SECTORS << SECTOR_SHIFT) 
+		if (l > NVMDEV_MEM_MAX_SECTORS << SECTOR_SHIFT)
 			l = NVMDEV_MEM_MAX_SECTORS << SECTOR_SHIFT;
-		nvm_write(device->nvmdev_model, ((char*) nvm) + o, ((const char*) src) + o, l, sector);
+		nvm_write(device->nvmdev_model, ((char *)nvm) + o, ((const char *)src) + o, l, sector);
 		n -= l;
 	}
 #else
@@ -248,9 +263,21 @@ void __always_inline copy_to_nvm(struct nvm_device *device,
  * Perform I/O control
  */
 static int nvm_ioctl(struct block_device *bdev, fmode_t mode,
-					    unsigned int cmd, unsigned long arg)
+					 unsigned int cmd, unsigned long arg)
 {
 	return -ENOTTY;
 }
 
+static int nvm_disk_getgeo(struct block_device *bdev,
+						   struct hd_geometry *geo){
 
+	long size;
+	struct nvm_device *dev = bdev->bd_disk->private_data;
+
+	size = dev->nvmdev_capacity * (HARDSECT_SIZE / KERNEL_SECT_SIZE);
+	geo->cylinders = (size & ~0x3f) >> 6;
+	geo->heads = 4;
+	geo->sectors = 16;
+	geo->start = 4;
+	return 0;
+}

@@ -38,7 +38,7 @@ module_param(nvm_num_devices, int, 0);
     
 #endif
 */
-int nvm_capacity_mb = 1024;
+int nvm_capacity_mb = 128;
 
 module_param(nvm_capacity_mb, int, 0);
 MODULE_PARM_DESC(nvm_capacity_mb, "Size of each NVM disk in MB");
@@ -113,7 +113,7 @@ static struct kobject *nvm_probe(dev_t dev, int *part, void *data)
 static int __init nvm_init(void)
 {
     int i;
-    unsigned long range;
+    //unsigned long range;
     struct nvm_device *device, *next;
     // register a block device number
     if (register_blkdev(NVM_MAJOR, NVM_DEVICES_NAME) != 0)
@@ -122,7 +122,7 @@ static int __init nvm_init(void)
         return -EIO;
     }
 
-    // allocate block device
+    // allocate block device and gendisk
 
     for (i = 0; i < nvm_num_devices; i++)
     {
@@ -133,13 +133,16 @@ static int __init nvm_init(void)
         list_add_tail(&device->nvmdev_list, &nvm_list_head);
     }
 
-    // Register block devices
+    // Register block devices's gendisk
     list_for_each_entry(device, &nvm_list_head, nvmdev_list)
     {
         add_disk(device->nvmdev_disk);
     }
-    range = nvm_num_devices ? nvm_num_devices : 1UL << (MINORBITS - 1);
-    blk_register_region(MKDEV(NVM_MAJOR, 0), range, THIS_MODULE, nvm_probe, NULL, NULL);
+
+    //range = nvm_num_devices ? nvm_num_devices : 1UL << (MINORBITS - 1);
+
+    // maybe redundancy or only need for larger number of devices; BUG
+    //blk_register_region(MKDEV(NVM_MAJOR, 0), range, THIS_MODULE, nvm_probe, NULL, NULL);
 
     printk(KERN_INFO "nvm: module loaded\n");
     return 0;
