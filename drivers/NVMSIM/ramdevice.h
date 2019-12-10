@@ -19,6 +19,11 @@
 #include <linux/blkdev.h>   
 #include <linux/blk_types.h>
 
+#include "nvm.h"
+#include "mem.h"
+
+//#include "nvmconfig.h"
+
 #define NVM_MAJOR		231
 #define SECTOR_SHIFT		9
 #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
@@ -29,7 +34,8 @@
 
 #define PARTION_PER_DISK (1)
 
-#deinfe NVMDEV_MEM_MAX_SECTORS (8)
+#define NVMDEV_MEM_MAX_SECTORS (8)
+#define NVM_RAMDISK_ONLY (1)
 
 
 /**
@@ -54,35 +60,42 @@ struct nvm_device {
 
 
 /**
- * Allocate the NVM device
+ * Allocate and free the NVM device
  */
 struct nvm_device* nvm_alloc(int index, unsigned capacity_mb);
 
-/**
- * Free a NVM device
- */
-void nvmsim_free(struct nvm_device *nvmsim);
+void nvm_free(struct nvm_device *device);
+
 
 /**
  * Binder requet to queue
  * 
  */
 
-static int nvmdev_make_request(struct request_queue *q, struct bio *bio);
+static int nvm_make_request(struct request_queue *q, struct bio *bio);
 
 
 /**
  *  nvmdev_do_bvec
  * 			Process a single request
  */
-static int nvmdev_do_bvec(struct nvm_device *pcmsim, struct page *page,
+static int nvm_do_bvec(struct nvm_device *device, struct page *page,
 						  unsigned int len, unsigned int off, int rw, sector_t sector);
 
 
 /** 
- * Copy n bytes to from the PCM to dest starting at the given sector
+ * Copy n bytes to from the NVM to dest starting at the given sector
  */
-void __always_inline copy_from_nvmdev(void *dest, struct nvm_device *pcmsim,
+void __always_inline copy_from_nvm(void *dest, struct nvm_device *device,
 									  sector_t sector, size_t n);
 
+void __always_inline copy_to_nvm(struct nvm_device *device,
+									const void *src, sector_t sector, size_t n);
+
+
+/**
+ * Perform I/O control
+ */
+static int nvm_ioctl(struct block_device *bdev, fmode_t mode,
+					 unsigned int cmd, unsigned long arg);
 #endif
