@@ -1,0 +1,958 @@
+                                                                     Page 1
+                         Data Dictionary Summary Report
+===============================================================================
+
+arg   (Parameter)
+   [pc.c, 16]
+
+arg   (Parameter)
+   [pc.c, 38]
+
+Buf   (Global Object)
+   [pc.c, 12]
+
+chick   (Global Object)
+   [philo.c, 11]
+
+Consumer   (Function)
+   [pc.c, 38]
+
+Empty   (Global Object)
+   [pc.c, 14]
+
+err   (Local Object)
+   [philo.c, 50]
+
+err_c   (Local Object)
+   [pc.c, 62]
+
+err_p   (Local Object)
+   [pc.c, 62]
+
+free   (Unknown Function)
+
+Full   (Global Object)
+   [pc.c, 14]
+
+getchar   (Unknown Function)
+
+i   (Local Object)
+   [pc.c, 18]
+
+i   (Parameter)
+   [philo.c, 14]
+
+i   (Parameter)
+   [philo.c, 18]
+
+i   (Local Object)
+   [philo.c, 24]
+
+i   (Local Object)
+   [philo.c, 52]
+
+in   (Local Object)
+   [pc.c, 19]
+
+j   (Local Object)
+   [pc.c, 40]
+                                                                     Page 2
+                         Data Dictionary Summary Report
+===============================================================================
+
+j   (Parameter)
+   [philo.c, 22]
+
+j   (Local Object)
+   [philo.c, 66]
+
+k   (Local Object)
+   [pc.c, 63]
+
+k   (Local Object)
+   [philo.c, 56]
+
+main   (Function)
+   [pc.c, 60]
+
+main   (Function)
+   [philo.c, 48]
+
+malloc   (Unknown Function)
+
+MAX   (Macro)
+   [pc.c, 7]
+
+Mutex   (Global Object)
+   [pc.c, 14]
+
+mutex   (Global Object)
+   [philo.c, 11]
+
+ntid_c   (Global Object)
+   [pc.c, 10]
+
+ntid_p   (Global Object)
+   [pc.c, 9]
+
+NULL   (Unknown Object)
+
+NUM   (Macro)
+   [philo.c, 9]
+
+out   (Local Object)
+   [pc.c, 41]
+
+P   (Function)
+   [philo.c, 14]
+
+philo   (Global Object)
+   [philo.c, 12]
+
+printf   (Unknown Function)
+
+Producer   (Function)
+   [pc.c, 16]
+                                                                     Page 3
+                         Data Dictionary Summary Report
+===============================================================================
+
+pthread_create   (Unknown Function)
+
+pthread_join   (Unknown Function)
+
+pthread_t   (Unknown Type)
+
+rand   (Unknown Function)
+
+sem_init   (Unknown Function)
+
+sem_post   (Unknown Function)
+
+sem_t   (Unknown Type)
+
+sem_wait   (Unknown Function)
+
+sleep   (Unknown Function)
+
+sophi   (Function)
+   [philo.c, 22]
+
+srand   (Unknown Function)
+
+strerror   (Unknown Function)
+
+t   (Local Object)
+   [philo.c, 26]
+
+tem   (Local Object)
+   [philo.c, 57]
+
+time   (Unknown Function)
+
+V   (Function)
+   [philo.c, 18]
+                                                                     Page 4
+                              File Contents Report
+===============================================================================
+
+pc.c
+  Global Variables
+    Buf
+    Empty
+    err_c
+    err_p
+    Full
+    i
+    in
+    j
+    k
+    Mutex
+    ntid_c
+    ntid_p
+    out
+  Global Functions
+    Consumer
+    main
+    Producer
+
+philo.c
+  Global Variables
+    chick
+    err
+    i
+    i
+    j
+    k
+    mutex
+    philo
+    t
+    tem
+  Global Functions
+    main
+    P
+    sophi
+    V
+                                                                     Page 5
+                      Program Unit Cross Reference Report
+===============================================================================
+
+Consumer   (Function)
+  Declared as: void *
+    Define [pc.c, 38]          pc.c
+    Pointer [pc.c, 72]         main
+
+free   (Unknown Function)
+    Call [philo.c, 25]         sophi
+
+getchar   (Unknown Function)
+    Call [pc.c, 75]            main
+
+main   (Function)
+  Declared as: int
+    Define [pc.c, 60]          pc.c
+
+main   (Function)
+  Declared as: int
+    Define [philo.c, 48]       philo.c
+
+malloc   (Unknown Function)
+    Call [philo.c, 57]         main
+
+P   (Function)
+  Declared as: int
+    Define [philo.c, 14]       philo.c
+    Call [philo.c, 32]         sophi
+    Call [philo.c, 33]         sophi
+    Call [philo.c, 34]         sophi
+
+printf   (Unknown Function)
+    Call [pc.c, 27]            Producer
+    Call [pc.c, 48]            Consumer
+    Call [pc.c, 71]            main
+    Call [pc.c, 74]            main
+    Call [philo.c, 30]         sophi
+    Call [philo.c, 37]         sophi
+    Call [philo.c, 40]         sophi
+    Call [philo.c, 62]         main
+
+Producer   (Function)
+  Declared as: void *
+    Define [pc.c, 16]          pc.c
+    Pointer [pc.c, 69]         main
+
+pthread_create   (Unknown Function)
+    Call [pc.c, 69]            main
+    Call [pc.c, 72]            main
+    Call [philo.c, 59]         main
+
+pthread_join   (Unknown Function)
+    Call [philo.c, 67]         main
+
+rand   (Unknown Function)
+    Call [pc.c, 33]            Producer
+    Call [pc.c, 55]            Consumer
+                                                                     Page 6
+                      Program Unit Cross Reference Report
+===============================================================================
+    Call [philo.c, 39]         sophi
+
+sem_init   (Unknown Function)
+    Call [pc.c, 64]            main
+    Call [pc.c, 65]            main
+    Call [pc.c, 66]            main
+    Call [philo.c, 51]         main
+    Call [philo.c, 53]         main
+
+sem_post   (Unknown Function)
+    Call [pc.c, 31]            Producer
+    Call [pc.c, 32]            Producer
+    Call [pc.c, 53]            Consumer
+    Call [pc.c, 54]            Consumer
+    Call [philo.c, 19]         V
+
+sem_wait   (Unknown Function)
+    Call [pc.c, 23]            Producer
+    Call [pc.c, 24]            Producer
+    Call [pc.c, 45]            Consumer
+    Call [pc.c, 46]            Consumer
+    Call [philo.c, 15]         P
+
+sleep   (Unknown Function)
+    Call [pc.c, 33]            Producer
+    Call [pc.c, 55]            Consumer
+    Call [philo.c, 39]         sophi
+
+sophi   (Function)
+  Declared as: void *
+    Define [philo.c, 22]       philo.c
+    Pointer [philo.c, 59]      main
+
+srand   (Unknown Function)
+    Call [pc.c, 20]            Producer
+    Call [pc.c, 42]            Consumer
+    Call [philo.c, 31]         sophi
+
+strerror   (Unknown Function)
+    Call [pc.c, 71]            main
+    Call [pc.c, 74]            main
+    Call [philo.c, 62]         main
+
+time   (Unknown Function)
+    Call [pc.c, 20]            Producer
+    Call [pc.c, 42]            Consumer
+    Call [philo.c, 31]         sophi
+
+V   (Function)
+  Declared as: int
+    Define [philo.c, 18]       philo.c
+    Call [philo.c, 35]         sophi
+    Call [philo.c, 42]         sophi
+    Call [philo.c, 43]         sophi
+                                                                     Page 7
+                         Object Cross Reference Report
+===============================================================================
+
+arg   (Parameter)
+  Declared as: void *
+    Define [pc.c, 16]          Producer
+
+arg   (Parameter)
+  Declared as: void *
+    Define [pc.c, 38]          Consumer
+
+Buf   (Global Object)
+  Declared as: int [5]
+    Define [pc.c, 12]          pc.c
+    Deref Set [pc.c, 26]       Producer
+    Deref Use [pc.c, 27]       Producer
+    Deref Use [pc.c, 48]       Consumer
+    Deref Set [pc.c, 49]       Consumer
+    Deref Set [pc.c, 68]       main
+
+chick   (Global Object)
+  Declared as: sem_t [5]
+    Define [philo.c, 11]       philo.c
+    Deref Use [philo.c, 33]    sophi
+    Deref Use [philo.c, 34]    sophi
+    Deref Use [philo.c, 42]    sophi
+    Deref Use [philo.c, 43]    sophi
+    Deref Use [philo.c, 53]    main
+
+Empty   (Global Object)
+  Declared as: sem_t
+    Define [pc.c, 14]          pc.c
+    Addr Use [pc.c, 23]        Producer
+    Addr Use [pc.c, 53]        Consumer
+    Addr Use [pc.c, 65]        main
+
+err   (Local Object)
+  Declared as: int
+    Define [philo.c, 50]       main
+    Set [philo.c, 59]          main
+    Use [philo.c, 60]          main
+    Use [philo.c, 62]          main
+
+err_c   (Local Object)
+  Declared as: int
+    Define [pc.c, 62]          main
+    Set [pc.c, 72]             main
+    Use [pc.c, 73]             main
+    Use [pc.c, 74]             main
+
+err_p   (Local Object)
+  Declared as: int
+    Define [pc.c, 62]          main
+    Set [pc.c, 69]             main
+    Use [pc.c, 70]             main
+    Use [pc.c, 71]             main
+                                                                     Page 8
+                         Object Cross Reference Report
+===============================================================================
+
+Full   (Global Object)
+  Declared as: sem_t
+    Define [pc.c, 14]          pc.c
+    Addr Use [pc.c, 31]        Producer
+    Addr Use [pc.c, 45]        Consumer
+    Addr Use [pc.c, 64]        main
+
+i   (Local Object)
+  Declared as: int=0
+    Define [pc.c, 18]          Producer
+    Init [pc.c, 18]            Producer
+    Use [pc.c, 21]             Producer
+    Use [pc.c, 26]             Producer
+    Modify [pc.c, 29]          Producer
+
+i   (Parameter)
+  Declared as: sem_t *
+    Define [philo.c, 14]       P
+    Use [philo.c, 15]          P
+
+i   (Parameter)
+  Declared as: sem_t *
+    Define [philo.c, 18]       V
+    Use [philo.c, 19]          V
+
+i   (Local Object)
+  Declared as: int=*(j)
+    Define [philo.c, 24]       sophi
+    Init [philo.c, 24]         sophi
+    Use [philo.c, 30]          sophi
+    Use [philo.c, 33]          sophi
+    Use [philo.c, 34]          sophi
+    Use [philo.c, 37]          sophi
+    Use [philo.c, 40]          sophi
+    Use [philo.c, 42]          sophi
+    Use [philo.c, 43]          sophi
+
+i   (Local Object)
+  Declared as: int=0
+    Define [philo.c, 52]       main
+    Init [philo.c, 52]         main
+    Use [philo.c, 52]          main
+    Modify [philo.c, 52]       main
+    Use [philo.c, 53]          main
+
+in   (Local Object)
+  Declared as: int=0
+    Define [pc.c, 19]          Producer
+    Init [pc.c, 19]            Producer
+    Use [pc.c, 26]             Producer
+    Use [pc.c, 27]             Producer
+    Use [pc.c, 27]             Producer
+    Use [pc.c, 28]             Producer
+    Set [pc.c, 28]             Producer
+                                                                     Page 9
+                         Object Cross Reference Report
+===============================================================================
+
+j   (Local Object)
+  Declared as: int=0
+    Define [pc.c, 40]          Consumer
+    Init [pc.c, 40]            Consumer
+    Use [pc.c, 43]             Consumer
+    Modify [pc.c, 51]          Consumer
+
+j   (Parameter)
+  Declared as: void *
+    Define [philo.c, 22]       sophi
+    Deref Use [philo.c, 24]    sophi
+    Use [philo.c, 25]          sophi
+
+j   (Local Object)
+  Declared as: int=0
+    Define [philo.c, 66]       main
+    Init [philo.c, 66]         main
+    Use [philo.c, 66]          main
+    Modify [philo.c, 66]       main
+    Use [philo.c, 67]          main
+
+k   (Local Object)
+  Declared as: int
+    Define [pc.c, 63]          main
+    Set [pc.c, 68]             main
+    Use [pc.c, 68]             main
+    Modify [pc.c, 68]          main
+    Use [pc.c, 68]             main
+
+k   (Local Object)
+  Declared as: int=0
+    Define [philo.c, 56]       main
+    Init [philo.c, 56]         main
+    Use [philo.c, 56]          main
+    Modify [philo.c, 56]       main
+    Use [philo.c, 58]          main
+    Use [philo.c, 59]          main
+
+Mutex   (Global Object)
+  Declared as: sem_t
+    Define [pc.c, 14]          pc.c
+    Addr Use [pc.c, 24]        Producer
+    Addr Use [pc.c, 32]        Producer
+    Addr Use [pc.c, 46]        Consumer
+    Addr Use [pc.c, 54]        Consumer
+    Addr Use [pc.c, 66]        main
+
+mutex   (Global Object)
+  Declared as: sem_t
+    Define [philo.c, 11]       philo.c
+    Addr Use [philo.c, 32]     sophi
+    Addr Use [philo.c, 35]     sophi
+    Addr Use [philo.c, 51]     main
+                                                                     Page 10
+                         Object Cross Reference Report
+===============================================================================
+
+ntid_c   (Global Object)
+  Declared as: pthread_t
+    Define [pc.c, 10]          pc.c
+    Addr Use [pc.c, 72]        main
+
+ntid_p   (Global Object)
+  Declared as: pthread_t
+    Define [pc.c, 9]           pc.c
+    Addr Use [pc.c, 69]        main
+
+NULL   (Unknown Object)
+    Use [pc.c, 20]             Producer
+    Use [pc.c, 42]             Consumer
+    Use [pc.c, 69]             main
+    Use [pc.c, 69]             main
+    Use [pc.c, 72]             main
+    Use [pc.c, 72]             main
+    Use [philo.c, 31]          sophi
+    Return [philo.c, 45]       sophi
+    Use [philo.c, 59]          main
+    Use [philo.c, 67]          main
+
+out   (Local Object)
+  Declared as: int=0
+    Define [pc.c, 41]          Consumer
+    Init [pc.c, 41]            Consumer
+    Use [pc.c, 48]             Consumer
+    Use [pc.c, 48]             Consumer
+    Use [pc.c, 49]             Consumer
+    Use [pc.c, 50]             Consumer
+    Set [pc.c, 50]             Consumer
+
+philo   (Global Object)
+  Declared as: pthread_t [5]
+    Define [philo.c, 12]       philo.c
+    Deref Use [philo.c, 59]    main
+    Deref Use [philo.c, 67]    main
+
+t   (Local Object)
+  Declared as: int=0
+    Define [philo.c, 26]       sophi
+    Init [philo.c, 26]         sophi
+    Modify [philo.c, 27]       sophi
+    Use [philo.c, 27]          sophi
+
+tem   (Local Object)
+  Declared as: int *=malloc(sizeof(int))
+    Define [philo.c, 57]       main
+    Init [philo.c, 57]         main
+    Deref Set [philo.c, 58]    main
+    Use [philo.c, 59]          main
+                                                                     Page 11
+                          Type Cross Reference Report
+===============================================================================
+
+pthread_t   (Unknown Type)
+    Type [pc.c, 9]             ntid_p
+    Type [pc.c, 10]            ntid_c
+    Type [philo.c, 12]         philo
+
+sem_t   (Unknown Type)
+    Type [pc.c, 14]            Full
+    Type [pc.c, 14]            Empty
+    Type [pc.c, 14]            Mutex
+    Type [philo.c, 11]         mutex
+    Type [philo.c, 11]         chick
+    Type [philo.c, 14]         i
+    Type [philo.c, 18]         i
+                                                                     Page 12
+                          Macro Cross Reference Report
+===============================================================================
+
+MAX
+  Declared as: 5
+    Define [pc.c, 7]           pc.c
+    Use [pc.c, 12]             pc.c
+    Use [pc.c, 28]             Producer
+    Use [pc.c, 33]             Producer
+    Use [pc.c, 50]             Consumer
+    Use [pc.c, 55]             Consumer
+    Use [pc.c, 65]             main
+    Use [pc.c, 68]             main
+
+NUM
+  Declared as: 5
+    Define [philo.c, 9]        philo.c
+    Use [philo.c, 11]          philo.c
+    Use [philo.c, 12]          philo.c
+    Use [philo.c, 27]          sophi
+    Use [philo.c, 34]          sophi
+    Use [philo.c, 39]          sophi
+    Use [philo.c, 43]          sophi
+    Use [philo.c, 52]          main
+    Use [philo.c, 56]          main
+    Use [philo.c, 66]          main
+                                                                     Page 13
+                      Include File Cross Reference Report
+===============================================================================
+
+D:\Code\Python\Anaconda\crapy\OperatingSystemAndCompiler\qinke\philo-problem
+
+
+pthread.h
+    Include [pc.c, 5]   pc.c
+    Include [philo.c, 4]   philo.c
+
+semaphore.h
+    Include [pc.c, 4]   pc.c
+    Include [philo.c, 3]   philo.c
+
+stdio.h
+    Include [pc.c, 1]   pc.c
+    Include [philo.c, 1]   philo.c
+
+stdlib.h
+    Include [pc.c, 2]   pc.c
+    Include [philo.c, 2]   philo.c
+
+string.h
+    Include [pc.c, 3]   pc.c
+    Include [philo.c, 7]   philo.c
+
+time.h
+    Include [pc.c, 6]   pc.c
+    Include [philo.c, 5]   philo.c
+
+unistd.h
+    Include [philo.c, 6]   philo.c
+                                                                     Page 14
+                         Simple Invocation Tree Report
+===============================================================================
+
+Consumer
+| srand
+| time
+| sem_wait
+| printf
+| sem_post
+| sleep
+| rand
+
+main
+| sem_init
+| pthread_create
+| Producer
+| printf
+| strerror
+| Consumer
+| getchar
+
+main
+| sem_init
+| malloc
+| pthread_create
+| sophi
+| printf
+| strerror
+| pthread_join
+
+P
+| sem_wait
+
+Producer
+| srand
+| time
+| sem_wait
+| printf
+| sem_post
+| sleep
+| rand
+
+sophi
+| free
+| printf
+| srand
+| time
+| P
+| V
+| sleep
+| rand
+
+V
+| sem_post
+                                                                     Page 15
+                         Program Unit Complexity Report
+===============================================================================
+
+Consumer
+   Cyclomatic:                        2
+   Modified Cyclomatic:               2
+   Strict Cyclomatic:                 2
+   Essential:                         1
+   Max Nesting:                       1
+   Count Path:                        2
+   Count Path Log:                        0
+
+main
+   Cyclomatic:                        5
+   Modified Cyclomatic:               5
+   Strict Cyclomatic:                 5
+   Essential:                         1
+   Max Nesting:                       1
+   Count Path:                       16
+   Count Path Log:                        1
+
+main
+   Cyclomatic:                        5
+   Modified Cyclomatic:               5
+   Strict Cyclomatic:                 5
+   Essential:                         1
+   Max Nesting:                       2
+   Count Path:                       12
+   Count Path Log:                        1
+
+P
+   Cyclomatic:                        1
+   Modified Cyclomatic:               1
+   Strict Cyclomatic:                 1
+   Essential:                         1
+   Max Nesting:                       0
+   Count Path:                        1
+   Count Path Log:                        0
+
+Producer
+   Cyclomatic:                        2
+   Modified Cyclomatic:               2
+   Strict Cyclomatic:                 2
+   Essential:                         1
+   Max Nesting:                       1
+   Count Path:                        2
+   Count Path Log:                        0
+
+sophi
+   Cyclomatic:                        2
+   Modified Cyclomatic:               2
+   Strict Cyclomatic:                 2
+   Essential:                         1
+   Max Nesting:                       1
+   Count Path:                        2
+   Count Path Log:                        0
+
+V
+   Cyclomatic:                        1
+   Modified Cyclomatic:               1
+   Strict Cyclomatic:                 1
+   Essential:                         1
+   Max Nesting:                       0
+   Count Path:                        1
+   Count Path Log:                        0
+                                                                     Page 16
+                         Project Metrics Summary Report
+===============================================================================
+Classes:                      0
+Files:                        2
+Program Units:                7
+Lines:                      148
+Lines Blank:                 26
+Lines Code:                 107
+Lines Comment:                0
+Lines Inactive:               0
+Executable Statements:       68
+Declarative Statements:      26
+Ratio Comment/Code:        0.00
+                                                                     Page 17
+                              Program Unit Metrics
+===============================================================================
+
+Consumer (Function)
+   Lines:                   21
+   Comment Lines:           0
+   Blank Lines:             2
+   Code Lines:              19
+   Inactive Lines:          0
+   Executable Code Lines:   14
+   Declarative Code Lines:  3
+   Execution Statements:    12
+   Declaration Statements:  2
+   Ratio Comment/Code:      0.00
+
+main (Function)
+   Lines:                   18
+   Comment Lines:           0
+   Blank Lines:             1
+   Code Lines:              17
+   Inactive Lines:          0
+   Executable Code Lines:   12
+   Declarative Code Lines:  3
+   Execution Statements:    15
+   Declaration Statements:  2
+   Ratio Comment/Code:      0.00
+
+main (Function)
+   Lines:                   23
+   Comment Lines:           0
+   Blank Lines:             3
+   Code Lines:              20
+   Inactive Lines:          0
+   Executable Code Lines:   11
+   Declarative Code Lines:  6
+   Execution Statements:    13
+   Declaration Statements:  5
+   Ratio Comment/Code:      0.00
+
+P (Function)
+   Lines:                   3
+   Comment Lines:           0
+   Blank Lines:             0
+   Code Lines:              3
+   Inactive Lines:          0
+   Executable Code Lines:   1
+   Declarative Code Lines:  1
+   Execution Statements:    1
+   Declaration Statements:  0
+   Ratio Comment/Code:      0.00
+
+Producer (Function)
+   Lines:                   21
+   Comment Lines:           0
+   Blank Lines:             2
+   Code Lines:              19
+   Inactive Lines:          0
+   Executable Code Lines:   14
+   Declarative Code Lines:  3
+   Execution Statements:    12
+   Declaration Statements:  2
+   Ratio Comment/Code:      0.00
+                                                                     Page 18
+                              Program Unit Metrics
+===============================================================================
+
+sophi (Function)
+   Lines:                   25
+   Comment Lines:           0
+   Blank Lines:             5
+   Code Lines:              20
+   Inactive Lines:          0
+   Executable Code Lines:   16
+   Declarative Code Lines:  3
+   Execution Statements:    14
+   Declaration Statements:  2
+   Ratio Comment/Code:      0.00
+
+V (Function)
+   Lines:                   3
+   Comment Lines:           0
+   Blank Lines:             0
+   Code Lines:              3
+   Inactive Lines:          0
+   Executable Code Lines:   1
+   Declarative Code Lines:  1
+   Execution Statements:    1
+   Declaration Statements:  0
+   Ratio Comment/Code:      0.00
+                                                                     Page 19
+                                  File Metrics
+===============================================================================
+
+pc.c
+   Lines:                   78
+   Comment Lines:           0
+   Blank Lines:             12
+   Preprocessor Lines:      7
+   Code Lines:              59
+   Inactive Lines:          0
+   Executable Code Lines:   40
+   Declarative Code Lines:  13
+   Execution Statements:    39
+   Declaration Statements:  13
+   Ratio Comment/Code:      0.00
+   Units                    3
+
+philo.c
+   Lines:                   70
+   Comment Lines:           0
+   Blank Lines:             14
+   Preprocessor Lines:      8
+   Code Lines:              48
+   Inactive Lines:          0
+   Executable Code Lines:   29
+   Declarative Code Lines:  13
+   Execution Statements:    29
+   Declaration Statements:  13
+   Ratio Comment/Code:      0.00
+   Units                    4
+                                                                     Page 20
+                          File Average Metrics Report
+===============================================================================
+
+pc.c
+   Cyclomatic                         3
+   Modified                           3
+   Strict                             3
+   Essential                          1
+   Lines                              20
+   Code                               18
+   Comment                            0
+   Blank                              2
+
+philo.c
+   Cyclomatic                         2
+   Modified                           2
+   Strict                             2
+   Essential                          1
+   Lines                              14
+   Code                               12
+   Comment                            0
+   Blank                              2
+                                                                     Page 21
+                              Class Metrics Report
+===============================================================================
+                                                                     Page 22
+                            Class OO Metrics Report
+===============================================================================
+                                                                     Page 23
+                           Uninitialized Items Report
+
+  Def: Items that have not been given an initial value at point of definition.
+===============================================================================
+
+pc.c         Line
+    Buf        12
+    Empty      14
+    err_c      62
+    err_p      62
+    Full       14
+    k          63
+    Mutex      14
+    ntid_c     10
+    ntid_p      9
+
+philo.c      Line
+    chick      11
+    err        50
+    mutex      11
+    philo      12
+                                                                     Page 24
+                          Unused Objects and Functions
+
+Def: A variable that is not read from, written to after declaration, 
+or passed to a function, function parameters that are unused in the function, 
+and functions that have no invocations. 
+===============================================================================
+
+pc.c                    Line
+    arg - Parameter       16
+      Declared in: Producer()
+    arg - Parameter       38
+      Declared in: Consumer()
+    main - Function       60
+
+philo.c                 Line
+    main - Function       48
+                                                                     Page 25
+                             Unused Objects Report
+===============================================================================
+
+pc.c
+    arg     16
+    arg     38
+                                                                     Page 26
+                              Unused Types Report
+===============================================================================
+                                                                     Page 27
+                          Unused Program Units Report
+===============================================================================
+
+pc.c
+    main     60
+
+philo.c
+    main     48
