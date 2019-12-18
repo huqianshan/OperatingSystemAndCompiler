@@ -1,7 +1,7 @@
 
 obj-m := nvmsim.o
 
-nvmsim-objs += module.o mem.o nvm.o  ramdevice.o
+nvmsim-objs += ramdevice.o mem.o
 
 # From: linuxdevcenter.com
 

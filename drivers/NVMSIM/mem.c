@@ -58,6 +58,5 @@ void memory_copy(void* dest, const void* buffer, size_t size)
 		:
 		: "S" (buffer), "D" (dest), "c" (size >> 3)
 	);
-
 #endif
 }

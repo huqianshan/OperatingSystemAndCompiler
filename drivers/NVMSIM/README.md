@@ -4,11 +4,7 @@
 
 ### File Contains
 
-- `module.c` : the initition of kernel module for driver
-
 - `ramdecive.h/c` the implementention of driver
-
-- `nvm.c` the non-volatile memory simmulation layer (Current Not Used)
 
 - `mem.c` the implementention of  `memcpy` like function
 

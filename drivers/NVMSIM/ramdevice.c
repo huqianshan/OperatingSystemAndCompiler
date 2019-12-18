@@ -1,13 +1,58 @@
 /*
  * ramDevice.C
- * NVM Simulator: RAM backed block device driver
- * 
- * Description:
- *            For the device of NVM block driver
+ * NVM Simulator: RAM based block device driver
  * 
  */
 
+#include <linux/kernel.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/moduleparam.h>
+#include <linux/major.h>
+#include <linux/genhd.h> // gendisk
+#include <linux/bio.h>
+#include <linux/blkdev.h> // blk_queue_xx
+#include <linux/fs.h>	 // block_device
+#include <linux/hdreg.h>  // hd_geometry
+#include <linux/blk_types.h>
+#include <linux/bvec.h>
+#include <asm/io.h>
+
+#include "mem.h"
 #include "ramdevice.h"
+
+/**
+ * 
+ * -------Module Parameters-------
+ * nvm_num_devices
+ *      The maximum number of NVM devices
+ * 
+ * nvmdevices_mutex:
+ *      The mutex guarding the list of devices
+ */
+static int nvm_num_devices = 1;
+
+module_param(nvm_num_devices, int, 0);
+
+/**
+ * Size of each NVM disk in MB
+ */
+int nvm_capacity_mb = 4096;
+uint64_t g_highmem_phys_addr = 0x100000000; /* beginning of the reserved phy mem space (bytes)*/
+module_param(nvm_capacity_mb, int, 0);
+MODULE_PARM_DESC(nvm_capacity_mb, "Size of each NVM disk in MB");
+
+/**
+ * The list and mutex of NVM devices
+ */
+static LIST_HEAD(nvm_list_head);
+static DEFINE_MUTEX(nvm_devices_mutex);
+
+/**
+ * nvm_devices_name:
+ *      The name of device
+ */
+#define NVM_DEVICES_NAME "nvm"
 
 /**
  * NVM block device operations
@@ -15,19 +60,70 @@
 static const struct block_device_operations nvmdev_fops = {
 	.owner = THIS_MODULE,
 	.getgeo = nvm_disk_getgeo,
-}
-;
+};
 
 /**
  * Allocate the NVM device
+ * 	  1. nvm_alloc() : allocates disk and driver 
+ *    2. nvm_highmem_map() : make mapping for highmem physical address by ioremap()
  */
+
+void *nvm_highmem_map(void)
+{
+
+	if ((g_highmem_virt_addr = ioremap_cache(g_highmem_phys_addr, g_highmem_size)))
+	{
+
+		g_highmem_curr_addr = g_highmem_virt_addr;
+		printk(KERN_INFO "NVMSIM: high memory space remapped (offset: %llu MB, size=%lu MB)\n",
+			   BYTES_TO_MB(g_highmem_phys_addr), BYTES_TO_MB(g_highmem_size));
+		return g_highmem_virt_addr;
+	}
+	else
+	{
+		printk(KERN_ERR "NVMSIM: %s(%d) %llu Bytes:%x failed remapping high memory space (offset: %llu MB size=%llu MB)\n",
+			   __FUNCTION__, __LINE__, g_highmem_phys_addr, g_highmem_virt_addr, BYTES_TO_MB(g_highmem_phys_addr), BYTES_TO_MB(g_highmem_size));
+		return NULL;
+	}
+}
+
+void nvm_highmem_unmap(void)
+{
+	/* de-remap the high memory from kernel address space */
+	if (g_highmem_virt_addr)
+	{
+		iounmap(g_highmem_virt_addr);
+		g_highmem_virt_addr = NULL;
+		printk(KERN_INFO "NVMSIM: unmapping high mem space (offset: %llu MB, size=%lu MB)is unmapped\n",
+			   BYTES_TO_MB(g_highmem_phys_addr), BYTES_TO_MB(g_highmem_size));
+	}
+	return;
+}
+
+static void *hmalloc(uint64_t bytes)
+{
+	void *rtn = NULL;
+
+	/* check if there is still available reserve high memory space */
+	if (bytes <= PMBD_HIGHMEM_AVAILABLE_SPACE)
+	{
+		rtn = g_highmem_curr_addr;
+		g_highmem_curr_addr += bytes;
+	}
+	else
+	{
+		printk(KERN_ERR "NVMSIM: %s(%d) - no available space (< %llu bytes) in reserved high memory\n",
+			   __FUNCTION__, __LINE__, bytes);
+	}
+	return rtn;
+}
+
 struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 {
 	struct nvm_device *device;
 	struct gendisk *disk;
 
 	// Allocate the device
-
 	device = kzalloc(sizeof(struct nvm_device), GFP_KERNEL);
 	if (!device)
 		goto out;
@@ -35,23 +131,31 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	device->nvmdev_capacity = capacity_mb << MB_PER_SECTOR_SHIFT; // in Sectors
 	spin_lock_init(&device->nvmdev_lock);
 
-	// Allocate the NVM model
-
-	//TODO 1 MAY BE BUG
-	device->nvmdev_model = nvm_model_allocate(device->nvmdev_capacity);
-	if (!device->nvmdev_model)
-		goto out_free_struct;
-
-	// Allocate the backing store
-
-	// BUG MAY BE WRONG IN SIZE ;ASSUME vmaloc allocate in size bytes
-	device->nvmdev_data = vmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
-	if (!device->nvmdev_data)
+	// vmaloc allocate in size bytes
+	if (NVM_USE_HIGHMEM())
 	{
-		printk(KERN_WARNING "vmalloc for %d bytes has been failed\n", device->nvmdev_capacity << SECTOR_SHIFT);
-		goto out_free_model;
+		device->nvmdev_data = hmalloc(device->nvmdev_capacity << SECTOR_BYTES_SHIFT);
 	}
-	
+	else
+	{
+		device->nvmdev_data = vmalloc(device->nvmdev_capacity << SECTOR_BYTES_SHIFT);
+	}
+
+	if (device->nvmdev_data != NULL)
+	{
+#if 0
+		/* FIXME: No need to do this. It's slow, system could be locked up */
+		memset(pmbd->mem_space, 0, pmbd->sectors * pmbd->sector_size);
+#endif
+		printk(KERN_INFO "NVMSIM:  created [%lu : %llu MBs]\n",
+			   (unsigned long)device->nvmdev_data, SECTORS_TO_MB(device->nvmdev_capacity));
+	}
+	else
+	{
+		printk(KERN_ERR "NVMSIM: %s(%d): NVM space allocation failed\n", __FUNCTION__, __LINE__);
+
+		goto out_free_struct;
+	}
 
 	// Allocate the block request queue by blk_alloc_queue without I/O scheduler
 
@@ -63,22 +167,9 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	// register nvmdev_queue,
 	blk_queue_make_request(device->nvmdev_queue, (make_request_fn *)nvm_make_request);
 
-	//set max sectors for a request for this queue
-	blk_queue_max_hw_sectors(device->nvmdev_queue, 255);
+	//blk_queue_max_hw_sectors(device->nvmdev_queue, 255);//set max sectors for a request for this queue
 
-	//set logical block size for the queue
-	blk_queue_logical_block_size(device->nvmdev_queue, 512);
-
-	// the QUEUE_ORDERED_TAG HAS BEEN REMOVED
-	//http://www.jeepxie.net/article/505053.html
-	// TODO BUGGY
-	//blk_queue_ordered(device->nvmdev_queue, QUEUE_ORDERED_TAG, NULL);
-	//blk_queue_flush(device->nvmdev_queue,) also depreasd
-	blk_queue_write_cache(device->nvmdev_queue, 0, 0);
-
-	//THIS ATTRIBUTE HAS BEEN SET TO DEFAUTLY
-	//blk_queue_bounce_limit(device->nvmdev_queue, BLK_BOUNCE_ANY);
-	/*blk_queue_max_sectors (device->nvmdev_queue, 1024);*/
+	blk_queue_logical_block_size(device->nvmdev_queue, HARDSECT_SIZE); //set logical block size for the queue
 
 	// Allocate the disk device /* cannot be partitioned */
 	device->nvmdev_disk = alloc_disk(PARTION_PER_DISK);
@@ -103,8 +194,6 @@ out_free_queue:
 	blk_cleanup_queue(device->nvmdev_queue);
 out_free_dev:
 	vfree(device->nvmdev_data);
-out_free_model:
-	nvm_model_free(device->nvmdev_model);
 out_free_struct:
 	kfree(device);
 out:
@@ -118,9 +207,19 @@ void nvm_free(struct nvm_device *device)
 {
 	put_disk(device->nvmdev_disk);
 	blk_cleanup_queue(device->nvmdev_queue);
-	nvm_model_free(device->nvmdev_model);
+
 	if (device->nvmdev_data != NULL)
-		vfree(device->nvmdev_data);
+	{
+		if (NVM_USE_HIGHMEM())
+		{
+			hfree(device->nvmdev_data);
+		}
+		else
+		{
+			vfree(device->nvmdev_data);
+		}
+	}
+
 	kfree(device);
 }
 
@@ -146,6 +245,8 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 	// Check the device capacity
 	// bi_sector,bi_size has moved to bio->bi_iter.bi_sector
 	// TODO the judge condition and out information
+
+	// bi_iter.bi_size is the number ofremained bi_vec
 	sector = bio->bi_iter.bi_sector;
 	capacity = get_capacity(bio->bi_disk);
 	if (sector + (bio->bi_iter.bi_size >> SECTOR_SHIFT) > capacity)
@@ -166,7 +267,8 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 		unsigned int len = bvec.bv_len;
 		// Every biovec means a SEGMENT of a PAGE
 		err = nvm_do_bvec(nvm_dev, bvec.bv_page, len, bvec.bv_offset, rw, sector);
-		if (err){
+		if (err)
+		{
 			printk(KERN_WARNING "Transfer data in Segments %x of address %x failed\n", len, bvec.bv_page);
 			break;
 		}
@@ -175,7 +277,7 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 	}
 out:
 	bio_endio(bio);
-	return ;
+	return;
 }
 
 /**
@@ -191,8 +293,7 @@ static int nvm_do_bvec(struct nvm_device *device, struct page *page,
 	if (rw == READ)
 	{
 		copy_from_nvm(mem + off, device, sector, len);
-		// if D-cache aliasing is not an issue
-		flush_dcache_page(page);
+		flush_dcache_page(page); // if D-cache aliasing is not an issue
 	}
 	else
 	{
@@ -211,52 +312,16 @@ void __always_inline copy_from_nvm(void *dest, struct nvm_device *device,
 								   sector_t sector, size_t n)
 {
 	const void *nvm;
-#ifndef NVM_RAMDISK_ONLY
-	unsigned l, o;
-#endif
-
 	nvm = device->nvmdev_data + (sector << SECTOR_SHIFT);
-
-#ifndef NVM_RAMDISK_ONLY
-	o = 0;
-	while (n > 0)
-	{
-		l = n;
-		// TODO MAYBE BUGGY AND ERROR
-		// o is useless?
-		if (l > NVMDEV_MEM_MAX_SECTORS << SECTOR_SHIFT)
-			l = NVMDEV_MEM_MAX_SECTORS << SECTOR_SHIFT;
-		nvm_read(device->nvmdev_model, ((char *)dest) + o, ((const char *)nvm) + o, l, sector);
-		n -= l;
-	}
-#else
 	memory_copy(dest, nvm, n);
-#endif
 }
 
 void __always_inline copy_to_nvm(struct nvm_device *device,
 								 const void *src, sector_t sector, size_t n)
 {
 	void *nvm;
-#ifndef NVM_RAMDISK_ONLY
-	unsigned l, o;
-#endif
-
 	nvm = device->nvmdev_data + (sector << SECTOR_SHIFT);
-
-#ifndef NVM_RAMDISK_ONLY
-	o = 0;
-	while (n > 0)
-	{
-		l = n;
-		if (l > NVMDEV_MEM_MAX_SECTORS << SECTOR_SHIFT)
-			l = NVMDEV_MEM_MAX_SECTORS << SECTOR_SHIFT;
-		nvm_write(device->nvmdev_model, ((char *)nvm) + o, ((const char *)src) + o, l, sector);
-		n -= l;
-	}
-#else
 	memory_copy(nvm, src, n);
-#endif
 }
 
 /**
@@ -269,7 +334,8 @@ static int nvm_ioctl(struct block_device *bdev, fmode_t mode,
 }
 
 static int nvm_disk_getgeo(struct block_device *bdev,
-						   struct hd_geometry *geo){
+						   struct hd_geometry *geo)
+{
 
 	long size;
 	struct nvm_device *dev = bdev->bd_disk->private_data;
@@ -281,3 +347,99 @@ static int nvm_disk_getgeo(struct block_device *bdev,
 	geo->start = 4;
 	return 0;
 }
+
+/**
+ * The driver function for NVM Block Drivers
+ * 
+ * Contains :
+ *          1. nvm_init()
+ *          2. nvm_exit()
+ * */
+
+static int __init nvm_init(void)
+{
+	int i;
+	struct nvm_device *device, *next;
+
+	g_highmem_size = (u64)(nvm_capacity_mb) << MB_PER_BYTES_SHIFT;
+	printk(KERN_ERR "NVMSIM:%llu %llu %llu %llu\n",
+		   g_highmem_size, g_highmem_phys_addr, nvm_capacity_mb, LLONG_MAX);
+
+	// remap the highmem physical address
+	if (NVM_USE_HIGHMEM())
+	{
+		if (nvm_highmem_map() == NULL)
+			return -ENOMEM;
+	}
+
+	// register a block device number
+	if (register_blkdev(NVM_MAJOR, NVM_DEVICES_NAME) != 0)
+	{
+		printk(KERN_INFO "The device major number %d is occupied\n", NVM_MAJOR);
+		return -EIO;
+	}
+
+	// allocate block device and gendisk
+	for (i = 0; i < nvm_num_devices; i++)
+	{
+		device = nvm_alloc(i, nvm_capacity_mb);
+		if (!device)
+			goto out_free;
+		// initialize a request queue
+		list_add_tail(&device->nvmdev_list, &nvm_list_head);
+	}
+
+	// Register block devices's gendisk
+	list_for_each_entry(device, &nvm_list_head, nvmdev_list)
+	{
+		add_disk(device->nvmdev_disk);
+	}
+	printk(KERN_INFO "nvm: module loaded\n");
+	return 0;
+
+out_free:
+	list_for_each_entry_safe(device, next, &nvm_list_head, nvmdev_list)
+	{
+		list_del(&device->nvmdev_list);
+		nvm_free(device);
+	}
+	unregister_blkdev(NVM_MAJOR, NVM_DEVICES_NAME);
+	return -ENOMEM;
+}
+
+/**
+ * Delete a device
+ */
+static void nvm_del_one(struct nvm_device *device)
+{
+	list_del(&device->nvmdev_list);
+	del_gendisk(device->nvmdev_disk);
+	nvm_free(device);
+}
+
+/**
+ * Deinitalize a module
+ */
+static void __exit nvm_exit(void)
+{
+	unsigned long range;
+	struct nvm_device *nvmsim, *next;
+
+	range = nvm_num_devices ? nvm_num_devices : 1UL << (MINORBITS - 1);
+
+	list_for_each_entry_safe(nvmsim, next, &nvm_list_head, nvmdev_list)
+	{
+		nvm_del_one(nvmsim);
+	}
+
+	blk_unregister_region(MKDEV(NVM_MAJOR, 0), range);
+	unregister_blkdev(NVM_MAJOR, NVM_DEVICES_NAME);
+}
+
+/**
+ * NVM Module declarations
+ */
+module_init(nvm_init);
+module_exit(nvm_exit);
+MODULE_LICENSE("GPL");
+MODULE_ALIAS_BLOCKDEV_MAJOR(NVM_MAJOR);
