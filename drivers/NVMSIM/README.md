@@ -1,19 +1,37 @@
-# This is the Block driver of Non-volatile Memory
+# A Block driver of Non-volatile Memory
 
 ## Version 1.0
 
-### Aims
+### File Contains
 
-#### Allocate physical memory for simulating
+- `module.c` : the initition of kernel module for driver
 
-#### Finsh the block driver for high-memory
+- `ramdecive.h/c` the implementention of driver
 
-## The Arche
+- `nvm.c` the non-volatile memory simmulation layer (Current Not Used)
 
-### `module.c`
+- `mem.c` the implementention of  `memcpy` like function
 
-- only  for the module
+- `nvmconfig.h` contains all of `#define` configuration (Current Not Used)
 
-### `ramDevice.c`
+### Architecture
 
-- for the driver
+#### The simulation of `Non-volatile Memory`
+
+- Write Delay
+
+- Write Bandwidth
+
+#### The Block Driver For `NVM`
+
+- The Memory Management
+  - Highmemory and Mapping to Kernel
+
+- Write/Read Function
+  - The Test of I/O throughput
+
+#### The Address Transformer Mechanism
+
+#### The Access Information Summary Table
+
+#### Data consistency and Fault-Tolerance Mechaism
