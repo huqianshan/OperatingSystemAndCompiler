@@ -65,23 +65,37 @@ int ilog2(int x) {
 
 void printb(int len){
   int i;
-  printf("\n BitMap Information\n")
-  for (i = 0; i < len;i++){
-    
+  int tem;
+  printf("\nBitMap Information\n");
+  for (i = 0; i < len; i++)
+  {
+    tem = BOOL_ONE(i);
+    printf("%d", tem!=0);
+    if((i+1)%4==0){
+      printf(" ");
+    }else if ((i+1)%8==0){
+      printf("   ");
+    }
+    else if((i+1)%(BIT_WIDTH_IN_BITS)==0){
+      printf("\n");
+    }
   }
+  printf("\n");
 }
-
-
 
 int main(){
     int size;
     scanf("%d", &size);
     printf("%d\n", size);
     init_bitmap(size);
-
-    SET_BITMAP(1);
-    SET_BITMAP(0);
-    printf("%x %d\n",BitMap[0],FIND_NUM_EQUL_ONE_BITMAP(2));
+    int code;
+    while (1)
+    {
+      scanf("%d", &code);
+      SET_BITMAP(code);
+      printb(size);
+      
+    }
     if(BitMap){
         free(BitMap);
     }

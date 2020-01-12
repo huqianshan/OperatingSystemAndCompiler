@@ -34,12 +34,13 @@ int bitCount(int x);
 #define INT_OFFSET(pos) (pos / (BIT_WIDTH_IN_BITS))
 
 /* Set the pos in Bitmap to one */
-#define SET_BITMAP(pos) (BitMap[INT_OFFSET(pos)] |= ((word_t)1 << BIT_OFFSET(pos))))
+#define SET_BITMAP(pos) \
+    (BitMap[INT_OFFSET(pos)] |= ((word_t)1 << BIT_OFFSET(pos)))
 /* Clear the pos in Bitmap to zero */
-#define CLEAR_BIT_BITMAP(pos) (BitMap[INT_OFFSET(pos)]&=(~((word_t)1<<BIT_OFFSET(pos))))
+#define CLEAR_BIT_BITMAP(pos) (BitMap[INT_OFFSET(pos)] &= (~((word_t)1 << BIT_OFFSET(pos)))
 /* find the pos postion if is equal to One*/
-#define FIND_POS_EQUL_ONE_BITMAP(pos) (BitMap[INT_OFFSET(pos)]&((word_t)1<<BIT_OFFSET(pos)))
-
+#define FIND_POS_EQUL_ONE_BITMAP(pos) (BitMap[INT_OFFSET(pos)] & ((word_t)1 << BIT_OFFSET(pos)))
+#define BOOL_ONE(pos) (BitMap[INT_OFFSET(pos)]&((word_t)1<<BIT_OFFSET(pos)))
 /**
  *  print first len bits of the bitmap 
  */
