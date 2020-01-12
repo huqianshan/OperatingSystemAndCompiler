@@ -22,9 +22,17 @@
 
 - The Memory Management
   - Highmemory and Mapping to Kernel
+  - `DONE`
 
 - Write/Read Function
   - The Test of I/O throughput
+  - `DONE`
+
+#### Free Block Manaement
+
+- `BitMap`
+
+  - 
 
 #### The Address Transformer Mechanism
 

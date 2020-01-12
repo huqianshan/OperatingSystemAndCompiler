@@ -70,7 +70,7 @@ static const struct block_device_operations nvmdev_fops = {
 
 void *nvm_highmem_map(void)
 {
-
+	// https://patchwork.kernel.org/patch/3092221/
 	if ((g_highmem_virt_addr = ioremap_cache(g_highmem_phys_addr, g_highmem_size)))
 	{
 
