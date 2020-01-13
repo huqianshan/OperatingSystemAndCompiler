@@ -32,10 +32,14 @@
 
 - `BitMap`
 
-  - 
+  - clear set get `Done`
 
 #### The Address Transformer Mechanism
 
 #### The Access Information Summary Table
+
+- 32 sectors `Done`
+
+- todo **lock**
 
 #### Data consistency and Fault-Tolerance Mechaism

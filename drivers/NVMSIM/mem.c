@@ -9,7 +9,8 @@
 
 #include <asm/uaccess.h>
 
-#define __NVM_MEM_NO_EXTERN
+#define MEMCOPY_DEFAULT 1  // use memcopy
+#define MEMCOPY_BARRIER 0  // use barrier
 #include "mem.h"
 
 
@@ -18,7 +19,9 @@
  */
 void memory_copy(void* dest, const void* buffer, size_t size)
 {
-
+#if MEMCOPY_DEFAULT==1
+	memcpy(dest, buffer, size);
+#elif MEMCOPY_BARRIER==1
 #ifndef __LP64__
 
 	asm("pushl %%eax\n\t"
@@ -38,9 +41,7 @@ void memory_copy(void* dest, const void* buffer, size_t size)
 		:
 		: "S" (buffer), "D" (dest), "c" (size >> 2)
 	);
-
 #else
-
 	asm("pushq %%rax\n\t"
 		"pushq %%rsi\n\t"
 		"pushq %%rdi\n\t"
@@ -58,5 +59,6 @@ void memory_copy(void* dest, const void* buffer, size_t size)
 		:
 		: "S" (buffer), "D" (dest), "c" (size >> 3)
 	);
+#endif
 #endif
 }

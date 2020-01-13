@@ -7,6 +7,8 @@
 #ifndef __RAMDEVICE_H
 #define __RAMDEVICE_H
 
+#define MEMCOPY_DEFAULT 1  // use memcopy
+#define MEMCOPY_BARRIER 0  // use barrier
 
 #define NVM_CONFIG_VMALLOC 0 /* use vmalloc() to allocate memory*/
 #define NVM_CONFIG_HIGHMEM 1 /* use ioremap to map highmemory-based memory*/
