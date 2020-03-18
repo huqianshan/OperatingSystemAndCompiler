@@ -40,6 +40,6 @@
 
 - 32 sectors `Done`
 
-- todo **lock**
+- Todo **lock**
 
 #### Data consistency and Fault-Tolerance Mechaism
