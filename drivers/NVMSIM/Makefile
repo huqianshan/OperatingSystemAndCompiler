@@ -34,4 +34,4 @@ clean:
 	       *~ .*~ .\#*~ \#*~ .*.cmd .tmp* bitmap
 
 test: bit_map.c bit_map.h
-	${CC} ${FLAGS} -o bitmap bit_map.c ${LIBS}
+	${CC} ${FLAGS} -o bit_map bit_map.c ${LIBS}

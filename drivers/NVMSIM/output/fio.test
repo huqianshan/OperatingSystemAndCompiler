@@ -1,0 +1,66 @@
+read4k-rand: (g=0): rw=randread, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=32
+read4k-seq: (g=1): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=32
+write4k-rand: (g=2): rw=randwrite, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=32
+fio-2.2.10
+Starting 3 threads
+read4k-rand: Laying out IO file(s) (1 file(s) / 1024MB)
+read4k-seq: Laying out IO file(s) (1 file(s) / 1024MB)
+write4k-rand: Laying out IO file(s) (1 file(s) / 1024MB)
+
+read4k-rand: (groupid=0, jobs=1): err= 0: pid=9773: Sun Jan 12 23:02:36 2020
+  read : io=1024.0MB, bw=861607KB/s, iops=215401, runt=  1217msec
+    slat (usec): min=1, max=419, avg= 3.47, stdev= 7.09
+    clat percentiles (usec):
+     |  1.00th=[    0],  5.00th=[    0], 10.00th=[    0], 20.00th=[    0],
+     | 30.00th=[    0], 40.00th=[    0], 50.00th=[    0], 60.00th=[    0],
+     | 70.00th=[    0], 80.00th=[    0], 90.00th=[    0], 95.00th=[    0],
+     | 99.00th=[    0], 99.50th=[    0], 99.90th=[    0], 99.95th=[    0],
+     | 99.99th=[    0]
+  cpu          : usr=22.70%, sys=76.97%, ctx=3, majf=0, minf=33
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=100.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.1%, 64=0.0%, >=64=0.0%
+     issued    : total=r=262144/w=0/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
+     latency   : target=0, window=0, percentile=100.00%, depth=32
+read4k-seq: (groupid=1, jobs=1): err= 0: pid=9774: Sun Jan 12 23:02:36 2020
+  read : io=1024.0MB, bw=1183.9MB/s, iops=303056, runt=   865msec
+    slat (usec): min=1, max=359, avg= 2.42, stdev= 4.81
+    clat percentiles (usec):
+     |  1.00th=[    0],  5.00th=[    0], 10.00th=[    0], 20.00th=[    0],
+     | 30.00th=[    0], 40.00th=[    0], 50.00th=[    0], 60.00th=[    0],
+     | 70.00th=[    0], 80.00th=[    0], 90.00th=[    0], 95.00th=[    0],
+     | 99.00th=[    0], 99.50th=[    0], 99.90th=[    0], 99.95th=[    0],
+     | 99.99th=[    0]
+  cpu          : usr=22.22%, sys=77.31%, ctx=13, majf=0, minf=1
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=100.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.1%, 64=0.0%, >=64=0.0%
+     issued    : total=r=262144/w=0/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
+     latency   : target=0, window=0, percentile=100.00%, depth=32
+write4k-rand: (groupid=2, jobs=1): err= 0: pid=9775: Sun Jan 12 23:02:36 2020
+  write: io=1024.0MB, bw=409760KB/s, iops=102440, runt=  2559msec
+    slat (usec): min=2, max=1101, avg= 8.56, stdev=12.34
+    clat percentiles (usec):
+     |  1.00th=[    0],  5.00th=[    0], 10.00th=[    0], 20.00th=[    0],
+     | 30.00th=[    0], 40.00th=[    0], 50.00th=[    0], 60.00th=[    0],
+     | 70.00th=[    0], 80.00th=[    0], 90.00th=[    0], 95.00th=[    0],
+     | 99.00th=[    0], 99.50th=[    0], 99.90th=[    0], 99.95th=[    0],
+     | 99.99th=[    0]
+  cpu          : usr=11.85%, sys=87.88%, ctx=32, majf=0, minf=1
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=0.1%, 32=100.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.1%, 64=0.0%, >=64=0.0%
+     issued    : total=r=0/w=262144/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
+     latency   : target=0, window=0, percentile=100.00%, depth=32
+
+Run status group 0 (all jobs):
+   READ: io=1024.0MB, aggrb=861607KB/s, minb=861607KB/s, maxb=861607KB/s, mint=1217msec, maxt=1217msec
+
+Run status group 1 (all jobs):
+   READ: io=1024.0MB, aggrb=1183.9MB/s, minb=1183.9MB/s, maxb=1183.9MB/s, mint=865msec, maxt=865msec
+
+Run status group 2 (all jobs):
+  WRITE: io=1024.0MB, aggrb=409760KB/s, minb=409760KB/s, maxb=409760KB/s, mint=2559msec, maxt=2559msec
+
+Disk stats (read/write):
+  nvm0: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%

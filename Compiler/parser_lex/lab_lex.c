@@ -10,7 +10,7 @@
 #define ERR_FILE_NAME "out.err"
 
 char word;
-char *num2word[24] = {"0", "$BEGIN", "$END", "$INTER", "$IF",
+char *num2word[24] = {"0", "$BEGIN", "$END", "$INT", "$IF",
                       "$THEN", "$ELSE", "$FUNCTION", "$READ",
                       "$WRITE", "$SYMBOL", "$CONST", "= $EQ",
                       "!= $NE", "<= $LE", "< $L", ">= $GE",

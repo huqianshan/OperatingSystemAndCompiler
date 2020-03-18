@@ -42,6 +42,12 @@ int *BitMap;
 int init_bitmap(int num);
 
 /**
+ * Query for the free block in page
+ * return block index  within page
+ */
+word_t query_bitmap(word_t pos);
+
+/**
  * retur ncount of number of 1's in word
  */
 int bitCount(int x);

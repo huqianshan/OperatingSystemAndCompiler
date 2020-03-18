@@ -2,21 +2,49 @@
 #include <stdlib.h>
 #include <stdint.h> /* for uint32_t */
 #include <string.h>
+//#include <math.h>
 
 #include "bit_map.h"
 
+#define DEBUG
+
 int init_bitmap(int num)
 {
-  int size = (num / BIT_WIDTH_IN_BITS) + 1;
-  int *tem = calloc(size, BIT_WIDTH_IN_BYTES);
+  int size = (num / BIT_WIDTH_IN_BITS) + 1; // ceil
+  word_t *tem = calloc(size, BIT_WIDTH_IN_BYTES);
   if (tem == NULL)
   {
     printf("Init BitMap Failed;Malloc return Null\n");
     return -1;
   }
   BitMap = tem;
-  printf("Bitmap address 0x%x  size: %d (int) %d(bytes)\n", BitMap, size, size << 2);
+  printf("Bitmap address 0x%x  size: %d (int) %u(bytes)\n", BitMap, size, size*BIT_WIDTH_IN_BYTES);
   return 0;
+}
+
+word_t query_bitmap(word_t pos)
+{
+  // find the first free block of page pos
+  word_t page_off = INT_OFFSET(pos);
+  word_t block_begin = page_off * PAGE_SIZE;
+  word_t block_end = (page_off + 1) * PAGE_SIZE;
+
+  int i;
+  for (i = block_begin; i < block_end; i++)
+  {
+    if (BOOL(i) == 0)
+    {
+#ifdef DEBUG
+      printf("Query pos %u: Page [%u] Offset [%u] BitPos [%u] \n",\
+       pos, page_off,i - block_begin,i);
+#endif
+      return (i - block_begin);
+    }
+  }
+#ifdef DEBUG
+  printf("Query pos %u return %u Failed\n", pos, i - block_begin);
+#endif
+  return -5;
 }
 
 /*
@@ -44,25 +72,6 @@ int bitCount(int x)
   c = (c & 0x00FF00FF) + ((c >> 8) & 0x00FF00FF);
   c = (c & 0x0000FFFF) + ((c >> 16) & 0x0000FFFF);
   return c;
-}
-
-/*
- * ilog2 - return floor(log base 2 of x), where x > 0
- *   Example: ilog2(16) = 4
- *   Legal ops: ! ~ & ^ | + << >>
- *   Max ops: 90
- *   Rating: 4
- */
-int ilog2(int x)
-{
-  //This program takes refrence to the Internet
-  //First consider the First 16 bit of x,if x>0xffff then the last 16 bit is useless so we can do right shift
-  //After the right shift,what is left is the original First 16 bits
-  //t records the answer
-  //use (!!x) as a representation of (x!=0)
-  //use bit-or to do add operation
-  //return 2;
-  return 2;
 }
 
 void printb(int len)
@@ -99,7 +108,7 @@ void printb(int len)
 
 void prints(int len)
 {
-  int size = (len / BIT_WIDTH_IN_BITS) ;
+  int size = (len / BIT_WIDTH_IN_BITS)+1; //ceilq
 
   // calcaulate every usage of int in bitmap
   int *tem = malloc(sizeof(int) * size);
@@ -168,10 +177,10 @@ int main()
   while (1)
   {
     scanf("%c%d", &code, &num);
-
     if (code == 's')
-    { 
-      if(num>size){
+    {
+      if (num >= size) //pos begin with 0
+      {
         printf("%u exceed size %u \n", num, size);
         continue;
       }
@@ -182,11 +191,14 @@ int main()
     {
       CLEAR_BITMAP(num);
     }
-    else
+    else if (code=='q')
     {
+      query_bitmap(num);
       continue;
     }
-
+    else{
+      continue;
+    }
     printb(size);
   }
 

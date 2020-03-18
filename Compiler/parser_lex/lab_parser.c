@@ -115,7 +115,7 @@ bool isProExisted(char* vname);
 /*获得下一符号，指针不变*/
 int getNextToken();
  
-char input[MAX_COUNT][17];//存放输入文件所有符号的数组
+
 int kind[MAX_COUNT];
 int inputCount;//输入符号的数量
 int pToken;//指向当前输入符号
@@ -130,144 +130,32 @@ varRecord var[MAX_COUNT];//存放变量名表项数组
 proRecord pro[MAX_COUNT];//存放过程名表项数组
 int varCount;//变量的数量
 int proCount;//过程的数量
- 
-FILE* inFile;//输入文件句柄
-FILE* outFile;//输出文件句柄
-FILE* errFile;//错误文件句柄
-FILE* varFile;//变量文件句柄
-FILE* proFile;//过程文件句柄
- 
+
+#define TOKENSIZE 256
+#define MAXSIZE 2048
+#define MAXLINE 128
+#define CODE_FILE_NAME "src.txt"
+#define DYD_FILE_NAME "out.dyd"
+#define ERR_FILE_NAME "out.err"
+char *errFile = NULL;
+char input[MAX_COUNT][17];//存放输入文件所有符号的数
+char code[MAXSIZE] = "";
+char *project = code;
+char token[TOKENSIZE] = "";
+char dyd_file[MAXSIZE] = "";
+char err_file[MAXSIZE] = "";
 /*主函数*/
 int main(int argc, char* argv[])
 {
-	if (init(argc, argv))
-	{
+
 		A();
 		final();
-	}
+
 	return 0;
 }
-bool init(int argc, char* argv[])
-{
-	if (argc != 2)
-	{
-		return false;
-	}
-	else
-	{
-		char* inFilename = argv[1];
-		char outFilename[MAX_COUNT] = "";
-		char errFilename[MAX_COUNT] = "";
-		char varFilename[MAX_COUNT] = "";
-		char proFilename[MAX_COUNT] = "";
-		char filename[MAX_COUNT] = "";
-		char path[MAX_COUNT] = "";
-		//获得文件名（不包括扩展名）和路径
-		getFilename(inFilename, filename);
-		getPath(inFilename, path);
-		//生成输出文件全部路径
- 
-		strcat(outFilename, path);
-		//strcat(outFilename, "\\");
-		strcat(outFilename, filename);
-		strcat(outFilename, ".dys");
-		//生成错误文件全部路径
- 
-		strcat(errFilename, path);
-		//strcat(errFilename, "\\");
-		strcat(errFilename, filename);
-		strcat(errFilename, ".err");
-		//生成变量文件全部路径
- 
-		strcat(varFilename, path);
-		//strcat(varFilename, "\\");
-		strcat(varFilename, filename);
-		strcat(varFilename, ".var");
-		//生成过程文件全部路径
- 
-		strcat(proFilename, path);
-		//strcat(proFilename, "\\");
-		strcat(proFilename, filename);
-		strcat(proFilename, ".pro");
-		//打开文件句柄
-		if ((inFile = fopen(inFilename, "r")) && (outFile = fopen(outFilename, "w")) && (errFile = fopen(errFilename, "w")) && (varFile = fopen(varFilename, "w")) && (proFile = fopen(proFilename, "w")))
-		{
-			//初始化单词指针、字符指针、行号、层次
-			inputCount = 0;
-			pToken = 0;
-			pChar = 0;
-			lineNum = 1;//当前行号
-			//level = 0;//当前层次
-			//varCountInPro = 0;
-			strcpy(currentPro.pname, "");
-			currentPro.plev = 0;
-			currentPro.varNum = 0;
-			currentPro.parameter = -1;
- 
-			varCount = 0;
-			proCount = 0;
-			//读取输入文件内容，初始化input数组
-			while (!feof(inFile))
-			{
-				char stringOfLine[MAX_COUNT];
-				if (fgets(stringOfLine, MAX_COUNT, inFile))
-				{
-					char lineString[20] = "";
-					strncpy(lineString, stringOfLine, 19);
-					char* kindString = strrchr(lineString, ' ');
-					kind[inputCount] = atoi(kindString+1);
- 
-					char string[17] = "";
-					strncpy(string, stringOfLine, 16);
-					char* lastString = strrchr(string, ' ');
-					strcpy(input[inputCount], lastString + 1);
- 
-					inputCount++;
-				}
-			}
-			return true;
-		}
-		else
-		{
-			fclose(inFile);
-			fclose(outFile);
-			fclose(errFile);
-			fclose(varFile);
-			fclose(proFile);
-			return false;
-		}
- 
- 
-	}
-}
-bool final()
-{
-	for (int i = 0; i < varCount; i++)
-	{
-		int vkind = var[i].vkind ? 1 : 0;
-		char* vtype = (var[i].vtype == integer) ? "integer" : "";
-		fprintf(varFile, "%16s %16s %d %s %d %d\n", var[i].vname, var[i].vproc, vkind, vtype, var[i].vlev, var[i].vadr);
-	}
-	for (int i = 0; i < proCount; i++)
-	{
-		char* ptype = (pro[i].ptype == integer) ? "integer" : "";
-		fprintf(proFile, "%16s %s %d %d %d\n", pro[i].pname, ptype, pro[i].plev, pro[i].fadr, pro[i].ladr);
-	}
-	if (fseek(inFile, 0, 0) == 0)
-	{
-		while (!feof(inFile))
-			fputc(fgetc(inFile), outFile);
- 
-	}
- 
-	bool val;
-	val = fclose(inFile);
-	val = fclose(outFile);
-	val = fclose(errFile);
-	val = fclose(varFile);
-	val = fclose(proFile);
-	return val;
-}
+
+
+
 bool error(int lineNum,int errNum,const char* symbol)
 {
 	char* errInfo;
@@ -296,31 +184,13 @@ bool error(int lineNum,int errNum,const char* symbol)
 	}
 	return 1;
 }
-void getPath(char* in, char* out)
-{
-	char* name;
-	name = strrchr(in, '\\');
-	if (name != NULL)
-		strncpy(out, in, strlen(in) - strlen(name) + 1);
-	else
-		strcpy(out, "");
-}
-void getFilename(char* in, char* out)
-{
-	char* fullName;
-	char* extension;
-	fullName = strrchr(in, '\\');
-	extension = strrchr(in, '.');
-	if (fullName != NULL)
-		strncpy(out, fullName + 1, strlen(fullName) - 1 - strlen(extension));
-	else
-		strncpy(out, in, strlen(in) - strlen(extension));
-}
+
+
 bool nextToken()
 {
 	pToken++;
 	pChar = 0;
-	if (strcmp(input[pToken], "EOF") == 0)
+	if (strcmp(input[pToken], "$EOF") == 0)
 	{
 		return true;
 	}
