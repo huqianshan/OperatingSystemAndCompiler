@@ -45,7 +45,7 @@ word_t flag_key(word_t key){
     key &= 0x1FF;
     return key;
 }
-*/
+Not Used*/
 
 /**
  * key helper function
@@ -58,6 +58,7 @@ word_t flag_key(word_t key){
 // get the flag(access information)
 #define ACCESS_TIME(key) (key & 0x3ffff)
 
+// get block offset within page
 word_t block_offset(word_t lbn)
 {
     word_t block_begin, block_offset;
@@ -70,7 +71,6 @@ word_t block_offset(word_t lbn)
 /**
  * init map table by logic block size
  */
-
 int init_maptable(word_t size);
 
 /**
@@ -96,7 +96,6 @@ word_t read_maptable(word_t lbn);
  *  update the bitmap
  *  increase access time in flag of key
  */
-
 int write_maptable(word_t lbn);
 
 #endif

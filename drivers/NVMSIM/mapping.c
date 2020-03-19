@@ -23,7 +23,6 @@ int update_maptable(word_t index,word_t key){
         printf("update for maptable failed index %u too big\n", index);
         return -6;
     }
-
     // maybe make sure the data recovery here
     MapTable[index] = key;
     return 0;
@@ -42,17 +41,14 @@ word_t get_maptable(word_t lbn){
 
 word_t read_maptable(word_t lbn){
     word_t key,phy_page_n,phy_block_n;
-
     // check for return value
     key = get_maptable(lbn);
     phy_page_n = PHYSICAL_PAGE_NUM(key);
-
     //calcaulate the offset of phy_block
 #ifdef PAGE_MAPPING
     phy_block_n = phy_page_n * PAGE_SIZE + block_offset(lbn);
     return phy_block_n;
 #endif
-
     return 0;
 }
 
@@ -67,19 +63,16 @@ int write_maptable(word_t lbn){
     //calcaulate the offset of phy_block
 #ifdef PAGE_MAPPING
     phy_block_n = phy_page_n * PAGE_SIZE + block_offset(lbn);
-
     // update bitmap
-    SET_BITMAP(phy_block_n);
+    //SET_BITMAP(phy_block_n);
     // add access time
     word_t newkey = key + 1;
     if(update_maptable(phy_page_n, newkey)!=0){
         prinf("update accesstime in maptable  failed\n");
         return -9;
     }
-
     return phy_block_n;
 #endif
-
     return 0;
 }    
 
