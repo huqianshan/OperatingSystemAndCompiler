@@ -44,6 +44,8 @@ int init_bitmap(int num);
 /**
  * Query for the free block in page
  * return block index  within page
+ *  pos: lbn
+ *  return: 
  */
 word_t query_bitmap(word_t pos);
 

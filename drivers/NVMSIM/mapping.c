@@ -1,25 +1,44 @@
-#include<stdio.h>
-#include<stdlib.h>
-
-#include "bit_map.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+//#include "bit_map.h"
 #include "mapping.h"
 
-int  init_maptable(word_t size){
-    word_t page_num = size / PAGE_SIZE;
-    word_t *tem = calloc(page_num, sizof(word_t));
+int init_maptable(word_t size)
+{
+    //word_t page_num = size / PAGE_SIZE;
+    word_t page_num = size;
+    word_t *tem = calloc(page_num, BIT_WIDTH_IN_BYTES);
 
-    if(tem==NULL){
+    if (tem == NULL)
+    {
         printf("malloc for maptable failed pagenum:%u\n", page_num);
         return -4;
     }
     MapTable = tem;
-      printf("Maptable address: 0x%x table size: %u\n", MapTable, page_num);
-  return 0;
+    printf("Maptable address: 0x%x table size: %u\n", MapTable, page_num);
+    return 0;
 }
 
-int update_maptable(word_t index,word_t key){
+int init_indextable(word_t size){
+    word_t page_num = size / PAGE_SIZE;
+    word_t *tem = calloc(page_num, BIT_WIDTH_IN_BITS);
+
+    if (tem == NULL)
+    {
+        printf("malloc for indexTable failed pagenum:%u\n", page_num);
+        return -4;
+    }
+    IndexTable= tem;
+    printf("Indextable address: 0x%x table size: %u\n", MapTable, page_num);
+    return 0;
+}
+
+int update_maptable(word_t index, word_t key)
+{
     // check for the valid parameter
-    if(index>(TOTAL_PAGES)){
+    if (index > (TOTAL_PAGES))
+    {
         printf("update for maptable failed index %u too big\n", index);
         return -6;
     }
@@ -28,51 +47,80 @@ int update_maptable(word_t index,word_t key){
     return 0;
 }
 
-
-word_t get_maptable(word_t lbn){
+word_t get_maptable(word_t lbn)
+{
     // check
-    if(lbn>(TOTAL_SECTORS)||lbn<=0){
+    if (lbn > (TOTAL_SECTORS) || lbn < 0)
+    {
         printf("get for maptable failed index %u too big\n", lbn);
-        return -7;// bug return type bug
+        return -7; // bug return type bug
     }
     // get key by logical page number
-    return MapTable[BLOCK_TO_PAGE(lbn)];
+    return MapTable[lbn];
 }
 
-word_t read_maptable(word_t lbn){
-    word_t key,phy_page_n,phy_block_n;
-    // check for return value
-    key = get_maptable(lbn);
-    phy_page_n = PHYSICAL_PAGE_NUM(key);
-    //calcaulate the offset of phy_block
-#ifdef PAGE_MAPPING
-    phy_block_n = phy_page_n * PAGE_SIZE + block_offset(lbn);
-    return phy_block_n;
-#endif
-    return 0;
-}
 
-int write_maptable(word_t lbn){
-    word_t key,phy_page_n,phy_block_n;
+int map_maptable(word_t lbn,word_t pbn)
+{
+    word_t key,num,newkey;
 
     // check for return value
     key = get_maptable(lbn);
     // if key=0 indicates lbn not mapping
-    phy_page_n = PHYSICAL_PAGE_NUM(key);
+    num = ACCESS_TIME(key)+1;
 
-    //calcaulate the offset of phy_block
 #ifdef PAGE_MAPPING
-    phy_block_n = phy_page_n * PAGE_SIZE + block_offset(lbn);
-    // update bitmap
-    //SET_BITMAP(phy_block_n);
-    // add access time
-    word_t newkey = key + 1;
-    if(update_maptable(phy_page_n, newkey)!=0){
-        prinf("update accesstime in maptable  failed\n");
+    //Bug check for overflow
+    newkey = MAKE_KEY(pbn, num);
+    if (update_maptable(lbn, newkey) != 0)
+    {
+        printf("update accesstime in maptable  failed\n");
         return -9;
     }
-    return phy_block_n;
+    printf("Map: lbn-:pbn  [%u]-:[%u] \n", lbn, pbn);
+    printf("Map: lbn      pbn      key      num      newkey\n");
+    printf("%6u%6u%6u%6u%6u\n", lbn, pbn, key, num, newkey);
+    return num;
 #endif
     return 0;
-}    
+}
 
+int demap_maptable(word_t lbn){
+    word_t key = get_maptable(lbn);
+    word_t access_num = ACCESS_TIME(key);
+
+    if(update_maptable(lbn,access_num)!=0){
+        printf("Demap in maptable failed lbn:accessTime [%u]:[%u]\n",
+        lbn,access_num);
+        return -7;
+    }
+    return 0;
+}
+
+int print_maptable(word_t lbn){
+    word_t i, tem;
+    printf("------------Mapping Table-----------------\n");
+    printf("    lbn      pbn      accesstime            \n");
+    for (i = 0; i <= lbn; i++)
+    {
+        tem = get_maptable(i);
+        if(tem!=0){
+            printf("%8u%8u%8u\n", i, \
+            PHYSICAL_PAGE_NUM(tem), ACCESS_TIME(tem));
+        }
+    }
+}
+
+int index_indextable(){
+    if(IndexTable==NULL){
+        printf("can't find index,indextable is null\n");
+        return -8;
+    }
+    word_t i = 0;
+    word_t tem = IndexTable[i];
+    while(tem!=0){
+        i++;
+        tem = IndexTable[i];
+    }
+    return i;
+}

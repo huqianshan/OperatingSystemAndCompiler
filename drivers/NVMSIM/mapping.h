@@ -1,12 +1,20 @@
 #ifndef MAPPING_H
 #define MAPPING_H
 
+typedef uint32_t word_t;
+/* The length of a "Bit",equal to int size*/
+#define BIT_WIDTH_IN_BYTES (sizeof(int))
+#define BIT_WIDTH_IN_BITS (BIT_WIDTH_IN_BYTES << 3)
+/* the position in "int" Bitmap */
+#define INT_OFFSET(pos) (pos / (BIT_WIDTH_IN_BITS))
+
 // page-maping and use block offset
 #define PAGE_MAPPING
 
 /* Mapping Table*/
 word_t *MapTable;
-
+// index Table
+word_t *IndexTable;
 /**
  * Mapping Table parameters
  */
@@ -52,21 +60,25 @@ Not Used*/
  * 18+14
  * physical-page-number + access information
  */
-// get the physical-page-number by key
+// get the physical-page-number by key bug mapping not page
 #define PHYSICAL_PAGE_NUM(key) (key >> 14)
 
 // get the flag(access information)
-#define ACCESS_TIME(key) (key & 0x3ffff)
+#define ACCESS_TIME(key) (key & 0x3fff)
+
+// make newkey by pbn and access time
+#define MAKE_KEY(pbn,num) ((pbn<<14)+num)
 
 // get block offset within page
+/*
 word_t block_offset(word_t lbn)
 {
-    word_t block_begin, block_offset;
+    word_t block_begin, offset;
     block_begin = INT_OFFSET(lbn) * PAGE_SIZE;
-    block_offset = lbn - block_begin;
+    offset = lbn - block_begin;
 
-    return block_offset;
-}
+    return offset;
+}*/
 
 /**
  * init map table by logic block size
@@ -81,21 +93,48 @@ int update_maptable(word_t index, word_t key);
 /**
  * get key from maptable by index(logic-block-number)
  */
-int get_maptable(word_t lbn);
-
-/** 
- * for read: 
- * just get the key by logical-block-number
- * return physical-block-number
- */
-word_t read_maptable(word_t lbn);
+word_t get_maptable(word_t lbn);
 
 /**
- * for write: 
- *  return the physical-block-number;
- *  update the bitmap
- *  increase access time in flag of key
+ * for map: 
+ *   make the map from lbn->pbn
+ *   return access time for lbn
  */
-int write_maptable(word_t lbn);
+int map_maptable(word_t lbn,word_t pbn);
 
+/**
+ * demap:
+ *  clear the physical-block-number
+ *  but reserve the access time
+ * 
+*/
+int demap_maptable(word_t lbn);
+
+/**
+ * print the mapping 
+ *  bug too big
+ */
+int print_maptable(word_t lbn);
+
+/**
+ * init
+ */
+int init_indextable(word_t size);
+
+/**
+ *index_indextable:
+ *      return the first index equals zero
+*/
+int index_indextable();
+
+/**
+ * insert:
+ *    insert
+*/
+int inset_indextable();
+
+/***
+ *  clear
+ */
+int clear_indextable();
 #endif

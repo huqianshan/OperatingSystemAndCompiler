@@ -5,6 +5,7 @@
 //#include <math.h>
 
 #include "bit_map.h"
+#include "mapping.h"
 
 #define DEBUG
 
@@ -103,6 +104,7 @@ void printb(int len)
   }
   prints(len);
   print_ait(len);
+  print_maptable(len);
   printf("\n");
 }
 
@@ -171,29 +173,32 @@ int main()
   scanf("%d", &size);
   init_bitmap(size);
   init_ait(size);
+  init_maptable(size);
 
-  int num;
+  int lbn;
   char code;
   while (1)
   {
-    scanf("%c%d", &code, &num);
+    scanf("%c%d", &code, &lbn);
     if (code == 's')
     {
-      if (num >= size) //pos begin with 0
+      if (lbn >= size) //pos begin with 0
       {
-        printf("%u exceed size %u \n", num, size);
+        printf("%u exceed size %u \n", lbn, size);
         continue;
       }
-      SET_BITMAP(num);
-      update_ait(num);
+      SET_BITMAP(lbn);
+      update_ait(lbn);
+      map_maptable(lbn,lbn);
     }
     else if (code == 'c')
     {
-      CLEAR_BITMAP(num);
+      CLEAR_BITMAP(lbn);
+      demap_maptable(lbn);
     }
     else if (code=='q')
     {
-      query_bitmap(num);
+      query_bitmap(lbn);
       continue;
     }
     else{

@@ -22,7 +22,7 @@ LIBS = -lm
 # with a working directory of the directory containing the kernel
 # source and compile only the modules in the PWD (local) directory.
 
-build: nvmsim test
+build: nvmsim test map
 
 nvmsim:
 	make -C /lib/modules/$(shell uname -r)/build M=$(CURDIR) modules
@@ -31,7 +31,10 @@ nvmsim:
 
 clean:
 	rm -rf *.o *.ko *.mod.c Module.* modules.* \
-	       *~ .*~ .\#*~ \#*~ .*.cmd .tmp* bitmap
+	       *~ .*~ .\#*~ \#*~ .*.cmd .tmp* bit_map
 
-test: bit_map.c bit_map.h
-	${CC} ${FLAGS} -o bit_map bit_map.c ${LIBS}
+test: bit_map.c bit_map.h mapping.c mapping.h
+	${CC} ${FLAGS} -o bit_map bit_map.c mapping.c ${LIBS}
+
+map: mapping.c mapping.h
+	${CC} ${FLAGS} -o mapping mapping.c ${LIBS}
