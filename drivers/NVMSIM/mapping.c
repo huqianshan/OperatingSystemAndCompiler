@@ -36,7 +36,7 @@ int init_indextable(word_t size){
 
 int update_maptable(word_t index, word_t key)
 {
-    // check for the valid parameter
+    // check for the valid parameter index bug
     if (index > (TOTAL_PAGES))
     {
         printf("update for maptable failed index %u too big\n", index);
@@ -77,9 +77,8 @@ int map_maptable(word_t lbn,word_t pbn)
         printf("update accesstime in maptable  failed\n");
         return -9;
     }
-    printf("Map: lbn-:pbn  [%u]-:[%u] \n", lbn, pbn);
-    printf("Map: lbn      pbn      key      num      newkey\n");
-    printf("%6u%6u%6u%6u%6u\n", lbn, pbn, key, num, newkey);
+    printf("Map: lbn   pbn   key   num   newkey\n");
+    printf("     %-6u%-6u%-6u%-6u%-6u\n", lbn, pbn, key, num, newkey);
     return num;
 #endif
     return 0;
@@ -98,15 +97,17 @@ int demap_maptable(word_t lbn){
 }
 
 int print_maptable(word_t lbn){
-    word_t i, tem;
+    word_t i, tem,pbn;
     printf("------------Mapping Table-----------------\n");
     printf("    lbn      pbn      accesstime            \n");
     for (i = 0; i <= lbn; i++)
     {
         tem = get_maptable(i);
-        if(tem!=0){
-            printf("%8u%8u%8u\n", i, \
-            PHYSICAL_PAGE_NUM(tem), ACCESS_TIME(tem));
+        pbn = PHYSICAL_PAGE_NUM(tem);
+        if (pbn != 0)
+        // bug ,=0->0 not show ;solved begin with [1,size]
+        {
+            printf("%8u%8u%8u\n", i, pbn, ACCESS_TIME(tem));
         }
     }
 }

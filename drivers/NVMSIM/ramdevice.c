@@ -134,11 +134,11 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	// vmaloc allocate in size bytes
 	if (NVM_USE_HIGHMEM())
 	{
-		device->nvmdev_data = hmalloc(device->nvmdev_capacity << SECTOR_BYTES_SHIFT);
+		device->nvmdev_data = hmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
 	}
 	else
 	{
-		device->nvmdev_data = vmalloc(device->nvmdev_capacity << SECTOR_BYTES_SHIFT);
+		device->nvmdev_data = vmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
 	}
 
 	if (device->nvmdev_data != NULL)
@@ -153,12 +153,10 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	else
 	{
 		printk(KERN_ERR "NVMSIM: %s(%d): NVM space allocation failed\n", __FUNCTION__, __LINE__);
-
 		goto out_free_struct;
 	}
 
 	// Allocate the block request queue by blk_alloc_queue without I/O scheduler
-
 	device->nvmdev_queue = blk_alloc_queue(GFP_KERNEL);
 	if (!device->nvmdev_queue)
 	{
@@ -169,8 +167,8 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 
 	//blk_queue_max_hw_sectors(device->nvmdev_queue, 255);//set max sectors for a request for this queue
 
-	blk_queue_logical_block_size(device->nvmdev_queue, HARDSECT_SIZE); //set logical block size for the queue
-
+	//set logical block size for the queue
+	blk_queue_logical_block_size(device->nvmdev_queue, HARDSECT_SIZE); 
 	// Allocate the disk device /* cannot be partitioned */
 	device->nvmdev_disk = alloc_disk(PARTION_PER_DISK);
 	disk = device->nvmdev_disk;
@@ -186,7 +184,6 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 
 	// in sectors
 	set_capacity(disk, capacity_mb << MB_PER_SECTOR_SHIFT);
-
 	return device;
 
 	// Cleanup on error
@@ -247,6 +244,7 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 	// TODO the judge condition and out information
 
 	// bi_iter.bi_size is the number ofremained bi_vec
+	// logcial block number lbn
 	sector = bio->bi_iter.bi_sector;
 	capacity = get_capacity(bio->bi_disk);
 	if (sector + (bio->bi_iter.bi_size >> SECTOR_SHIFT) > capacity)
@@ -289,6 +287,7 @@ static int nvm_do_bvec(struct nvm_device *device, struct page *page,
 	void *mem;
 	int err = 0;
 
+	// map to kernel address 
 	mem = kmap_atomic(page);
 	if (rw == READ)
 	{
@@ -336,7 +335,7 @@ static int nvm_ioctl(struct block_device *bdev, fmode_t mode,
 static int nvm_disk_getgeo(struct block_device *bdev,
 						   struct hd_geometry *geo)
 {
-
+	// bug to check size and geo argu
 	long size;
 	struct nvm_device *dev = bdev->bd_disk->private_data;
 

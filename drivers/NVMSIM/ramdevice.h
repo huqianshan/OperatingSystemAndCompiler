@@ -54,7 +54,6 @@ void *g_highmem_curr_addr = NULL;    /* beginning of the available HIGH_MEM spac
 
 
 #define NVM_MAJOR 231
-#define SECTOR_BYTES_SHIFT 9
 #define PAGE_SECTORS_SHIFT (PAGE_SHIFT - SECTOR_SHIFT)
 #define PAGE_SECTORS (1 << PAGE_SECTORS_SHIFT)
 

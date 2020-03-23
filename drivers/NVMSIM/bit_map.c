@@ -19,27 +19,24 @@ int init_bitmap(int num)
     return -1;
   }
   BitMap = tem;
-  printf("Bitmap address 0x%x  size: %d (int) %u(bytes)\n", BitMap, size, size*BIT_WIDTH_IN_BYTES);
+  printf("Bitmap address 0x%x  size: %d (int) %u(bytes)\n", BitMap, size, size * BIT_WIDTH_IN_BYTES);
   return 0;
 }
 
 word_t query_bitmap(word_t pos)
 {
+
   // find the first free block of page pos
   word_t page_off = INT_OFFSET(pos);
-  word_t block_begin = page_off * PAGE_SIZE;
-  word_t block_end = (page_off + 1) * PAGE_SIZE;
+  word_t block_begin = page_off * BIT_WIDTH_IN_BITS;
+  word_t block_end = (page_off + 1) * BIT_WIDTH_IN_BITS;
 
   int i;
   for (i = block_begin; i < block_end; i++)
   {
     if (BOOL(i) == 0)
     {
-#ifdef DEBUG
-      printf("Query pos %u: Page [%u] Offset [%u] BitPos [%u] \n",\
-       pos, page_off,i - block_begin,i);
-#endif
-      return (i - block_begin);
+      return i;
     }
   }
 #ifdef DEBUG
@@ -103,14 +100,14 @@ void printb(int len)
     }
   }
   prints(len);
-  print_ait(len);
+  //print_ait(len);
   print_maptable(len);
   printf("\n");
 }
 
 void prints(int len)
 {
-  int size = (len / BIT_WIDTH_IN_BITS)+1; //ceilq
+  int size = (len / BIT_WIDTH_IN_BITS) + 1; //ceilq
 
   // calcaulate every usage of int in bitmap
   int *tem = malloc(sizeof(int) * size);
@@ -167,15 +164,63 @@ void print_ait(int len)
   printf("\n");
 }
 
+word_t set_helper(word_t lbn)
+{
+  //1. find maptable
+  word_t key = get_maptable(lbn);
+  word_t pbn = PHYSICAL_PAGE_NUM(key);
+
+  if (pbn == 0)
+  {
+    // not map
+    pbn = query_bitmap(lbn);
+    printf("pbn: %u\n", pbn);
+    SET_BITMAP(pbn);
+    map_maptable(lbn, pbn + 1); // map table not begin with 0 but 1
+  }else{
+    // only add acces time
+    word_t num = ACCESS_TIME(key) + 1;
+    word_t newkey = MAKE_KEY(pbn, num);
+    if (update_maptable(lbn, newkey) != 0)
+    {
+        printf("update accesstime in maptable  failed\n");
+        return 0;
+    }
+  }
+  return pbn;
+}
+
+word_t read_helper(word_t lbn)
+{
+  // 1. find maptable
+  word_t key = get_maptable(lbn);
+  word_t pbn = PHYSICAL_PAGE_NUM(key);
+  return pbn;
+}
+
+void clear_helper(word_t lbn){
+    //1. find maptable
+  word_t key = get_maptable(lbn);
+  word_t pbn = PHYSICAL_PAGE_NUM(key);
+
+  if(pbn==0){
+    return;
+  }
+
+  printf("Clear lbn: %u pbn:%u\n", lbn, pbn);
+  CLEAR_BITMAP((pbn-1));
+  demap_maptable(lbn);
+}
+
 int main()
 {
-  int size;
+  int size; //8338608
   scanf("%d", &size);
   init_bitmap(size);
-  init_ait(size);
+  //init_ait(size);
   init_maptable(size);
 
-  int lbn;
+  word_t lbn;
   char code;
   while (1)
   {
@@ -187,21 +232,33 @@ int main()
         printf("%u exceed size %u \n", lbn, size);
         continue;
       }
-      SET_BITMAP(lbn);
-      update_ait(lbn);
-      map_maptable(lbn,lbn);
+      set_helper(lbn);
     }
     else if (code == 'c')
     {
-      CLEAR_BITMAP(lbn);
-      demap_maptable(lbn);
+      clear_helper(lbn);
     }
-    else if (code=='q')
+    else if (code == 'q')
     {
-      query_bitmap(lbn);
+      word_t pbn = query_bitmap(lbn);
+      printf("Query lbn:%u return pbn:%u\n", lbn, pbn);
       continue;
     }
-    else{
+    else if (code == 'r')
+    {
+      word_t pbn = read_helper(lbn);  // map return bigger than bigtmap
+      if (pbn == 0)
+      {
+        printf("Read failed\n");
+      }
+      else
+      {
+        printf("Read lbn:%u return pbn:%u\n", lbn, pbn);
+      }
+      continue;
+    }
+    else
+    {
       continue;
     }
     printb(size);
