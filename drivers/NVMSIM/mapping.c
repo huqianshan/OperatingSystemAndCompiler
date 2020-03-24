@@ -63,7 +63,6 @@ word_t get_maptable(word_t lbn)
 int map_maptable(word_t lbn,word_t pbn)
 {
     word_t key,num,newkey;
-
     // check for return value
     key = get_maptable(lbn);
     // if key=0 indicates lbn not mapping
@@ -95,6 +94,8 @@ int demap_maptable(word_t lbn){
     }
     return 0;
 }
+
+
 
 int print_maptable(word_t lbn){
     word_t i, tem,pbn;
