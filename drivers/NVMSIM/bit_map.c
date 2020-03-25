@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <stdint.h> /* for uint32_t */
 #include <string.h>
-//#include <math.h>
+#include <math.h>
 
 #include "bit_map.h"
 #include "mapping.h"
+#include "kth.h"
 
 #define DEBUG
 
@@ -54,7 +55,7 @@ word_t query_bitmap(word_t pos)
  */
 int bitCount(int x)
 {
-  /* So So difficult
+  /* 
   This method is based on Divide and Conquer
   Is also known as haming weight "popcount" or "sideways addition"
   'variable-precision SWAR algorithm'
@@ -177,14 +178,16 @@ word_t set_helper(word_t lbn)
     printf("pbn: %u\n", pbn);
     SET_BITMAP(pbn);
     map_maptable(lbn, pbn + 1); // map table not begin with 0 but 1
-  }else{
+  }
+  else
+  {
     // only add acces time
     word_t num = ACCESS_TIME(key) + 1;
     word_t newkey = MAKE_KEY(pbn, num);
     if (update_maptable(lbn, newkey) != 0)
     {
-        printf("update accesstime in maptable  failed\n");
-        return 0;
+      printf("update accesstime in maptable  failed\n");
+      return 0;
     }
   }
   return pbn;
@@ -198,18 +201,89 @@ word_t read_helper(word_t lbn)
   return pbn;
 }
 
-void clear_helper(word_t lbn){
-    //1. find maptable
+void clear_helper(word_t lbn)
+{
+  //1. find maptable
   word_t key = get_maptable(lbn);
   word_t pbn = PHYSICAL_PAGE_NUM(key);
 
-  if(pbn==0){
+  if (pbn == 0)
+  {
     return;
   }
 
   printf("Clear lbn: %u pbn:%u\n", lbn, pbn);
-  CLEAR_BITMAP((pbn-1));
+  CLEAR_BITMAP((pbn - 1));
   demap_maptable(lbn);
+}
+
+word_t wear_leavel(word_t size)
+{
+  // 1. get keys and index array of maptable
+  word_t *arr = NULL; // key
+  word_t *index = NULL; // lbn
+  word_t n = extract_maptable(size, &arr, &index);
+  printf("[%s()] keys %x index %x size %u\n", __FUNCTION__, arr, index, n);
+
+  if ((!arr) || (!index))
+  {
+    // checkpoint
+    return 0;
+  }
+
+  // make an arry with key value of accesstime not key(pbn+accesstime)
+
+  word_t *tarr = malloc(sizeof(word_t) * n);
+  for (int j = 0; j < n; j++)
+  {
+    tarr[j] = ACCESS_TIME(arr[j]);
+    printf("[%s()] tarr %d:%u:%u\n",__FUNCTION__,j, index[j], tarr[j]);
+  }
+  printf("\n");
+
+  word_t k = ceil(0.2 * n);
+  printf("[%s()] k:%u\n", __FUNCTION__, k);
+  word_t *bigK = bigK_index(tarr, n, k);
+  for (int j = 0; j < k;j++){
+    printf("[%s()] bigK %d:%u lbn:%u pbn:%u times %u\n",__FUNCTION__,
+     j, bigK[j],index[bigK[j]],PHYSICAL_PAGE_NUM(arr[bigK[j]]) ,tarr[bigK[j]]);
+  }
+  word_t *smallK = smallK_index(tarr, n, k);
+
+  word_t tem, bindex, sindex, blbn, slbn, bkey, skey;
+  for (int i = 0; i < k; i++)
+  {
+    // bindex one of the big k index
+    bindex = bigK[i];
+    blbn = index[bindex];
+    bkey = arr[bindex];
+
+    sindex = smallK[i];
+    slbn = index[sindex];
+    skey = arr[sindex];
+
+    map_maptable(blbn, PHYSICAL_PAGE_NUM(skey));
+    printf("[%s()] blbn %u skey %u pbn: %u access %u\n",
+           __FUNCTION__, blbn, skey, PHYSICAL_PAGE_NUM(skey), ACCESS_TIME(skey));
+
+    // here transfer data
+
+    map_maptable(slbn, PHYSICAL_PAGE_NUM(bkey));
+    printf("[%s()] slbn %u bkey %u pbn: %u access %u\n",
+           __FUNCTION__, slbn, bkey, PHYSICAL_PAGE_NUM(bkey), ACCESS_TIME(bkey));
+  }
+  if (bigK && smallK && tarr)
+  {
+    free(bigK);
+    free(smallK);
+    free(tarr);
+  }
+  if (arr && index)
+  {
+    free(arr);
+    free(index);
+  }
+  return 1;
 }
 
 int main()
@@ -230,7 +304,6 @@ int main()
       if (lbn >= size) //pos begin with 0
       {
         printf("%u exceed size %u \n", lbn, size);
-        continue;
       }
       set_helper(lbn);
     }
@@ -242,11 +315,10 @@ int main()
     {
       word_t pbn = query_bitmap(lbn);
       printf("Query lbn:%u return pbn:%u\n", lbn, pbn);
-      continue;
     }
     else if (code == 'r')
     {
-      word_t pbn = read_helper(lbn);  // map return bigger than bigtmap
+      word_t pbn = read_helper(lbn); // map return bigger than bigtmap
       if (pbn == 0)
       {
         printf("Read failed\n");
@@ -255,13 +327,33 @@ int main()
       {
         printf("Read lbn:%u return pbn:%u\n", lbn, pbn);
       }
-      continue;
+    }
+    else if (code == 'e')
+    {
+      word_t *arr = NULL;
+      word_t *index = NULL;
+      word_t n = extract_maptable(size, &arr, &index);
+      printf("%x %x\n", arr, index);
+      if (arr && index)
+      {
+        for (int i = 0; i < n; i++)
+        {
+          printf("lbn %u pbn %u access %u\n", index[i], PHYSICAL_PAGE_NUM(arr[i]), ACCESS_TIME(arr[i]));
+        }
+        free(arr);
+        free(index);
+      }
+    }
+    else if (code == 'w')
+    {
+      wear_leavel(size);
+    }else if(code=='p'){
+      printb(size);
     }
     else
     {
       continue;
     }
-    printb(size);
   }
 
   if (BitMap)

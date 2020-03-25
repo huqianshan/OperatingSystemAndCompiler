@@ -137,4 +137,15 @@ int inset_indextable();
  *  clear
  */
 int clear_indextable();
+
+/**
+ * extract valid map-item from maptable
+ * return n,arr is the map-item array;
+ * 
+ *  table_size: maptable size
+ *  arr: items conatains key
+ *  index: lbn array
+ */
+word_t extract_maptable(word_t table_size, word_t **arr,word_t **index);
+
 #endif

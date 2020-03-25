@@ -95,4 +95,11 @@ word_t get_ait(word_t pos);
 
 void print_ait(int len);
 
+word_t set_helper(word_t lbn);
+word_t read_helper(word_t lbn);
+void clear_helper(word_t lbn);
+
+
+word_t wear_leavel(word_t size);
+
 #endif

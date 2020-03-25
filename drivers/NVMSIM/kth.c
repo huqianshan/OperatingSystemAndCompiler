@@ -123,9 +123,9 @@ int smallK_index(int *arr, int n, int k){
 
     return addr;
 }
-
+/*
 int main(){
-    /*check for minum function*/
+
     //int arr[] = {3,3,3};
     //int arr[] = {};
     //int arr[] = {-1, -3, -2, -1};
@@ -134,9 +134,7 @@ int main(){
     int min_index = maxium(arr, size);
     printf("Arr %x bytes: %d size %d minum index %d min: %d\n", (unsigned)arr, sizeof(arr),size, min_index, arr[min_index]);
 
-    /**
-     * check for bigK function
-     */
+
     int brr[] = {-12,23,44, 1, 5, -2222};
     //int brr[] = {};
     //int brr[] = {3,6,15,894,13,64,1,8161,81,3,631,-115,6135,31135}; // ok
@@ -162,9 +160,7 @@ int main(){
         printf("Failed,Brr %x size %d k %d\n", brr, bsize, k);
     }
 
-    /**
-     * check for bigK_index function
-     */
+
     int *index = smallK_index(brr, bsize, k);
     if(index){
         printf("index:\n");
@@ -177,3 +173,4 @@ int main(){
         printf("index failed\n");
     }
 }
+*/

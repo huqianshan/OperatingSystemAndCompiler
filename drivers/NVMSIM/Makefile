@@ -33,8 +33,8 @@ clean:
 	rm -rf *.o *.ko *.mod.c Module.* modules.* \
 	       *~ .*~ .\#*~ \#*~ .*.cmd .tmp* bit_map mapping data kth
 
-test: bit_map.c bit_map.h mapping.c mapping.h
-	${CC} ${FLAGS} -o bit_map bit_map.c mapping.c ${LIBS}
+test: bit_map.c bit_map.h mapping.c mapping.h kth.c kth.c
+	${CC} ${FLAGS} -o bit_map bit_map.c mapping.c kth.c ${LIBS}
 
 map: mapping.c mapping.h
 	${CC} ${FLAGS} -o mapping mapping.c ${LIBS}

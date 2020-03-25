@@ -43,3 +43,9 @@
 - ToDo **lock**
 
 #### Data consistency and Fault-Tolerance Mechaism
+
+## use `struct` refactory
+
+## bitmap code
+
+32 s1 s2 s2 s3 s3 s3 s4 s4 s4 s4
