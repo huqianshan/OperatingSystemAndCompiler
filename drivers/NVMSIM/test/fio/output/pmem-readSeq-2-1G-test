@@ -1,0 +1,32 @@
+mytest: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=2
+...
+fio-2.2.10
+Starting 3 processes
+
+mytest: (groupid=0, jobs=3): err= 0: pid=10570: Thu Mar 26 18:39:16 2020
+  read : io=3072.0MB, bw=4420.2MB/s, iops=1131.6K, runt=   695msec
+    slat (usec): min=1, max=2568, avg= 1.76, stdev= 5.35
+    clat (usec): min=1, max=3198, avg= 3.06, stdev= 7.06
+     lat (usec): min=3, max=3200, avg= 4.86, stdev= 9.02
+    clat percentiles (usec):
+     |  1.00th=[    2],  5.00th=[    2], 10.00th=[    2], 20.00th=[    2],
+     | 30.00th=[    2], 40.00th=[    3], 50.00th=[    3], 60.00th=[    3],
+     | 70.00th=[    3], 80.00th=[    3], 90.00th=[    4], 95.00th=[    4],
+     | 99.00th=[   18], 99.50th=[   23], 99.90th=[   57], 99.95th=[   82],
+     | 99.99th=[  157]
+    bw (MB  /s): min= 1468, max= 1548, per=34.22%, avg=1512.61, stdev=40.47
+    lat (usec) : 2=0.01%, 4=89.90%, 10=8.96%, 20=0.31%, 50=0.71%
+    lat (usec) : 100=0.09%, 250=0.03%, 500=0.01%, 750=0.01%, 1000=0.01%
+    lat (msec) : 2=0.01%, 4=0.01%
+  cpu          : usr=27.96%, sys=70.40%, ctx=134, majf=0, minf=42
+  IO depths    : 1=0.1%, 2=100.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued    : total=r=786432/w=0/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
+     latency   : target=0, window=0, percentile=100.00%, depth=2
+
+Run status group 0 (all jobs):
+   READ: io=3072.0MB, aggrb=4420.2MB/s, minb=4420.2MB/s, maxb=4420.2MB/s, mint=695msec, maxt=695msec
+
+Disk stats (read/write):
+  pmem0: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
