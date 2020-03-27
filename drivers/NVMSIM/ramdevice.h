@@ -106,7 +106,6 @@ static int hfree(void *addr)
 /**
  * Binder requet to queue
  */
-
 static void nvm_make_request(struct request_queue *q, struct bio *bio);
 
 /**

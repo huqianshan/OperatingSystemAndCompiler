@@ -3,7 +3,6 @@
  * NVM Simulator: RAM based block device driver
  * 
  */
-
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -31,7 +30,6 @@
  *      The mutex guarding the list of devices
  */
 static int nvm_num_devices = 1;
-
 module_param(nvm_num_devices, int, 0);
 
 /**
@@ -67,7 +65,6 @@ static const struct block_device_operations nvmdev_fops = {
  * 	  1. nvm_alloc() : allocates disk and driver 
  *    2. nvm_highmem_map() : make mapping for highmem physical address by ioremap()
  */
-
 void *nvm_highmem_map(void)
 {
 	// https://patchwork.kernel.org/patch/3092221/
@@ -228,7 +225,6 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 	// bio->bi_bdev has been discarded
 	//struct block_device *bdev = bio->bi_bdev;
 	//struct nvm_device *device = bdev->bd_disk->private_data;
-
 	struct nvm_device *nvm_dev = bio->bi_disk->private_data;
 
 	int rw;
@@ -243,7 +239,7 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 	// bi_sector,bi_size has moved to bio->bi_iter.bi_sector
 	// TODO the judge condition and out information
 
-	// bi_iter.bi_size is the number ofremained bi_vec
+	// bi_iter.bi_size is the number of remained bi_vec
 	// logcial block number lbn
 	sector = bio->bi_iter.bi_sector;
 	capacity = get_capacity(bio->bi_disk);
@@ -251,12 +247,6 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 		goto out;
 
 	// Get the request vector
-	// bio_rw and READA has been removed
-	// https://patchwork.kernel.org/patch/9173331/
-	// bio_data_dir == (op_is_write(bio_op(bio)) ? WRITE : READ) 1 0
-	/*rw = bio_rw(bio);
-	if (rw == READA)
-		rw = READ;*/
 	rw = bio_data_dir(bio);
 
 	// Perform each part of a request
@@ -442,3 +432,6 @@ module_init(nvm_init);
 module_exit(nvm_exit);
 MODULE_LICENSE("GPL");
 MODULE_ALIAS_BLOCKDEV_MAJOR(NVM_MAJOR);
+MODULE_AUTHOR("HuQianshan <hujinlei1999@qq.com>");
+MODULE_ALIAS("NVM");
+MODULE_VERSION("0.1");

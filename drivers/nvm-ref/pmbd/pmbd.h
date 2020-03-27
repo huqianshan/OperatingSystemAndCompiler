@@ -228,7 +228,7 @@ typedef struct pmbd_device {
 #define SECTOR_SHIFT			9
 #define PAGE_SHIFT			12
 #define SECTOR_SIZE			(1UL << SECTOR_SHIFT)
-//#define PAGE_SIZE			(1UL << PAGE_SHIFT)
+#define PAGE_SIZE			(1UL << PAGE_SHIFT)
 #define SECTOR_MASK			(~(SECTOR_SIZE-1))
 #define PAGE_MASK			(~(PAGE_SIZE-1))
 #define PMBD_SECTOR_SIZE			SECTOR_SIZE
