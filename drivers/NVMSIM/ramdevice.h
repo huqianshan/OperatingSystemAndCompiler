@@ -7,6 +7,8 @@
 #ifndef __RAMDEVICE_H
 #define __RAMDEVICE_H
 
+typedef unsigned int word_t;
+
 #define MEMCOPY_DEFAULT 1  // use memcopy
 #define MEMCOPY_BARRIER 0  // use barrier
 
@@ -82,6 +84,10 @@ struct nvm_device
 	struct gendisk *nvmdev_disk;		/// Disk
 
 	struct list_head nvmdev_list; /// The collection of lists the device belongs to
+
+	/*Maptable*/
+	word_t *MapTable;
+	spinlock_t map_lock;  
 };
 
 /**
@@ -132,5 +138,37 @@ static int nvm_ioctl(struct block_device *bdev, fmode_t mode,
 
 static int nvm_disk_getgeo(struct block_device *bdev,
 						   struct hd_geometry *geo);
+
+
+/**
+ * Maptabl function
+ */
+// get the flag(access information)
+#define MAP_PER_SECTORS_SHIFT (5)
+#define MAP_PER_SECOTRS (1<<MAP_PER_SECTORS_SHIFT)
+
+/**
+ * key helper function
+ * 18+14
+ * physical-page-number + access information
+ */
+// get the physical-page-number by key bug mapping not page
+#define PHY_SEC_NUM(key) (key >> 14)
+
+// get the flag(access information)
+#define ACCESS_TIME(key) (key & 0x3fff)
+
+// make newkey by pbn and access time
+#define MAKE_KEY(pbn,num) ((pbn<<14)+num)
+
+
+// return maptable addr
+word_t *init_maptable(word_t size);
+int update_maptable(word_t *map_table, word_t index, word_t key);
+word_t get_maptable(word_t *map_table,word_t lbn);
+int map_table(word_t *map_table,word_t lbn, word_t pbn);
+int demap_maptable(word_t *map_table,word_t lbn);
+void print_maptable(word_t *map_table,word_t lbn);
+word_t extract_maptbale(word_t *map_table,word_t table_size, word_t **arr, word_t **index);
 
 #endif

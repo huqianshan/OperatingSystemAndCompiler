@@ -36,13 +36,16 @@ module_param(nvm_num_devices, int, 0);
  * Size of each NVM disk in MB
  */
 int nvm_capacity_mb = 4096;
+int nvm_capacity_mb_shift = 12;
 uint64_t g_highmem_phys_addr = 0x100000000; /* beginning of the reserved phy mem space (bytes)*/
 module_param(nvm_capacity_mb, int, 0);
 MODULE_PARM_DESC(nvm_capacity_mb, "Size of each NVM disk in MB");
-
+//word_t map_table_size= (nvm_capacity_mb << (MB_PER_BYTES_SHIFT - SECTOR_SHIFT - MAP_PER_SECTORS_SHIFT));
+word_t map_table_size = 262144;
 /**
  * The list and mutex of NVM devices
  */
+
 static LIST_HEAD(nvm_list_head);
 static DEFINE_MUTEX(nvm_devices_mutex);
 
@@ -59,6 +62,130 @@ static const struct block_device_operations nvmdev_fops = {
 	.owner = THIS_MODULE,
 	.getgeo = nvm_disk_getgeo,
 };
+
+/**
+ *  Maptable functions
+ */
+word_t *init_maptable(word_t size)
+{
+
+	word_t table_num = size + 1;
+	unsigned long v_size = (unsigned long)table_num * sizeof(word_t);
+	word_t *tem = vmalloc(v_size);
+
+	if (tem == NULL)
+	{
+		printk(KERN_ERR "NVMSIM: %s(%d) init maptable size: %u failed  \n",
+			   __FUNCTION__, __LINE__, table_num);
+	}
+	else
+	{
+		memset(tem, 0, v_size);
+		printk(KERN_INFO "NVMSIM: %s(%d) init maptbale size: %u success addr: %x\n",
+			   __FUNCTION__, __LINE__, table_num, tem);
+	}
+	return tem;
+}
+
+int update_maptable(word_t *map_table, word_t index, word_t key)
+{
+	if (index > map_table_size)
+	{
+		printk(KERN_ERR "NVMSIM: %s(%d) index %u exceed %u,update maptble failed\n",
+			   __FUNCTION__, __LINE__, index, map_table_size);
+		return 0;
+	}
+	map_table[index] = key;
+	return 1;
+}
+
+word_t get_maptable(word_t *map_table, word_t lbn)
+{
+	if (lbn > map_table_size || (lbn < 0))
+	{
+		printk(KERN_ERR "NVMSIM: %s(%d) index %u exceed %u,gete maptble failed\n",
+			   __FUNCTION__, __LINE__, lbn, map_table_size);
+	}
+	return map_table[lbn];
+}
+
+int map_table(word_t *map_table, word_t lbn, word_t pbn)
+{
+	word_t key, num, newkey;
+	// check for return value
+	key = get_maptable(map_table, lbn);
+	// if key=0 indicates lbn not mapping
+	num = ACCESS_TIME(key) + 1;
+
+	newkey = MAKE_KEY(pbn+1, num);
+	if ((update_maptable(map_table, lbn, newkey) == 0))
+	{
+		return -1;
+	}
+	return num;
+}
+
+int demap_maptable(word_t *map_table, word_t lbn)
+{
+	word_t key = get_maptable(map_table, lbn);
+	word_t access_num = ACCESS_TIME(key);
+
+	if (update_maptable(map_table, lbn, access_num) <= 0)
+	{
+		return 0;
+	}
+	return 1;
+}
+void print_maptable(word_t *map_table, word_t lbn)
+{
+	word_t i, tem, pbn;
+	printk(KERN_INFO "NVMSIM: %s(%d)\n------------Mapping Table-----------------\n", __FUNCTION__, __LINE__);
+	printk(KERN_INFO "    lbn      pbn      accesstime            \n");
+	for (i = 0; i <= lbn; i++)
+	{
+		tem = get_maptable(map_table, i);
+		pbn = PHY_SEC_NUM(tem);
+		if (i%1000==0&&pbn != 0)
+		// bug ,=0->0 not show ;solved, pbn begin with [1,size]
+		{
+			printk(KERN_INFO "%8u%8u%8u\n", i, pbn, ACCESS_TIME(tem));
+		}
+	}
+}
+word_t extract_maptbale(word_t *map_table, word_t table_size, word_t **arr, word_t **index)
+{
+	word_t n = 0;
+	word_t tem, pbn;
+	// begin with 1 bug
+	int i = 0;
+	for (i; i < table_size; i++)
+	{
+		tem = get_maptable(map_table, i);
+		pbn = PHY_SEC_NUM(tem);
+		if (pbn != 0)
+		{
+			n++;
+		}
+	}
+	word_t *tem_arr = vmalloc(sizeof(word_t) * n);
+	word_t *new_arr = vmalloc(sizeof(word_t) * n);
+	word_t j = 0;
+	i = 0;
+	for (i; i < table_size; i++)
+	{
+		tem = get_maptable(map_table, i);
+		pbn = PHY_SEC_NUM(tem);
+		if (pbn != 0)
+		{
+			tem_arr[j] = tem;
+			new_arr[j] = i;
+			j++;
+		}
+	}
+	*arr = tem_arr;
+	*index = new_arr;
+	return n;
+}
 
 /**
  * Allocate the NVM device
@@ -127,6 +254,20 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	device->nvmdev_number = index;
 	device->nvmdev_capacity = capacity_mb << MB_PER_SECTOR_SHIFT; // in Sectors
 	spin_lock_init(&device->nvmdev_lock);
+	// maptable init
+	spin_lock_init(&device->map_lock);
+	device->MapTable = init_maptable(map_table_size);
+	if (device->MapTable == NULL)
+	{
+		printk(KERN_ERR "NVMSIM: %s(%d): maptable space allocation %u failed\n",\
+			   __FUNCTION__, __LINE__, map_table_size);
+		goto out_free_struct;
+	}
+	else
+	{
+		printk(KERN_INFO "NVMSIM: %s(%d): maptable space allocation %u Success\n",\
+			   __FUNCTION__, __LINE__, map_table_size);
+	}
 
 	// vmaloc allocate in size bytes
 	if (NVM_USE_HIGHMEM())
@@ -144,7 +285,7 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 		/* FIXME: No need to do this. It's slow, system could be locked up */
 		memset(pmbd->mem_space, 0, pmbd->sectors * pmbd->sector_size);
 #endif
-		printk(KERN_INFO "NVMSIM:  created [%lu : %llu MBs]\n",
+		printk(KERN_INFO "NVMSIM: %s(%d):  created [%lu : %llu MBs]\n", __FUNCTION__, __LINE__,
 			   (unsigned long)device->nvmdev_data, SECTORS_TO_MB(device->nvmdev_capacity));
 	}
 	else
@@ -165,7 +306,7 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
 	//blk_queue_max_hw_sectors(device->nvmdev_queue, 255);//set max sectors for a request for this queue
 
 	//set logical block size for the queue
-	blk_queue_logical_block_size(device->nvmdev_queue, HARDSECT_SIZE); 
+	blk_queue_logical_block_size(device->nvmdev_queue, HARDSECT_SIZE);
 	// Allocate the disk device /* cannot be partitioned */
 	device->nvmdev_disk = alloc_disk(PARTION_PER_DISK);
 	disk = device->nvmdev_disk;
@@ -214,6 +355,14 @@ void nvm_free(struct nvm_device *device)
 		}
 	}
 
+	if (device->MapTable != NULL)
+	{
+		print_maptable(device->MapTable, map_table_size);
+		vfree(device->MapTable);
+		printk(KERN_INFO "NVMSIM: %s(%d): maptable space free %u success\n",\
+			   __FUNCTION__, __LINE__, map_table_size);
+	}
+
 	kfree(device);
 }
 
@@ -248,8 +397,17 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 
 	// Get the request vector
 	rw = bio_data_dir(bio);
-
+	//printk(KERN_INFO "NVMSIM: %s(%d) sector: %lu rw: %d\n",
+	//	   __FUNCTION__, __LINE__, sector, rw);
 	// Perform each part of a request
+	if(rw==WRITE){
+		word_t lbn = (sector >> MAP_PER_SECTORS_SHIFT);
+		word_t num=map_table(nvm_dev->MapTable, lbn, lbn);
+		if(num!=-1){
+			printk(KERN_INFO "maptbale secotr: %u lbn %u times %u success\n",
+				  sector, lbn, num);
+		}
+	}
 	bio_for_each_segment(bvec, bio, iter)
 	{
 		unsigned int len = bvec.bv_len;
@@ -261,7 +419,8 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
 			break;
 		}
 		sector += len >> SECTOR_SHIFT;
-		//TODO BUT MAY BUG secotr not update
+		//printk(KERN_INFO "NVMSIM: %s(%d) sector: %lu rw: %d bvec.bv_len :%u bvec.bv_page :%x bvec.bv_offset %u\n",
+		//	   __FUNCTION__, __LINE__, sector, rw, len, bvec.bv_page, bvec.bv_offset);
 	}
 out:
 	bio_endio(bio);
@@ -277,7 +436,7 @@ static int nvm_do_bvec(struct nvm_device *device, struct page *page,
 	void *mem;
 	int err = 0;
 
-	// map to kernel address 
+	// map to kernel address
 	mem = kmap_atomic(page);
 	if (rw == READ)
 	{
@@ -351,8 +510,8 @@ static int __init nvm_init(void)
 	struct nvm_device *device, *next;
 
 	g_highmem_size = (u64)(nvm_capacity_mb) << MB_PER_BYTES_SHIFT;
-	printk(KERN_ERR "NVMSIM:%llu %llu %llu %llu\n",
-		   g_highmem_size, g_highmem_phys_addr, nvm_capacity_mb, LLONG_MAX);
+	printk(KERN_INFO "NVMSIM: [%s() %d] g_highmem_size %llu bytes g_highmemaddr %llu ; nvm_capacity_mb %llu MB \n",
+		   __FUNCTION__, __LINE__, g_highmem_size, g_highmem_phys_addr, nvm_capacity_mb, LLONG_MAX);
 
 	// remap the highmem physical address
 	if (NVM_USE_HIGHMEM())
@@ -383,7 +542,7 @@ static int __init nvm_init(void)
 	{
 		add_disk(device->nvmdev_disk);
 	}
-	printk(KERN_INFO "nvm: module loaded\n");
+	printk(KERN_INFO "NVMSIM [%s() %d]: module loaded\n", __FUNCTION__, __LINE__);
 	return 0;
 
 out_free:
@@ -423,6 +582,8 @@ static void __exit nvm_exit(void)
 
 	blk_unregister_region(MKDEV(NVM_MAJOR, 0), range);
 	unregister_blkdev(NVM_MAJOR, NVM_DEVICES_NAME);
+	printk(KERN_ERR "NVMSIM: %s(%d) -Exited\n",
+		   __FUNCTION__, __LINE__);
 }
 
 /**
