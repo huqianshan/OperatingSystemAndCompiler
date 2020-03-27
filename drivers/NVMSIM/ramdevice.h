@@ -87,7 +87,11 @@ struct nvm_device
 
 	/*Maptable*/
 	word_t *MapTable;
-	spinlock_t map_lock;  
+	spinlock_t map_lock; 
+
+	/* Bitmap*/
+	word_t *BitMap;
+	spinlock_t bit_lock;
 };
 
 /**
@@ -171,4 +175,54 @@ int demap_maptable(word_t *map_table,word_t lbn);
 void print_maptable(word_t *map_table,word_t lbn);
 word_t extract_maptbale(word_t *map_table,word_t table_size, word_t **arr, word_t **index);
 
+/**
+ * Bitmap
+ */
+
+word_t ONE = 1;
+/* The length of a "Bit",equal to int size*/
+#define BIT_WIDTH_IN_BYTES (sizeof(word_t))
+#define BIT_WIDTH_IN_BITS (BIT_WIDTH_IN_BYTES << 3)
+/* the position in "Bit"*/
+#define BIT_OFFSET(pos) (pos % (BIT_WIDTH_IN_BITS))
+/* the position in "int" Bitmap */
+#define INT_OFFSET(pos) (pos / (BIT_WIDTH_IN_BITS))
+/* Set the pos in Bitmap to one */
+#define SET_BITMAP(pos,BitMap) \
+    (BitMap[INT_OFFSET(pos)] |= (ONE << BIT_OFFSET(pos)))
+/* Clear the pos in Bitmap to zero */
+#define CLEAR_BITMAP(pos,BitMap) \
+    (BitMap[INT_OFFSET(pos)] &= (~(ONE << BIT_OFFSET(pos))))
+/* find the pos postion if is equal to One*/
+#define BOOL(pos,BitMap) \
+	((BitMap[INT_OFFSET(pos)] & (ONE << BIT_OFFSET(pos)))!=0)
+
+/**
+ * Bitmap function
+ */
+//Num is the total numbers of item. 
+word_t *init_bitmap(word_t num);
+
+/**
+ * Query for the free block in page
+ * return physical block number
+ *  pos: lbn
+ *  return: pbn; 0 for not found
+ */
+word_t query_bitmap(word_t *bitmap,word_t pos);
+
+/**
+ * retur ncount of number of 1's in word
+ */
+word_t bitCount(word_t x);
+
+/**
+ *  print first len bits of the bitmap 
+ */
+void printb_bitmap(word_t *bitmap,word_t len);
+
+/**
+ * print summary information of bitmap
+ */
+void print_summary_bitmap(word_t *bitmap,word_t len);
 #endif

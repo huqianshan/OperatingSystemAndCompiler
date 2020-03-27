@@ -53,7 +53,7 @@ word_t query_bitmap(word_t pos)
  *   Max ops: 40
  *   Rating: 4
  */
-int bitCount(int x)
+word_t bitCount(word_t x)
 {
   /* 
   This method is based on Divide and Conquer
@@ -63,8 +63,8 @@ int bitCount(int x)
              2.http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
              3.https://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
   */
-  int c = 0;
-  int v = x;
+  word_t c = 0;
+  word_t v = x;
   c = (v & 0x55555555) + ((v >> 1) & 0x55555555);
   c = (c & 0x33333333) + ((c >> 2) & 0x33333333);
   c = (c & 0x0F0F0F0F) + ((c >> 4) & 0x0F0F0F0F);
@@ -349,6 +349,10 @@ int main()
       wear_leavel(size);
     }else if(code=='p'){
       printb(size);
+    }
+    else if(code=='b'){
+      word_t count = bitCount(lbn);
+      printf("%u has %u 1 bits\n", lbn, count);
     }
     else
     {

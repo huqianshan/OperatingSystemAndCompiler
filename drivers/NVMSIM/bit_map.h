@@ -31,10 +31,7 @@ int *BitMap;
     (BitMap[INT_OFFSET(pos)] &= (~(ONE << BIT_OFFSET(pos))))
 
 /* find the pos postion if is equal to One*/
-#define FIND_POS_EQUL_ONE_BITMAP(pos) \
-    (BitMap[INT_OFFSET(pos)] & (ONE << BIT_OFFSET(pos)))
-
-#define BOOL(pos) (FIND_POS_EQUL_ONE_BITMAP(pos)!=0)
+#define BOOL(pos) (BitMap[INT_OFFSET(pos)] & (ONE << BIT_OFFSET(pos)))
 
 /**
  *  Num is the total numbers of item. 
@@ -52,7 +49,7 @@ word_t query_bitmap(word_t pos);
 /**
  * retur ncount of number of 1's in word
  */
-int bitCount(int x);
+word_t bitCount(word_t x);
 
 /**
  *  print first len bits of the bitmap 
