@@ -16,6 +16,7 @@
 #include <linux/blk_types.h>
 #include <linux/bvec.h>
 #include <asm/io.h>
+#include <linux/proc_fs.h> //proc
 
 #include "mem.h"
 #include "ramdevice.h"
@@ -50,6 +51,28 @@ word_t bit_table_size = 8388608;
 static LIST_HEAD(nvm_list_head);
 static DEFINE_MUTEX(nvm_devices_mutex);
 
+/* /proc file system entry */
+static struct proc_dir_entry *proc_nvm = NULL;
+static struct proc_dir_entry *proc_nvmstat = NULL;
+static struct proc_dir_entry *proc_nvmcfg = NULL;
+
+struct file_operations proc_nvmstat_ops = {
+    //.read = nvm_proc_nvmstat_read, bug
+    .read=seq_read,
+    .owner = THIS_MODULE,
+};
+
+struct file_operations proc_nvmcfg_ops = {
+    //.read = nvm_proc_nvmcfg_read,
+    .read=seq_read,
+    .owner = THIS_MODULE,
+};
+
+struct file_operations proc_nvmdev_ops = {
+    //.read = nvm_proc_devstat_read,
+    .read=seq_read,
+    .owner = THIS_MODULE,
+};
 /**
  * nvm_devices_name:
  *      The name of device
@@ -194,8 +217,11 @@ word_t extract_maptbale(word_t *map_table, word_t table_size, word_t **arr, word
 
 word_t *init_bitmap(word_t num)
 {
-    word_t size = (num / BIT_WIDTH_IN_BITS) + 1; // ceil
-    word_t *tem = vmalloc(size * sizeof(word_t));
+    word_t size, *tem;
+    unsigned long v_size;
+    size = (num / BIT_WIDTH_IN_BITS) + 1;
+    v_size = (unsigned long)size * sizeof(word_t);
+    tem = vmalloc(v_size);
     if (tem == NULL)
     {
         printk(KERN_ERR "NVMSIM: %s(%d) init BitMap size: %u failed  \n",
@@ -203,6 +229,7 @@ word_t *init_bitmap(word_t num)
     }
     else
     {
+        memset(tem, 0, v_size);
         printk(KERN_INFO "NVMSIM: %s(%d) init BitMap size: %u success addr: %x\n",
                __FUNCTION__, __LINE__, size, tem);
     }
@@ -262,6 +289,59 @@ void print_summary_bitmap(word_t *bitmap, word_t len)
     }
     printk(KERN_INFO "\nUsed bits: %d     Free bits %d \n", total, len - total);
 }
+
+/*
+ **************************************************************************
+ * /proc file system entries
+ **************************************************************************
+ */
+
+static int nvm_proc_create(void)
+{
+    proc_nvm = proc_mkdir("nvm", 0);
+    if (proc_nvm == NULL)
+    {
+        printk(KERN_ERR "NVM: %s(%d): cannot create /proc/nvm\n", __FUNCTION__, __LINE__);
+        return -ENOMEM;
+    }
+
+    // create_proc_entry change to proc_create
+    proc_nvmstat = proc_create("nvmstat", S_IRUGO, proc_nvm,&proc_nvmstat_ops);
+    if (proc_nvmstat == NULL)
+    {
+        remove_proc_entry("nvmstat", proc_nvm);
+        printk(KERN_ERR "nvm: cannot create /proc/nvm/nvmstat\n");
+        return -ENOMEM;
+    }
+    //proc_nvmstat->read_proc = nvm_proc_nvmstat_read;
+    printk(KERN_INFO "nvm: /proc/nvm/nvmstat created\n");
+
+    proc_nvmcfg = proc_create("nvmcfg", S_IRUGO, proc_nvm,&proc_nvmcfg_ops);
+    if (proc_nvmcfg == NULL)
+    {
+        remove_proc_entry("nvmcfg", proc_nvm);
+        printk(KERN_ERR "nvm: cannot create /proc/nvm/nvmcfg\n");
+        return -ENOMEM;
+    }
+    //proc_nvmcfg->read_proc = nvm_proc_nvmcfg_read;
+    printk(KERN_INFO "nvm: /proc/nvm/nvmcfg created\n");
+
+    return 0;
+}
+
+static int nvm_proc_destroy(void)
+{
+    remove_proc_entry("nvmcfg", proc_nvm);
+    printk(KERN_INFO "nvm: /proc/nvm/nvmcfg is removed\n");
+
+    remove_proc_entry("nvmstat", proc_nvm);
+    printk(KERN_INFO "nvm: /proc/nvm/nvmstat is removed\n");
+
+    remove_proc_entry("nvm", 0);
+    printk(KERN_INFO "nvm: /proc/nvm is removed\n");
+    return 0;
+}
+
 /**
  * Allocate the NVM device
  * 	  1. nvm_alloc() : allocates disk and driver 
@@ -299,12 +379,242 @@ void nvm_highmem_unmap(void)
     return;
 }
 
+/* device->device_stat */
+static int nvm_stat_alloc(NVM_DEVICE_T *device)
+{
+    int err = 0;
+    device->nvm_stat = (NVM_STAT_T *)kzalloc(sizeof(NVM_STAT_T), GFP_KERNEL);
+    if (device->nvm_stat)
+    {
+        spin_lock_init(&device->nvm_stat->stat_lock);
+    }
+    else
+    {
+        printk(KERN_ERR "nvm: %s(%d): NVM space allocation failed\n", __FUNCTION__, __LINE__);
+        err = -ENOMEM;
+    }
+    return err;
+}
+
+static int nvm_stat_free(NVM_DEVICE_T *device)
+{
+    if (device->nvm_stat)
+    {
+        kfree(device->nvm_stat);
+        device->nvm_stat = NULL;
+    }
+    return 0;
+}
+
+/*
+ * Allocate/free memory backstore space for nvm devices
+ */
+static int nvm_mem_space_alloc(NVM_DEVICE_T *device)
+{
+    int err = 0;
+    // vmaloc allocate in size bytes
+    if (NVM_USE_HIGHMEM())
+    {
+        device->nvmdev_data = hmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
+    }
+    else
+    {
+        device->nvmdev_data = vmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
+    }
+
+    if (device->nvmdev_data != NULL)
+    {
+        printk(KERN_INFO "NVMSIM: %s(%d):  created [%lu : %llu MBs]\n", __FUNCTION__, __LINE__,
+               (unsigned long)device->nvmdev_data, SECTORS_TO_MB(device->nvmdev_capacity));
+    }
+    else
+    {
+        printk(KERN_ERR "NVMSIM: %s(%d): NVM space allocation failed\n", __FUNCTION__, __LINE__);
+        err = -ENOMEM;
+    }
+    return err;
+}
+
+static int nvm_mem_space_free(NVM_DEVICE_T *device)
+{
+    if (device->nvmdev_data)
+    {
+        if (NVM_USE_HIGHMEM())
+        {
+            hfree(device->nvmdev_data);
+        }
+        else
+        {
+            vfree(device->nvmdev_data);
+        }
+        device->nvmdev_data = NULL;
+    }
+    return 0;
+}
+
+static int nvm_pbi_space_alloc(NVM_DEVICE_T *device)
+{
+    /* maptable bitmap init*/
+    spin_lock_init(&device->map_lock);
+    spin_lock_init(&device->bit_lock);
+    device->MapTable = init_maptable(map_table_size);
+    if (device->MapTable == NULL)
+    {
+        goto out_free_struct;
+    }
+
+    device->BitMap = init_bitmap(bit_table_size);
+    if (device->BitMap == NULL)
+    {
+        goto out_free_struct;
+    }
+    return 0;
+out_free_struct:
+    kfree(device);
+out:
+    return -ENOMEM;
+}
+
+static int nvm_pbi_space_free(NVM_DEVICE_T *device)
+{
+
+    if (device->MapTable != NULL)
+    {
+        print_maptable(device->MapTable, map_table_size);
+        vfree(device->MapTable);
+        printk(KERN_INFO "NVMSIM: %s(%d): maptable space free %u success\n",
+               __FUNCTION__, __LINE__, map_table_size);
+    }
+
+    if (device->BitMap != NULL)
+    {
+        printb_bitmap(device->BitMap, 128);
+        print_summary_bitmap(device->BitMap, bit_table_size);
+        vfree(device->BitMap);
+        printk(KERN_INFO "NVMSIM: %s(%d): BitMap space free %u success\n",
+               __FUNCTION__, __LINE__, bit_table_size);
+    }
+    return 0;
+}
+ssize_t nvm_proc_pmbdstat_read(char *buffer, char **start, off_t offset, int count, int *eof, void *data)
+{
+    int rtn;
+    char local_buffer[1024];
+    if (offset > 0)
+    {
+        *eof = 1;
+        rtn = 0;
+    }
+    else
+    {
+        sprintf(local_buffer, "nvm_proc_pmbdstat_read test test test N/A\n");
+        memcpy(buffer, local_buffer, strlen(local_buffer));
+        rtn = strlen(local_buffer);
+    }
+    return rtn;
+}
+
+ssize_t nvm_proc_devstat_read(char *buffer, char **start, off_t offset, int count, int *eof, void *data)
+{
+    int rtn;
+    char local_buffer[1024];
+    if (offset > 0)
+    {
+        *eof = 1;
+        rtn = 0;
+    }
+    else
+    {
+        sprintf(local_buffer, "N/A\n");
+        memcpy(buffer, local_buffer, strlen(local_buffer));
+        rtn = strlen(local_buffer);
+    }
+    return rtn;
+}
+
+static int nvm_proc_devstat_create(NVM_DEVICE_T *device)
+{
+    /*  create a /proc/nvm/<dev> entry  */
+    device->proc_devstat = proc_create(device->nvm_name, S_IRUGO, proc_nvm,&proc_nvmdev_ops);
+    if (device->proc_devstat == NULL)
+    {
+        remove_proc_entry(device->nvm_name, proc_nvm);
+        printk(KERN_ERR "NVMSIM: cannot create /proc/nvm/%s\n", device->nvm_name);
+        return -ENOMEM;
+    }
+    //device->proc_devstat->read_proc = nvm_proc_devstat_read;
+    printk(KERN_INFO "NVMSIM: /proc/nvm/%s created\n", device->nvm_name);
+    return 0;
+}
+static int nvm_proc_devstat_destroy(NVM_DEVICE_T *device)
+{
+    remove_proc_entry(device->nvm_name, proc_nvm);
+    printk(KERN_INFO "pmbd: /proc/pmbd/%s removed\n", device->nvm_name);
+    return 0;
+}
+
+static int nvm_buffer_space_alloc(NVM_DEVICE_T *device){
+    return 0;
+}
+
+static int nvm_buffer_space_free(NVM_DEVICE_T *device){
+    return 0;
+}
+
+static int nvm_create(NVM_DEVICE_T *device)
+{
+    int err = 0;
+    /* allocate statistics info */
+    if ((err = nvm_stat_alloc(device)) < 0)
+        goto error;
+
+    /* allocate memory space */
+    if ((err = nvm_mem_space_alloc(device)) < 0)
+        goto error;
+
+    /* allocate buffer space */
+    if ((err = nvm_buffer_space_alloc(device)) < 0)
+        goto error;
+
+    /* allocate block info space */
+    if ((err = nvm_pbi_space_alloc(device)) < 0)
+        goto error;
+
+    /* create a /proc/device/<dev> entry*/
+    if ((err = nvm_proc_devstat_create(device)) < 0)
+        goto error;
+error:
+    return err;
+}
+
+static int nvm_destroy(NVM_DEVICE_T *device)
+{
+    /* free /proc entry */
+    nvm_proc_devstat_destroy(device);
+
+    /* free buffer space */
+    nvm_buffer_space_free(device);
+
+    /* free block info space */
+    nvm_pbi_space_free(device);
+
+    /* free memory backstore space */
+    nvm_mem_space_free(device);
+
+    /* free statistics data */
+    nvm_stat_free(device);
+
+    printk(KERN_INFO "nvm: /dev/%s is destroyed (%llu MB)\n", \
+    device->nvm_name, SECTORS_TO_MB(device->nvmdev_capacity));
+    return 0;
+}
+
 static void *hmalloc(uint64_t bytes)
 {
     void *rtn = NULL;
 
     /* check if there is still available reserve high memory space */
-    if (bytes <= PMBD_HIGHMEM_AVAILABLE_SPACE)
+    if (bytes <= NVM_HIGHMEM_AVAILABLE_SPACE)
     {
         rtn = g_highmem_curr_addr;
         g_highmem_curr_addr += bytes;
@@ -329,72 +639,22 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
     device->nvmdev_number = index;
     device->nvmdev_capacity = capacity_mb << MB_PER_SECTOR_SHIFT; // in Sectors
     spin_lock_init(&device->nvmdev_lock);
-    // maptable bitmap init
-    spin_lock_init(&device->map_lock);
-    spin_lock_init(&device->bit_lock);
-    device->MapTable = init_maptable(map_table_size);
-    if (device->MapTable == NULL)
-    {
-        printk(KERN_ERR "NVMSIM: %s(%d): maptable space allocation %u failed\n",
-               __FUNCTION__, __LINE__, map_table_size);
-        goto out_free_struct;
-    }
-    else
-    {
-        printk(KERN_INFO "NVMSIM: %s(%d): maptable space allocation %u Success\n",
-               __FUNCTION__, __LINE__, map_table_size);
-    }
-
-    device->BitMap = init_bitmap(bit_table_size);
-    if (device->BitMap == NULL)
-    {
-        printk(KERN_ERR "NVMSIM: %s(%d): BitMap space allocation %u failed\n",
-               __FUNCTION__, __LINE__, map_table_size);
-        goto out_free_struct;
-    }
-    else
-    {
-        printk(KERN_INFO "NVMSIM: %s(%d): BitMap space allocation %u Success\n",
-               __FUNCTION__, __LINE__, map_table_size);
-    }
-    // vmaloc allocate in size bytes
-    if (NVM_USE_HIGHMEM())
-    {
-        device->nvmdev_data = hmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
-    }
-    else
-    {
-        device->nvmdev_data = vmalloc(device->nvmdev_capacity << SECTOR_SHIFT);
-    }
-
-    if (device->nvmdev_data != NULL)
-    {
-#if 0
-		/* FIXME: No need to do this. It's slow, system could be locked up */
-		memset(pmbd->mem_space, 0, pmbd->sectors * pmbd->sector_size);
-#endif
-        printk(KERN_INFO "NVMSIM: %s(%d):  created [%lu : %llu MBs]\n", __FUNCTION__, __LINE__,
-               (unsigned long)device->nvmdev_data, SECTORS_TO_MB(device->nvmdev_capacity));
-    }
-    else
-    {
-        printk(KERN_ERR "NVMSIM: %s(%d): NVM space allocation failed\n", __FUNCTION__, __LINE__);
-        goto out_free_struct;
-    }
 
     // Allocate the block request queue by blk_alloc_queue without I/O scheduler
     device->nvmdev_queue = blk_alloc_queue(GFP_KERNEL);
+    sprintf(device->nvm_name, "nvm%d", (index));
+   
     if (!device->nvmdev_queue)
     {
         goto out_free_dev;
     }
     // register nvmdev_queue,
     blk_queue_make_request(device->nvmdev_queue, (make_request_fn *)nvm_make_request);
-
-    //blk_queue_max_hw_sectors(device->nvmdev_queue, 255);//set max sectors for a request for this queue
-
+    //set max sectors for a request for this queue
+    blk_queue_max_hw_sectors(device->nvmdev_queue, 1024);
     //set logical block size for the queue
     blk_queue_logical_block_size(device->nvmdev_queue, HARDSECT_SIZE);
+
     // Allocate the disk device /* cannot be partitioned */
     device->nvmdev_disk = alloc_disk(PARTION_PER_DISK);
     disk = device->nvmdev_disk;
@@ -406,10 +666,13 @@ struct nvm_device *nvm_alloc(int index, unsigned capacity_mb)
     disk->private_data = device;
     disk->queue = device->nvmdev_queue;
     //disk->flags |= GENHD_FL_SUPPRESS_PARTITION_INFO;
-    sprintf(disk->disk_name, "nvm%d", index);
-
+    strcpy(disk->disk_name, device->nvm_name);
     // in sectors
     set_capacity(disk, capacity_mb << MB_PER_SECTOR_SHIFT);
+
+    /* allocate PM space */
+    if (nvm_create(device) < 0)
+		goto out_free_queue;
     return device;
 
     // Cleanup on error
@@ -430,37 +693,11 @@ void nvm_free(struct nvm_device *device)
 {
     put_disk(device->nvmdev_disk);
     blk_cleanup_queue(device->nvmdev_queue);
-
-    if (device->nvmdev_data != NULL)
-    {
-        if (NVM_USE_HIGHMEM())
-        {
-            hfree(device->nvmdev_data);
-        }
-        else
-        {
-            vfree(device->nvmdev_data);
-        }
-    }
-
-    if (device->MapTable != NULL)
-    {
-        print_maptable(device->MapTable, map_table_size);
-        vfree(device->MapTable);
-        printk(KERN_INFO "NVMSIM: %s(%d): maptable space free %u success\n",
-               __FUNCTION__, __LINE__, map_table_size);
-    }
-
-    if (device->BitMap != NULL)
-    {
-        printb_bitmap(device->BitMap, 128);
-        print_summary_bitmap(device->BitMap, bit_table_size);
-        vfree(device->BitMap);
-        printk(KERN_INFO "NVMSIM: %s(%d): BitMap space free %u success\n",
-               __FUNCTION__, __LINE__, bit_table_size);
-    }
+    nvm_destroy(device);
     kfree(device);
 }
+
+
 
 // set helper function
 int set_helper(struct nvm_device *device, sector_t sector, word_t len)
@@ -533,7 +770,7 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
     bio_for_each_segment(bvec, bio, iter)
     {
         unsigned int len = bvec.bv_len;
-        //bug other flag
+        //bug other flag and read
         if (rw == WRITE)
         {
             set_helper(nvm_dev, sector, len);
@@ -646,6 +883,8 @@ static int __init nvm_init(void)
         if (nvm_highmem_map() == NULL)
             return -ENOMEM;
     }
+    // proc
+    nvm_proc_create();
 
     // register a block device number
     if (register_blkdev(NVM_MAJOR, NVM_DEVICES_NAME) != 0)
@@ -707,10 +946,17 @@ static void __exit nvm_exit(void)
         nvm_del_one(nvmsim);
     }
 
+    /* deioremap high memory space */
+    if (NVM_USE_HIGHMEM())
+    {
+        nvm_highmem_unmap();
+    }
+
     blk_unregister_region(MKDEV(NVM_MAJOR, 0), range);
     unregister_blkdev(NVM_MAJOR, NVM_DEVICES_NAME);
-    printk(KERN_ERR "NVMSIM: %s(%d) -Exited\n",
-           __FUNCTION__, __LINE__);
+
+    nvm_proc_destroy();
+    printk(KERN_ERR "NVMSIM: %s(%d) -Exited\n", __FUNCTION__, __LINE__);
 }
 
 /**

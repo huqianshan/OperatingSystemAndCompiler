@@ -1,12 +1,15 @@
 /*
  * ramDevice.h
- * NVM Simulator: RAM backed block device driver
- * 
+ * NVM Simulator: RAM based block device driver
  */
-
 #ifndef __RAMDEVICE_H
 #define __RAMDEVICE_H
 
+/*
+ * support definitions
+ */
+#define TRUE				(1)
+#define FALSE				(0)
 typedef unsigned int word_t;
 
 #define MEMCOPY_DEFAULT 1  // use memcopy
@@ -20,18 +23,14 @@ typedef unsigned int word_t;
 #define NVM_READ 0
 #define NVM_WRITE 1
 
+/* high memory
+ ** high memory configs */
 unsigned g_nvm_type = NVM_CONFIG_HIGHMEM;
-
 #define NVM_USE_HIGHMEM() (g_nvm_type == NVM_CONFIG_HIGHMEM)
-
-/* high memory configs */
 uint64_t g_highmem_size = 0;    /* size of the reserved physical mem space (bytes) */
-
 void *g_highmem_virt_addr = NULL;    /* beginning of the reserve HIGH_MEM space */
 void *g_highmem_curr_addr = NULL;    /* beginning of the available HIGH_MEM space for alloc*/
-
-/* high memory */
-#define PMBD_HIGHMEM_AVAILABLE_SPACE (g_highmem_virt_addr + g_highmem_size - g_highmem_curr_addr)
+#define NVM_HIGHMEM_AVAILABLE_SPACE (g_highmem_virt_addr + g_highmem_size - g_highmem_curr_addr)
 
 /**
  *  The SIZE TRANSFER
@@ -53,9 +52,6 @@ void *g_highmem_curr_addr = NULL;    /* beginning of the available HIGH_MEM spac
 #define BYTE_TO_SECTOR(N) ((N) >> SECTOR_SHIFT)
 
 
-
-
-#define NVM_MAJOR 231
 #define PAGE_SECTORS_SHIFT (PAGE_SHIFT - SECTOR_SHIFT)
 #define PAGE_SECTORS (1 << PAGE_SECTORS_SHIFT)
 
@@ -67,14 +63,35 @@ void *g_highmem_curr_addr = NULL;    /* beginning of the available HIGH_MEM spac
 
 #define PARTION_PER_DISK (1)
 
+
+#define NVM_MAJOR 231
 #define NVMDEV_MEM_MAX_SECTORS (8)
-#define NVM_RAMDISK_ONLY (1)
+
+/*
+ * NVM physical block information 
+ * (each corresponding to a PM block)
+ */
+
+typedef struct nvm_stat{
+	/* stat_lock does not protect cycles_*[] counters */
+	spinlock_t			stat_lock;		/* protection lock */
+
+	unsigned			last_access_jiffies;	/* the timestamp of the most recent access */
+	uint64_t			num_sectors_read;	/* total num of sectors being read */
+	uint64_t			num_sectors_write;	/* total num of sectors being written */
+	uint64_t			num_requests_read;	/* total num of requests for read */
+	uint64_t			num_requests_write;	/* total num of request for write */
+	uint64_t			num_write_barrier;	/* total num of write barriers received */
+	uint64_t			num_write_fua;		/* total num of write barriers received */
+} NVM_STAT_T;
+
 
 /**
- * The simulated NVM device with  RAM 
+ * The simulated NVM device
  */
-struct nvm_device
+typedef struct nvm_device
 {
+	char nvm_name[32];					/* device name */
 
 	int nvmdev_number;					// The device number
 	unsigned long nvmdev_capacity;		// The capacity in sectors BUG should in bytes?
@@ -83,7 +100,10 @@ struct nvm_device
 	struct request_queue *nvmdev_queue; /// Request queue
 	struct gendisk *nvmdev_disk;		/// Disk
 
-	struct list_head nvmdev_list; /// The collection of lists the device belongs to
+	struct list_head nvmdev_list; 		// The collection of lists the device belongs to
+	
+	NVM_STAT_T *nvm_stat;			/* statistics data */
+	struct proc_dir_entry* 		proc_devstat;	/* the proc output */
 
 	/*Maptable*/
 	word_t *MapTable;
@@ -92,13 +112,44 @@ struct nvm_device
 	/* Bitmap*/
 	word_t *BitMap;
 	spinlock_t bit_lock;
-};
+}NVM_DEVICE_T;
 
 /**
  * Allocate and free the NVM device
  */
-struct nvm_device *nvm_alloc(int index, unsigned capacity_mb);
-void nvm_free(struct nvm_device *device);
+static NVM_DEVICE_T *nvm_alloc(int index, unsigned capacity_mb);
+static int nvm_create(NVM_DEVICE_T *nvm);
+static int nvm_stat_alloc(NVM_DEVICE_T *device);
+static int nvm_mem_space_alloc(NVM_DEVICE_T *device);
+static int nvm_buffer_space_alloc(NVM_DEVICE_T *device);
+static int nvm_pbi_space_alloc(NVM_DEVICE_T *device);
+
+static void nvm_free(struct nvm_device *device);
+static int nvm_destroy(NVM_DEVICE_T *device);
+static int nvm_stat_free(NVM_DEVICE_T *device);
+static int nvm_mem_space_free(NVM_DEVICE_T *device);
+
+static int nvm_pbi_space_free(NVM_DEVICE_T *device);
+
+static inline uint64_t nvm_device_is_idle(NVM_DEVICE_T *device);
+/*
+ **************************************************************************
+ * /proc file system entries
+ **************************************************************************
+ */
+static int nvm_proc_create(void);
+static int nvm_proc_destroy(void);
+
+static int nvm_proc_devstat_create(NVM_DEVICE_T *device);
+static int nvm_proc_devstat_destroy(NVM_DEVICE_T *device);
+
+static ssize_t  nvm_proc_devstat_read(char *buffer, char **start, off_t offset,
+								 int count, int *eof, void *data);
+static  ssize_t nvm_proc_nvmcfg_read(char *buffer, char **start, off_t offset,
+								int count, int *eof, void *data);
+static ssize_t nvm_proc_nvmstat_read(char *buffer, char **start, off_t offset, 
+								int count, int *eof, void *data);
+
 
 /**
  *  NOTE: we can also use ioremap_* functions to directly set memory
@@ -114,14 +165,10 @@ static int hfree(void *addr)
 }
 
 /**
- * Binder requet to queue
+ * Binder request to queue
  */
 static void nvm_make_request(struct request_queue *q, struct bio *bio);
-
-/**
- *  nvmdev_do_bvec
- * 			Process a single request
- */
+/**  nvmdev_do_bvec		Process a single request*/
 static int nvm_do_bvec(struct nvm_device *device, struct page *page,
 					   unsigned int len, unsigned int off, int rw, sector_t sector);
 
@@ -130,7 +177,6 @@ static int nvm_do_bvec(struct nvm_device *device, struct page *page,
  */
 void __always_inline copy_from_nvm(void *dest, struct nvm_device *device,
 								   sector_t sector, size_t n);
-
 void __always_inline copy_to_nvm(struct nvm_device *device,
 								 const void *src, sector_t sector, size_t n);
 
@@ -139,9 +185,10 @@ void __always_inline copy_to_nvm(struct nvm_device *device,
  */
 static int nvm_ioctl(struct block_device *bdev, fmode_t mode,
 					 unsigned int cmd, unsigned long arg);
-
+/* Set Disk Arguments*/
 static int nvm_disk_getgeo(struct block_device *bdev,
 						   struct hd_geometry *geo);
+
 
 
 /**
