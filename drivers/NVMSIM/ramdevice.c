@@ -462,6 +462,40 @@ void nvm_free(struct nvm_device *device)
     kfree(device);
 }
 
+// set helper function
+int set_helper(struct nvm_device *device, sector_t sector, word_t len)
+{
+    word_t sector_begin, sector_end, lbn_begin, lbn_end;
+    sector_begin = sector;
+    sector_end = sector + (len >> SECTOR_SHIFT);
+    lbn_begin = sector_begin >> MAP_PER_SECTORS_SHIFT;
+    lbn_end = sector_end >> MAP_PER_SECTORS_SHIFT;
+
+    printk(KERN_INFO "set helper %u %u %u %u\n", sector_begin, sector_end, lbn_begin, lbn_end);
+    word_t i, rtn;
+    // maptbale
+    for (i = lbn_begin; i <= lbn_end; i++)
+    {
+        // pbn just equal lbn+1
+        rtn = map_table(device->MapTable, i, i);
+        if (rtn != -1)
+        {
+            printk(KERN_INFO "maptbale secotr: [%u:%u] lbn %u times %u success\n",
+                   sector_begin, sector_end, i, rtn);
+        }
+    }
+    //set bitmap
+    for (i = sector_begin; i < sector_end; i++)
+    {
+        if (BOOL(i, device->BitMap) == 0)
+        {
+            SET_BITMAP(i, device->BitMap);
+            printk(KERN_INFO "BitMap sector %u actual in MapTable %u\n", i, (i >> MAP_PER_SECTORS_SHIFT));
+        }
+    }
+    return 1;
+}
+
 /**
  * Process pending requests from the queue
  */
@@ -496,25 +530,14 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio)
     //printk(KERN_INFO "NVMSIM: %s(%d) sector: %lu rw: %d\n",
     //	   __FUNCTION__, __LINE__, sector, rw);
     // Perform each part of a request
-    if (rw == WRITE)
-    {
-        word_t lbn = (sector >> MAP_PER_SECTORS_SHIFT);
-        word_t num = map_table(nvm_dev->MapTable, lbn, lbn);
-        if (num != -1)
-        {
-            printk(KERN_INFO "maptbale secotr: %u lbn %u times %u success\n",
-                   sector, lbn, num);
-        }
-        word_t bit_sec = sector + 1;
-        if (BOOL(bit_sec, nvm_dev->BitMap) == 0)
-        {
-            SET_BITMAP(bit_sec, nvm_dev->BitMap);
-            printk(KERN_INFO "BitMap sector %u actual %u\n", sector, bit_sec);
-        }
-    }
     bio_for_each_segment(bvec, bio, iter)
     {
         unsigned int len = bvec.bv_len;
+        //bug other flag
+        if (rw == WRITE)
+        {
+            set_helper(nvm_dev, sector, len);
+        }
         // Every biovec means a SEGMENT of a PAGE
         err = nvm_do_bvec(nvm_dev, bvec.bv_page, len, bvec.bv_offset, rw, sector);
         if (err)

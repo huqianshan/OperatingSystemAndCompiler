@@ -1,0 +1,8 @@
+[ 2758.674788] NVMSIM: [nvm_init() 640] g_highmem_size 4294967296 bytes g_highmemaddr 4294967296 ; nvm_capacity_mb 4096 MB 
+[ 2758.674955] NVMSIM: high memory space remapped (offset: 4096 MB, size=4096 MB)
+[ 2758.675315] NVMSIM: init_maptable(86) init maptbale size: 262145 success addr: 42791000
+[ 2758.675316] NVMSIM: nvm_alloc(345): maptable space allocation 262144 Success
+[ 2758.675356] NVMSIM: init_bitmap(207) init BitMap size: 262145 success addr: 43195000
+[ 2758.675356] NVMSIM: nvm_alloc(358): BitMap space allocation 262144 Success
+[ 2758.675357] NVMSIM: nvm_alloc(376):  created [18446672475530985472 : 4096 MBs]
+[ 2758.676340] NVMSIM [nvm_init() 671]: module loaded

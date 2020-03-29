@@ -225,4 +225,10 @@ void printb_bitmap(word_t *bitmap,word_t len);
  * print summary information of bitmap
  */
 void print_summary_bitmap(word_t *bitmap,word_t len);
+
+
+/**
+ * total helper function
+ */
+int set_helper(struct nvm_device *device,sector_t sector,word_t len);
 #endif
