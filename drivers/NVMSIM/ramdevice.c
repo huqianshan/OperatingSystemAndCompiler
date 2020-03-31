@@ -444,12 +444,12 @@ static int nvm_pbi_space_free(NVM_DEVICE_T *device) {
 ssize_t nvm_proc_nvmstat_read(struct file *filp, char *buf, size_t count,
                               loff_t *offp) {
   int ret;
+  char *messages = NULL;
   if (*offp > 0) {
     ret = 0;
     goto out;
-  }else
-  {
-    char *messages = kzalloc(128 * sizeof(char), GFP_KERNEL);
+  } else {
+    messages = kzalloc(PROC_CHAR_SIZZE * sizeof(char), GFP_KERNEL);
     int len;
     sprintf(messages, "%s %d Hello World \n", __FUNCTION__, __LINE__);
     len = strlen(messages);
@@ -459,10 +459,15 @@ ssize_t nvm_proc_nvmstat_read(struct file *filp, char *buf, size_t count,
 
     if (copy_to_user(buf, messages, count)) {
       ret = -EFAULT;
-      goto out;
+      goto free_out;
     }
     *offp += count;
     ret = count;
+  }
+
+free_out:
+  if (messages) {
+    kfree(messages);
   }
 out:
   return ret;
@@ -471,12 +476,12 @@ out:
 ssize_t nvm_proc_nvmcfg_read(struct file *filp, char *buf, size_t count,
                              loff_t *offp) {
   int ret;
+  char *messages = NULL;
   if (*offp > 0) {
     ret = 0;
     goto out;
-  }else
-  {
-    char *messages = kzalloc(128 * sizeof(char), GFP_KERNEL);
+  } else {
+    messages = kzalloc(PROC_CHAR_SIZZE * sizeof(char), GFP_KERNEL);
     int len;
     sprintf(messages, "%s %d Hello World \n", __FUNCTION__, __LINE__);
     len = strlen(messages);
@@ -486,10 +491,15 @@ ssize_t nvm_proc_nvmcfg_read(struct file *filp, char *buf, size_t count,
 
     if (copy_to_user(buf, messages, count)) {
       ret = -EFAULT;
-      goto out;
+      goto free_out;
     }
     *offp += count;
     ret = count;
+  }
+
+free_out:
+  if (messages) {
+    kfree(messages);
   }
 out:
   return ret;
@@ -497,13 +507,18 @@ out:
 
 ssize_t nvm_proc_devstat_read(struct file *filp, char *buf, size_t count,
                               loff_t *offp) {
+  /**
+   * What is missing from the preceding list is the case of “there is no data,
+   * but it may arrive later.”
+   * In this case, the read system call should block
+   */
   int ret;
+  char *messages = NULL;
   if (*offp > 0) {
     ret = 0;
     goto out;
-  }else
-  {
-    char *messages = kzalloc(128 * sizeof(char), GFP_KERNEL);
+  } else {
+    messages = kzalloc(PROC_CHAR_SIZZE * sizeof(char), GFP_KERNEL);
     int len;
     sprintf(messages, "%s %d Hello World \n", __FUNCTION__, __LINE__);
     len = strlen(messages);
@@ -513,10 +528,15 @@ ssize_t nvm_proc_devstat_read(struct file *filp, char *buf, size_t count,
 
     if (copy_to_user(buf, messages, count)) {
       ret = -EFAULT;
-      goto out;
+      goto free_out;
     }
     *offp += count;
     ret = count;
+  }
+
+free_out:
+  if (messages) {
+    kfree(messages);
   }
 out:
   return ret;
@@ -599,14 +619,14 @@ static int nvm_destroy(NVM_DEVICE_T *device) {
 
 static inline uint64_t nvm_device_is_idle(NVM_DEVICE_T *device) {
   // check size type
-  unsigned last_jiffies, now_jiffies;
+  unsigned long last_jiffies, now_jiffies;
   uint64_t interval = 0;
 
   now_jiffies = jiffies;
   NVM_DEV_GET_ACCESS_TIME(device, last_jiffies);
-  interval = jiffies_to_usecs(now_jiffies - last_jiffies);
+  interval = jiffies_to_msecs(now_jiffies - last_jiffies);
 
-  if (NVM_DEV_IS_IDLE(device, interval)) {
+  if (NVM_DEV_IS_IDLE(interval)) {
     return interval;
   } else {
     printk(KERN_INFO
@@ -686,7 +706,12 @@ static int nvm_syncer_worker(void *device) {
     /* go to sleep */
     // FIXME CHECK FOR DEADLOCK maybe bug
     set_current_state(TASK_INTERRUPTIBLE);
-    schedule_timeout(10);
+    // printk(KERN_INFO "NVM_SIM %s%d sleep %lu\n", __FUNCTION__, __LINE__,
+    //       NVM_AFTER_FLUSH_SLEEPTIME);
+    schedule_timeout(NVM_AFTER_FLUSH_SLEEPTIME);
+    // printk(KERN_INFO "NVM_SIM %s%d Wake up after %lu\n", __FUNCTION__,
+    // __LINE__,
+    //       NVM_AFTER_FLUSH_SLEEPTIME);
     set_current_state(TASK_RUNNING);
   } while (!kthread_should_stop());
   return 0;

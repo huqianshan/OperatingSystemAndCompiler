@@ -68,9 +68,9 @@ void *g_highmem_curr_addr =
 #define NVM_MAJOR 231
 #define NVMDEV_MEM_MAX_SECTORS (8)
 
-/* idle period timer */
-#define NVM_FLUSH_IDLE_TIMEOUT (8000)  /*  8 millisecond */
-#define NVM_AFTER_FLUSH_SLEEPTIME (10) /*  10 seconds */
+/* idle period timer */ 
+#define NVM_FLUSH_IDLE_TIMEOUT (12)  /*  12 millisecond */
+#define NVM_AFTER_FLUSH_SLEEPTIME (10*HZ) /*  10 seconds */ //HZ = 250
 #define NVM_DEV_UPDATE_ACCESS_TIME(NVM)             \
   {                                                 \
     spin_lock(&(NVM)->nvm_stat->stat_lock);         \
@@ -85,7 +85,7 @@ void *g_highmem_curr_addr =
     spin_unlock(&(NVM)->nvm_stat->stat_lock);   \
   }
 
-#define NVM_DEV_IS_IDLE(NVM, IDLE) ((IDLE) > NVM_FLUSH_IDLE_TIMEOUT)
+#define NVM_DEV_IS_IDLE(IDLE) ((IDLE) > NVM_FLUSH_IDLE_TIMEOUT)
 
 /*
  * NVM    spin_lock(&(NVM)->nvm_stat->stat_lock);         \
@@ -164,6 +164,7 @@ static inline uint64_t nvm_device_is_idle(NVM_DEVICE_T *device);
  * /proc file system entries
  **************************************************************************
  */
+#define PROC_CHAR_SIZZE (1024)  /* should not bigger than A PAGE SIZE*/
 static int nvm_proc_create(void);
 static int nvm_proc_destroy(void);
 
