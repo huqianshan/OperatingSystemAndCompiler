@@ -69,13 +69,14 @@ void *g_highmem_curr_addr =
 #define NVMDEV_MEM_MAX_SECTORS (8)
 
 /* idle period timer */
-#define NVM_FLUSH_IDLE_TIMEOUT (4000) /* 4 millisecond */
-#define NVM_DEV_UPDATE_ACCESS_TIME(NVM)   \
-  {                                       \
+#define NVM_FLUSH_IDLE_TIMEOUT (8000)  /*  8 millisecond */
+#define NVM_AFTER_FLUSH_SLEEPTIME (10) /*  10 seconds */
+#define NVM_DEV_UPDATE_ACCESS_TIME(NVM)             \
+  {                                                 \
     spin_lock(&(NVM)->nvm_stat->stat_lock);         \
     (NVM)->nvm_stat->last_access_jiffies = jiffies; \
-    spin_unlock(&(NVM)->nvm_stat->stat_lock); \
-}
+    spin_unlock(&(NVM)->nvm_stat->stat_lock);       \
+  }
 
 #define NVM_DEV_GET_ACCESS_TIME(NVM, T)         \
   {                                             \
@@ -129,7 +130,7 @@ typedef struct nvm_device {
   /* Wear leveling*/
   struct task_struct *syncer;
   spinlock_t syncer_lock;
-  spinlock_t flush_lock; // maynot use FIXME
+  spinlock_t flush_lock;  // maynot use FIXME
 
   /*Maptable*/
   spinlock_t map_lock;
@@ -169,12 +170,9 @@ static int nvm_proc_destroy(void);
 static int nvm_proc_devstat_create(NVM_DEVICE_T *device);
 static int nvm_proc_devstat_destroy(NVM_DEVICE_T *device);
 
-ssize_t nvm_proc_devstat_read(char *buffer, char **start, off_t offset,
-                              int count, int *eof, void *data);
-ssize_t nvm_proc_nvmcfg_read(char *buffer, char **start, off_t offset,
-                             int count, int *eof, void *data);
-ssize_t nvm_proc_nvmstat_read(char *buffer, char **start, off_t offset,
-                              int count, int *eof, void *data);
+ssize_t nvm_proc_devstat_read(struct file *filp,char *buf,size_t count,loff_t *offp);
+ssize_t nvm_proc_nvmcfg_read(struct file *filp,char *buf,size_t count,loff_t *offp);
+ssize_t nvm_proc_nvmstat_read(struct file *filp,char *buf,size_t count,loff_t *offp);
 
 /*
  **************************************************************************
@@ -186,7 +184,8 @@ static int nvm_syncer_stop(NVM_DEVICE_T *device);
 
 static int nvm_syncer_worker(void *device);
 
-int nvm_block_above_level(NVM_DEVICE_T *device) { return 0; }
+int nvm_block_above_level(NVM_DEVICE_T *device);
+int nvm_check_head_tail(NVM_DEVICE_T *device);
 /**
  *  NOTE: we can also use ioremap_* functions to directly set memory
  *  page attributes when do remapping,

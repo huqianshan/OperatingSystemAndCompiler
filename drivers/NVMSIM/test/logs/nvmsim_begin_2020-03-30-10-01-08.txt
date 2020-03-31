@@ -1,0 +1,9 @@
+[ 2879.708675] NVMSIM: [nvm_init() 987] g_highmem_size 4294967296 bytes g_highmemaddr 4294967296 ; nvm_capacity_mb 4096 MB 
+[ 2879.708737] NVMSIM: high memory space remapped (offset: 4096 MB, size=4096 MB)
+[ 2879.708813] nvm: nvm_stat_alloc(354): NVM Stat space allocation Success
+[ 2879.708814] NVMSIM: nvm_mem_space_alloc(385):  created [18446663802918273024 : 4096 MBs]
+[ 2879.710418] NVMSIM: nvm_syncer_init:631 inin syncer threads at 000000009ee3d702 success
+[ 2879.710685] NVMSIM: init_maptable(106) init maptbale size: 262145 success addr: 42d05000
+[ 2879.710811] NVMSIM: init_bitmap(216) init BitMap size: 262145 success addr: 42f7d000
+[ 2879.710813] NVMSIM: /proc/nvm/nvm0 created
+[ 2879.711049] NVMSIM [nvm_init() 1017]: module loaded

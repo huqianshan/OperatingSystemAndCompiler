@@ -62,20 +62,17 @@ static struct proc_dir_entry *proc_nvmstat = NULL;
 static struct proc_dir_entry *proc_nvmcfg = NULL;
 
 struct file_operations proc_nvmstat_ops = {
-    //.read = nvm_proc_nvmstat_read, bug
-    .read = seq_read,
+    .read = nvm_proc_nvmstat_read,
     .owner = THIS_MODULE,
 };
 
 struct file_operations proc_nvmcfg_ops = {
-    //.read = nvm_proc_nvmcfg_read,
-    .read = seq_read,
+    .read = nvm_proc_nvmcfg_read,
     .owner = THIS_MODULE,
 };
 
 struct file_operations proc_nvmdev_ops = {
-    //.read = nvm_proc_devstat_read,
-    .read = seq_read,
+    .read = nvm_proc_devstat_read,
     .owner = THIS_MODULE,
 };
 /**
@@ -172,7 +169,8 @@ word_t extract_maptbale(word_t *map_table, word_t table_size, word_t **arr,
                         word_t **index) {
   word_t n = 0;
   word_t tem, pbn;
-  // begin with 1 bug
+  // Check begin with 1 bug
+  // get map_table size n
   int i = 0;
   for (i; i < table_size; i++) {
     tem = get_maptable(map_table, i);
@@ -443,34 +441,85 @@ static int nvm_pbi_space_free(NVM_DEVICE_T *device) {
   return 0;
 }
 
-ssize_t nvm_proc_nvmstat_read(char *buffer, char **start, off_t offset,
-                              int count, int *eof, void *data) {
-  int rtn;
-  char local_buffer[1024];
-  if (offset > 0) {
-    *eof = 1;
-    rtn = 0;
-  } else {
-    sprintf(local_buffer, "nvm_proc_nvmstat_read test test test N/A\n");
-    memcpy(buffer, local_buffer, strlen(local_buffer));
-    rtn = strlen(local_buffer);
+ssize_t nvm_proc_nvmstat_read(struct file *filp, char *buf, size_t count,
+                              loff_t *offp) {
+  int ret;
+  if (*offp > 0) {
+    ret = 0;
+    goto out;
+  }else
+  {
+    char *messages = kzalloc(128 * sizeof(char), GFP_KERNEL);
+    int len;
+    sprintf(messages, "%s %d Hello World \n", __FUNCTION__, __LINE__);
+    len = strlen(messages);
+    if (count > len) {
+      count = len;
+    }
+
+    if (copy_to_user(buf, messages, count)) {
+      ret = -EFAULT;
+      goto out;
+    }
+    *offp += count;
+    ret = count;
   }
-  return rtn;
+out:
+  return ret;
 }
 
-ssize_t nvm_proc_devstat_read(char *buffer, char **start, off_t offset,
-                              int count, int *eof, void *data) {
-  int rtn;
-  char local_buffer[1024];
-  if (offset > 0) {
-    *eof = 1;
-    rtn = 0;
-  } else {
-    sprintf(local_buffer, "N/A\n");
-    memcpy(buffer, local_buffer, strlen(local_buffer));
-    rtn = strlen(local_buffer);
+ssize_t nvm_proc_nvmcfg_read(struct file *filp, char *buf, size_t count,
+                             loff_t *offp) {
+  int ret;
+  if (*offp > 0) {
+    ret = 0;
+    goto out;
+  }else
+  {
+    char *messages = kzalloc(128 * sizeof(char), GFP_KERNEL);
+    int len;
+    sprintf(messages, "%s %d Hello World \n", __FUNCTION__, __LINE__);
+    len = strlen(messages);
+    if (count > len) {
+      count = len;
+    }
+
+    if (copy_to_user(buf, messages, count)) {
+      ret = -EFAULT;
+      goto out;
+    }
+    *offp += count;
+    ret = count;
   }
-  return rtn;
+out:
+  return ret;
+}
+
+ssize_t nvm_proc_devstat_read(struct file *filp, char *buf, size_t count,
+                              loff_t *offp) {
+  int ret;
+  if (*offp > 0) {
+    ret = 0;
+    goto out;
+  }else
+  {
+    char *messages = kzalloc(128 * sizeof(char), GFP_KERNEL);
+    int len;
+    sprintf(messages, "%s %d Hello World \n", __FUNCTION__, __LINE__);
+    len = strlen(messages);
+    if (count > len) {
+      count = len;
+    }
+
+    if (copy_to_user(buf, messages, count)) {
+      ret = -EFAULT;
+      goto out;
+    }
+    *offp += count;
+    ret = count;
+  }
+out:
+  return ret;
 }
 
 static int nvm_proc_devstat_create(NVM_DEVICE_T *device) {
@@ -637,10 +686,30 @@ static int nvm_syncer_worker(void *device) {
     /* go to sleep */
     // FIXME CHECK FOR DEADLOCK maybe bug
     set_current_state(TASK_INTERRUPTIBLE);
-    schedule_timeout(1);
+    schedule_timeout(10);
     set_current_state(TASK_RUNNING);
   } while (!kthread_should_stop());
   return 0;
+}
+
+int nvm_block_above_level(NVM_DEVICE_T *device) {
+  // check head_tail
+  int num = 0;
+  return 0;
+  if ((num = nvm_check_head_tail(device)) != 0) {
+    return 1;
+  }
+};
+int nvm_check_head_tail(NVM_DEVICE_T *device) {
+  word_t *arr = NULL, *index = NULL;
+  word_t n = 0;
+  n = extract_maptbale(device->MapTable, 100, &arr, &index);
+  if ((!n) || (!arr) || (!index)) {
+    return n;
+  }
+  printk(KERN_INFO "NVMSIM %s%d Debug keys %x index %x size %u\n", __FUNCTION__,
+         __LINE__, arr, index, n);
+  return n;
 }
 
 static void *hmalloc(uint64_t bytes) {
@@ -795,7 +864,8 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio) {
   rw = bio_data_dir(bio);
   /* update rw */
   if (rw != READ && rw != WRITE)
-    panic("NVMSIM: %s(%d) found request not read or write either\n",__FUNCTION__, __LINE__);
+    panic("NVMSIM: %s(%d) found request not read or write either\n",
+          __FUNCTION__, __LINE__);
 
   /* update the access time*/
   NVM_DEV_UPDATE_ACCESS_TIME(nvm_dev);
