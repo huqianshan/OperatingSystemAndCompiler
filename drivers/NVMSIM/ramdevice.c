@@ -930,7 +930,7 @@ int nvm_get_sorted_head_tail_maptale(NVM_DEVICE_T *device) {
   }
 
   word_t k, *bigK, smallK;
-  k = n / 5 + 1;
+  k = (n / 5) + 1;
   device->head_tail_size = k;
   bigK = bigK_index(tarr, n, k);
   smallK = smallK_index(tarr, n, k);
@@ -962,6 +962,15 @@ int nvm_block_check_flush(NVM_DEVICE_T *device) {
   index = device->ExtractedIndexMaptable;
   arr = device->ExtractedPbnMapTable;
   k = device->head_tail_size;
+  if ((!bigK) || (!smallK) || (!index) || (!arr)) {
+    return 0;
+  }
+  if ((k < device->ExtractedSize)) {
+    printk(KERN_INFO"NVM_SIM [%s(%d)]: Test for k %u extrated size %u\n",
+    __FUNCTION__,__LINE__,k,device->ExtractedSize);
+  }else{
+    return 0;
+  }
   printk(KERN_INFO "NVM_SIM [%s(%d)]: Flush k %u\n", __FUNCTION__, __LINE__, k);
   for (i = 0; i < k; i++) {
     // bindex one of the big k index
