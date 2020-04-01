@@ -1,0 +1,1000 @@
+[ 1463.576723] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.576724] set helper 48 56 1 1
+[ 1463.576724] maptbale secotr: [48:56] lbn 1 times 379 success
+[ 1463.576726] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.576726] set helper 56 64 1 2
+[ 1463.576726] maptbale secotr: [56:64] lbn 1 times 380 success
+[ 1463.576727] maptbale secotr: [56:64] lbn 2 times 226 success
+[ 1463.576728] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.576728] set helper 64 72 2 2
+[ 1463.576729] maptbale secotr: [64:72] lbn 2 times 227 success
+[ 1463.576730] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.576730] set helper 72 80 2 2
+[ 1463.576731] maptbale secotr: [72:80] lbn 2 times 228 success
+[ 1463.581523] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582164] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582165] set helper 0 8 0 0
+[ 1463.582167] maptbale secotr: [0:8] lbn 0 times 305 success
+[ 1463.582169] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582170] set helper 8 16 0 0
+[ 1463.582187] maptbale secotr: [8:16] lbn 0 times 306 success
+[ 1463.582189] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582189] set helper 16 24 0 0
+[ 1463.582189] maptbale secotr: [16:24] lbn 0 times 307 success
+[ 1463.582191] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582191] set helper 24 32 0 1
+[ 1463.582192] maptbale secotr: [24:32] lbn 0 times 308 success
+[ 1463.582192] maptbale secotr: [24:32] lbn 1 times 381 success
+[ 1463.582193] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582194] set helper 32 40 1 1
+[ 1463.582194] maptbale secotr: [32:40] lbn 1 times 382 success
+[ 1463.582196] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582196] set helper 40 48 1 1
+[ 1463.582196] maptbale secotr: [40:48] lbn 1 times 383 success
+[ 1463.582198] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582198] set helper 48 56 1 1
+[ 1463.582198] maptbale secotr: [48:56] lbn 1 times 384 success
+[ 1463.582200] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582200] set helper 56 64 1 2
+[ 1463.582201] maptbale secotr: [56:64] lbn 1 times 385 success
+[ 1463.582201] maptbale secotr: [56:64] lbn 2 times 229 success
+[ 1463.582203] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582203] set helper 64 72 2 2
+[ 1463.582203] maptbale secotr: [64:72] lbn 2 times 230 success
+[ 1463.582205] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.582205] set helper 72 80 2 2
+[ 1463.582205] maptbale secotr: [72:80] lbn 2 times 231 success
+[ 1463.587086] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587801] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587802] set helper 0 8 0 0
+[ 1463.587803] maptbale secotr: [0:8] lbn 0 times 309 success
+[ 1463.587806] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587806] set helper 8 16 0 0
+[ 1463.587807] maptbale secotr: [8:16] lbn 0 times 310 success
+[ 1463.587808] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587809] set helper 16 24 0 0
+[ 1463.587809] maptbale secotr: [16:24] lbn 0 times 311 success
+[ 1463.587811] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587811] set helper 24 32 0 1
+[ 1463.587811] maptbale secotr: [24:32] lbn 0 times 312 success
+[ 1463.587812] maptbale secotr: [24:32] lbn 1 times 386 success
+[ 1463.587813] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587813] set helper 32 40 1 1
+[ 1463.587814] maptbale secotr: [32:40] lbn 1 times 387 success
+[ 1463.587815] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587816] set helper 40 48 1 1
+[ 1463.587816] maptbale secotr: [40:48] lbn 1 times 388 success
+[ 1463.587817] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587818] set helper 48 56 1 1
+[ 1463.587818] maptbale secotr: [48:56] lbn 1 times 389 success
+[ 1463.587819] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587820] set helper 56 64 1 2
+[ 1463.587820] maptbale secotr: [56:64] lbn 1 times 390 success
+[ 1463.587820] maptbale secotr: [56:64] lbn 2 times 232 success
+[ 1463.587822] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587822] set helper 64 72 2 2
+[ 1463.587823] maptbale secotr: [64:72] lbn 2 times 233 success
+[ 1463.587824] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.587824] set helper 72 80 2 2
+[ 1463.587825] maptbale secotr: [72:80] lbn 2 times 234 success
+[ 1463.592487] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593397] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593398] set helper 0 8 0 0
+[ 1463.593399] maptbale secotr: [0:8] lbn 0 times 313 success
+[ 1463.593402] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593403] set helper 8 16 0 0
+[ 1463.593403] maptbale secotr: [8:16] lbn 0 times 314 success
+[ 1463.593405] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593405] set helper 16 24 0 0
+[ 1463.593406] maptbale secotr: [16:24] lbn 0 times 315 success
+[ 1463.593407] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593408] set helper 24 32 0 1
+[ 1463.593408] maptbale secotr: [24:32] lbn 0 times 316 success
+[ 1463.593409] maptbale secotr: [24:32] lbn 1 times 391 success
+[ 1463.593410] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593411] set helper 32 40 1 1
+[ 1463.593411] maptbale secotr: [32:40] lbn 1 times 392 success
+[ 1463.593413] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593413] set helper 40 48 1 1
+[ 1463.593413] maptbale secotr: [40:48] lbn 1 times 393 success
+[ 1463.593415] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593415] set helper 48 56 1 1
+[ 1463.593416] maptbale secotr: [48:56] lbn 1 times 394 success
+[ 1463.593417] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593417] set helper 56 64 1 2
+[ 1463.593418] maptbale secotr: [56:64] lbn 1 times 395 success
+[ 1463.593418] maptbale secotr: [56:64] lbn 2 times 235 success
+[ 1463.593419] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593420] set helper 64 72 2 2
+[ 1463.593420] maptbale secotr: [64:72] lbn 2 times 236 success
+[ 1463.593422] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.593422] set helper 72 80 2 2
+[ 1463.593422] maptbale secotr: [72:80] lbn 2 times 237 success
+[ 1463.598210] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599474] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599475] set helper 0 8 0 0
+[ 1463.599476] maptbale secotr: [0:8] lbn 0 times 317 success
+[ 1463.599479] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599479] set helper 8 16 0 0
+[ 1463.599480] maptbale secotr: [8:16] lbn 0 times 318 success
+[ 1463.599481] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599481] set helper 16 24 0 0
+[ 1463.599482] maptbale secotr: [16:24] lbn 0 times 319 success
+[ 1463.599483] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599484] set helper 24 32 0 1
+[ 1463.599484] maptbale secotr: [24:32] lbn 0 times 320 success
+[ 1463.599485] maptbale secotr: [24:32] lbn 1 times 396 success
+[ 1463.599486] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599486] set helper 32 40 1 1
+[ 1463.599487] maptbale secotr: [32:40] lbn 1 times 397 success
+[ 1463.599488] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599488] set helper 40 48 1 1
+[ 1463.599489] maptbale secotr: [40:48] lbn 1 times 398 success
+[ 1463.599490] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599491] set helper 48 56 1 1
+[ 1463.599491] maptbale secotr: [48:56] lbn 1 times 399 success
+[ 1463.599492] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599493] set helper 56 64 1 2
+[ 1463.599493] maptbale secotr: [56:64] lbn 1 times 400 success
+[ 1463.599494] maptbale secotr: [56:64] lbn 2 times 238 success
+[ 1463.599495] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599495] set helper 64 72 2 2
+[ 1463.599496] maptbale secotr: [64:72] lbn 2 times 239 success
+[ 1463.599497] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.599497] set helper 72 80 2 2
+[ 1463.599498] maptbale secotr: [72:80] lbn 2 times 240 success
+[ 1463.604415] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605103] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605104] set helper 0 8 0 0
+[ 1463.605105] maptbale secotr: [0:8] lbn 0 times 321 success
+[ 1463.605108] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605108] set helper 8 16 0 0
+[ 1463.605109] maptbale secotr: [8:16] lbn 0 times 322 success
+[ 1463.605110] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605111] set helper 16 24 0 0
+[ 1463.605111] maptbale secotr: [16:24] lbn 0 times 323 success
+[ 1463.605113] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605113] set helper 24 32 0 1
+[ 1463.605113] maptbale secotr: [24:32] lbn 0 times 324 success
+[ 1463.605114] maptbale secotr: [24:32] lbn 1 times 401 success
+[ 1463.605115] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605115] set helper 32 40 1 1
+[ 1463.605116] maptbale secotr: [32:40] lbn 1 times 402 success
+[ 1463.605117] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605118] set helper 40 48 1 1
+[ 1463.605118] maptbale secotr: [40:48] lbn 1 times 403 success
+[ 1463.605119] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605120] set helper 48 56 1 1
+[ 1463.605120] maptbale secotr: [48:56] lbn 1 times 404 success
+[ 1463.605122] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605122] set helper 56 64 1 2
+[ 1463.605122] maptbale secotr: [56:64] lbn 1 times 405 success
+[ 1463.605123] maptbale secotr: [56:64] lbn 2 times 241 success
+[ 1463.605124] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605125] set helper 64 72 2 2
+[ 1463.605125] maptbale secotr: [64:72] lbn 2 times 242 success
+[ 1463.605126] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.605127] set helper 72 80 2 2
+[ 1463.605127] maptbale secotr: [72:80] lbn 2 times 243 success
+[ 1463.611505] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612406] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612407] set helper 0 8 0 0
+[ 1463.612408] maptbale secotr: [0:8] lbn 0 times 325 success
+[ 1463.612411] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612412] set helper 8 16 0 0
+[ 1463.612412] maptbale secotr: [8:16] lbn 0 times 326 success
+[ 1463.612414] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612415] set helper 16 24 0 0
+[ 1463.612415] maptbale secotr: [16:24] lbn 0 times 327 success
+[ 1463.612417] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612417] set helper 24 32 0 1
+[ 1463.612418] maptbale secotr: [24:32] lbn 0 times 328 success
+[ 1463.612418] maptbale secotr: [24:32] lbn 1 times 406 success
+[ 1463.612420] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612420] set helper 32 40 1 1
+[ 1463.612420] maptbale secotr: [32:40] lbn 1 times 407 success
+[ 1463.612422] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612422] set helper 40 48 1 1
+[ 1463.612423] maptbale secotr: [40:48] lbn 1 times 408 success
+[ 1463.612424] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612425] set helper 48 56 1 1
+[ 1463.612425] maptbale secotr: [48:56] lbn 1 times 409 success
+[ 1463.612427] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612427] set helper 56 64 1 2
+[ 1463.612427] maptbale secotr: [56:64] lbn 1 times 410 success
+[ 1463.612428] maptbale secotr: [56:64] lbn 2 times 244 success
+[ 1463.612430] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612430] set helper 64 72 2 2
+[ 1463.612430] maptbale secotr: [64:72] lbn 2 times 245 success
+[ 1463.612432] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.612432] set helper 72 80 2 2
+[ 1463.612433] maptbale secotr: [72:80] lbn 2 times 246 success
+[ 1463.619128] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620631] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620632] set helper 0 8 0 0
+[ 1463.620633] maptbale secotr: [0:8] lbn 0 times 329 success
+[ 1463.620636] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620636] set helper 8 16 0 0
+[ 1463.620637] maptbale secotr: [8:16] lbn 0 times 330 success
+[ 1463.620639] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620639] set helper 16 24 0 0
+[ 1463.620640] maptbale secotr: [16:24] lbn 0 times 331 success
+[ 1463.620641] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620642] set helper 24 32 0 1
+[ 1463.620642] maptbale secotr: [24:32] lbn 0 times 332 success
+[ 1463.620642] maptbale secotr: [24:32] lbn 1 times 411 success
+[ 1463.620644] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620644] set helper 32 40 1 1
+[ 1463.620645] maptbale secotr: [32:40] lbn 1 times 412 success
+[ 1463.620646] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620647] set helper 40 48 1 1
+[ 1463.620647] maptbale secotr: [40:48] lbn 1 times 413 success
+[ 1463.620649] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620649] set helper 48 56 1 1
+[ 1463.620649] maptbale secotr: [48:56] lbn 1 times 414 success
+[ 1463.620651] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620651] set helper 56 64 1 2
+[ 1463.620651] maptbale secotr: [56:64] lbn 1 times 415 success
+[ 1463.620652] maptbale secotr: [56:64] lbn 2 times 247 success
+[ 1463.620653] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620654] set helper 64 72 2 2
+[ 1463.620654] maptbale secotr: [64:72] lbn 2 times 248 success
+[ 1463.620656] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.620656] set helper 72 80 2 2
+[ 1463.620656] maptbale secotr: [72:80] lbn 2 times 249 success
+[ 1463.626307] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627327] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627328] set helper 0 8 0 0
+[ 1463.627329] maptbale secotr: [0:8] lbn 0 times 333 success
+[ 1463.627332] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627332] set helper 8 16 0 0
+[ 1463.627333] maptbale secotr: [8:16] lbn 0 times 334 success
+[ 1463.627334] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627335] set helper 16 24 0 0
+[ 1463.627335] maptbale secotr: [16:24] lbn 0 times 335 success
+[ 1463.627337] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627338] set helper 24 32 0 1
+[ 1463.627338] maptbale secotr: [24:32] lbn 0 times 336 success
+[ 1463.627338] maptbale secotr: [24:32] lbn 1 times 416 success
+[ 1463.627340] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627340] set helper 32 40 1 1
+[ 1463.627341] maptbale secotr: [32:40] lbn 1 times 417 success
+[ 1463.627342] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627342] set helper 40 48 1 1
+[ 1463.627343] maptbale secotr: [40:48] lbn 1 times 418 success
+[ 1463.627344] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627345] set helper 48 56 1 1
+[ 1463.627345] maptbale secotr: [48:56] lbn 1 times 419 success
+[ 1463.627347] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627347] set helper 56 64 1 2
+[ 1463.627347] maptbale secotr: [56:64] lbn 1 times 420 success
+[ 1463.627348] maptbale secotr: [56:64] lbn 2 times 250 success
+[ 1463.627349] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627349] set helper 64 72 2 2
+[ 1463.627350] maptbale secotr: [64:72] lbn 2 times 251 success
+[ 1463.627351] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.627352] set helper 72 80 2 2
+[ 1463.627352] maptbale secotr: [72:80] lbn 2 times 252 success
+[ 1463.632362] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633033] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633034] set helper 0 8 0 0
+[ 1463.633035] maptbale secotr: [0:8] lbn 0 times 337 success
+[ 1463.633038] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633038] set helper 8 16 0 0
+[ 1463.633039] maptbale secotr: [8:16] lbn 0 times 338 success
+[ 1463.633040] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633041] set helper 16 24 0 0
+[ 1463.633041] maptbale secotr: [16:24] lbn 0 times 339 success
+[ 1463.633042] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633043] set helper 24 32 0 1
+[ 1463.633043] maptbale secotr: [24:32] lbn 0 times 340 success
+[ 1463.633044] maptbale secotr: [24:32] lbn 1 times 421 success
+[ 1463.633045] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633045] set helper 32 40 1 1
+[ 1463.633046] maptbale secotr: [32:40] lbn 1 times 422 success
+[ 1463.633047] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633047] set helper 40 48 1 1
+[ 1463.633048] maptbale secotr: [40:48] lbn 1 times 423 success
+[ 1463.633049] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633050] set helper 48 56 1 1
+[ 1463.633050] maptbale secotr: [48:56] lbn 1 times 424 success
+[ 1463.633051] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633052] set helper 56 64 1 2
+[ 1463.633052] maptbale secotr: [56:64] lbn 1 times 425 success
+[ 1463.633052] maptbale secotr: [56:64] lbn 2 times 253 success
+[ 1463.633054] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633054] set helper 64 72 2 2
+[ 1463.633055] maptbale secotr: [64:72] lbn 2 times 254 success
+[ 1463.633056] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.633056] set helper 72 80 2 2
+[ 1463.633057] maptbale secotr: [72:80] lbn 2 times 255 success
+[ 1463.637753] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638359] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638361] set helper 0 8 0 0
+[ 1463.638362] maptbale secotr: [0:8] lbn 0 times 341 success
+[ 1463.638365] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638365] set helper 8 16 0 0
+[ 1463.638366] maptbale secotr: [8:16] lbn 0 times 342 success
+[ 1463.638367] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638367] set helper 16 24 0 0
+[ 1463.638368] maptbale secotr: [16:24] lbn 0 times 343 success
+[ 1463.638369] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638370] set helper 24 32 0 1
+[ 1463.638370] maptbale secotr: [24:32] lbn 0 times 344 success
+[ 1463.638370] maptbale secotr: [24:32] lbn 1 times 426 success
+[ 1463.638372] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638372] set helper 32 40 1 1
+[ 1463.638372] maptbale secotr: [32:40] lbn 1 times 427 success
+[ 1463.638374] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638374] set helper 40 48 1 1
+[ 1463.638375] maptbale secotr: [40:48] lbn 1 times 428 success
+[ 1463.638376] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638377] set helper 48 56 1 1
+[ 1463.638377] maptbale secotr: [48:56] lbn 1 times 429 success
+[ 1463.638378] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638379] set helper 56 64 1 2
+[ 1463.638379] maptbale secotr: [56:64] lbn 1 times 430 success
+[ 1463.638379] maptbale secotr: [56:64] lbn 2 times 256 success
+[ 1463.638381] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638381] set helper 64 72 2 2
+[ 1463.638381] maptbale secotr: [64:72] lbn 2 times 257 success
+[ 1463.638383] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.638383] set helper 72 80 2 2
+[ 1463.638384] maptbale secotr: [72:80] lbn 2 times 258 success
+[ 1463.643155] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643845] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643846] set helper 0 8 0 0
+[ 1463.643847] maptbale secotr: [0:8] lbn 0 times 345 success
+[ 1463.643850] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643851] set helper 8 16 0 0
+[ 1463.643851] maptbale secotr: [8:16] lbn 0 times 346 success
+[ 1463.643853] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643854] set helper 16 24 0 0
+[ 1463.643854] maptbale secotr: [16:24] lbn 0 times 347 success
+[ 1463.643856] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643856] set helper 24 32 0 1
+[ 1463.643857] maptbale secotr: [24:32] lbn 0 times 348 success
+[ 1463.643857] maptbale secotr: [24:32] lbn 1 times 431 success
+[ 1463.643858] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643859] set helper 32 40 1 1
+[ 1463.643859] maptbale secotr: [32:40] lbn 1 times 432 success
+[ 1463.643861] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643861] set helper 40 48 1 1
+[ 1463.643862] maptbale secotr: [40:48] lbn 1 times 433 success
+[ 1463.643863] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643863] set helper 48 56 1 1
+[ 1463.643864] maptbale secotr: [48:56] lbn 1 times 434 success
+[ 1463.643865] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643866] set helper 56 64 1 2
+[ 1463.643866] maptbale secotr: [56:64] lbn 1 times 435 success
+[ 1463.643866] maptbale secotr: [56:64] lbn 2 times 259 success
+[ 1463.643868] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643868] set helper 64 72 2 2
+[ 1463.643869] maptbale secotr: [64:72] lbn 2 times 260 success
+[ 1463.643870] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.643870] set helper 72 80 2 2
+[ 1463.643871] maptbale secotr: [72:80] lbn 2 times 261 success
+[ 1463.648765] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649343] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649344] set helper 0 8 0 0
+[ 1463.649345] maptbale secotr: [0:8] lbn 0 times 349 success
+[ 1463.649348] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649348] set helper 8 16 0 0
+[ 1463.649349] maptbale secotr: [8:16] lbn 0 times 350 success
+[ 1463.649350] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649351] set helper 16 24 0 0
+[ 1463.649351] maptbale secotr: [16:24] lbn 0 times 351 success
+[ 1463.649353] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649353] set helper 24 32 0 1
+[ 1463.649353] maptbale secotr: [24:32] lbn 0 times 352 success
+[ 1463.649354] maptbale secotr: [24:32] lbn 1 times 436 success
+[ 1463.649355] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649355] set helper 32 40 1 1
+[ 1463.649356] maptbale secotr: [32:40] lbn 1 times 437 success
+[ 1463.649357] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649358] set helper 40 48 1 1
+[ 1463.649358] maptbale secotr: [40:48] lbn 1 times 438 success
+[ 1463.649359] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649360] set helper 48 56 1 1
+[ 1463.649360] maptbale secotr: [48:56] lbn 1 times 439 success
+[ 1463.649361] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649362] set helper 56 64 1 2
+[ 1463.649362] maptbale secotr: [56:64] lbn 1 times 440 success
+[ 1463.649362] maptbale secotr: [56:64] lbn 2 times 262 success
+[ 1463.649364] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649364] set helper 64 72 2 2
+[ 1463.649364] maptbale secotr: [64:72] lbn 2 times 263 success
+[ 1463.649366] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.649366] set helper 72 80 2 2
+[ 1463.649367] maptbale secotr: [72:80] lbn 2 times 264 success
+[ 1463.654004] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654728] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654729] set helper 0 8 0 0
+[ 1463.654730] maptbale secotr: [0:8] lbn 0 times 353 success
+[ 1463.654732] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654733] set helper 8 16 0 0
+[ 1463.654733] maptbale secotr: [8:16] lbn 0 times 354 success
+[ 1463.654735] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654735] set helper 16 24 0 0
+[ 1463.654736] maptbale secotr: [16:24] lbn 0 times 355 success
+[ 1463.654737] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654738] set helper 24 32 0 1
+[ 1463.654738] maptbale secotr: [24:32] lbn 0 times 356 success
+[ 1463.654738] maptbale secotr: [24:32] lbn 1 times 441 success
+[ 1463.654740] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654740] set helper 32 40 1 1
+[ 1463.654740] maptbale secotr: [32:40] lbn 1 times 442 success
+[ 1463.654742] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654742] set helper 40 48 1 1
+[ 1463.654742] maptbale secotr: [40:48] lbn 1 times 443 success
+[ 1463.654744] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654744] set helper 48 56 1 1
+[ 1463.654744] maptbale secotr: [48:56] lbn 1 times 444 success
+[ 1463.654746] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654746] set helper 56 64 1 2
+[ 1463.654747] maptbale secotr: [56:64] lbn 1 times 445 success
+[ 1463.654747] maptbale secotr: [56:64] lbn 2 times 265 success
+[ 1463.654748] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654749] set helper 64 72 2 2
+[ 1463.654749] maptbale secotr: [64:72] lbn 2 times 266 success
+[ 1463.654750] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.654751] set helper 72 80 2 2
+[ 1463.654751] maptbale secotr: [72:80] lbn 2 times 267 success
+[ 1463.659539] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660166] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660167] set helper 0 8 0 0
+[ 1463.660169] maptbale secotr: [0:8] lbn 0 times 357 success
+[ 1463.660171] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660172] set helper 8 16 0 0
+[ 1463.660172] maptbale secotr: [8:16] lbn 0 times 358 success
+[ 1463.660174] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660174] set helper 16 24 0 0
+[ 1463.660174] maptbale secotr: [16:24] lbn 0 times 359 success
+[ 1463.660176] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660176] set helper 24 32 0 1
+[ 1463.660177] maptbale secotr: [24:32] lbn 0 times 360 success
+[ 1463.660177] maptbale secotr: [24:32] lbn 1 times 446 success
+[ 1463.660178] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660179] set helper 32 40 1 1
+[ 1463.660179] maptbale secotr: [32:40] lbn 1 times 447 success
+[ 1463.660181] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660181] set helper 40 48 1 1
+[ 1463.660181] maptbale secotr: [40:48] lbn 1 times 448 success
+[ 1463.660183] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660183] set helper 48 56 1 1
+[ 1463.660184] maptbale secotr: [48:56] lbn 1 times 449 success
+[ 1463.660185] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660185] set helper 56 64 1 2
+[ 1463.660186] maptbale secotr: [56:64] lbn 1 times 450 success
+[ 1463.660186] maptbale secotr: [56:64] lbn 2 times 268 success
+[ 1463.660187] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660188] set helper 64 72 2 2
+[ 1463.660188] maptbale secotr: [64:72] lbn 2 times 269 success
+[ 1463.660190] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.660190] set helper 72 80 2 2
+[ 1463.660190] maptbale secotr: [72:80] lbn 2 times 270 success
+[ 1463.664936] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665615] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665616] set helper 0 8 0 0
+[ 1463.665617] maptbale secotr: [0:8] lbn 0 times 361 success
+[ 1463.665620] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665620] set helper 8 16 0 0
+[ 1463.665621] maptbale secotr: [8:16] lbn 0 times 362 success
+[ 1463.665622] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665623] set helper 16 24 0 0
+[ 1463.665623] maptbale secotr: [16:24] lbn 0 times 363 success
+[ 1463.665624] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665625] set helper 24 32 0 1
+[ 1463.665625] maptbale secotr: [24:32] lbn 0 times 364 success
+[ 1463.665626] maptbale secotr: [24:32] lbn 1 times 451 success
+[ 1463.665627] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665627] set helper 32 40 1 1
+[ 1463.665628] maptbale secotr: [32:40] lbn 1 times 452 success
+[ 1463.665629] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665629] set helper 40 48 1 1
+[ 1463.665630] maptbale secotr: [40:48] lbn 1 times 453 success
+[ 1463.665631] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665631] set helper 48 56 1 1
+[ 1463.665632] maptbale secotr: [48:56] lbn 1 times 454 success
+[ 1463.665633] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665633] set helper 56 64 1 2
+[ 1463.665634] maptbale secotr: [56:64] lbn 1 times 455 success
+[ 1463.665634] maptbale secotr: [56:64] lbn 2 times 271 success
+[ 1463.665636] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665636] set helper 64 72 2 2
+[ 1463.665636] maptbale secotr: [64:72] lbn 2 times 272 success
+[ 1463.665638] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.665638] set helper 72 80 2 2
+[ 1463.665639] maptbale secotr: [72:80] lbn 2 times 273 success
+[ 1463.670566] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671221] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671222] set helper 0 8 0 0
+[ 1463.671224] maptbale secotr: [0:8] lbn 0 times 365 success
+[ 1463.671227] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671227] set helper 8 16 0 0
+[ 1463.671228] maptbale secotr: [8:16] lbn 0 times 366 success
+[ 1463.671229] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671229] set helper 16 24 0 0
+[ 1463.671230] maptbale secotr: [16:24] lbn 0 times 367 success
+[ 1463.671231] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671232] set helper 24 32 0 1
+[ 1463.671232] maptbale secotr: [24:32] lbn 0 times 368 success
+[ 1463.671232] maptbale secotr: [24:32] lbn 1 times 456 success
+[ 1463.671234] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671234] set helper 32 40 1 1
+[ 1463.671235] maptbale secotr: [32:40] lbn 1 times 457 success
+[ 1463.671236] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671236] set helper 40 48 1 1
+[ 1463.671237] maptbale secotr: [40:48] lbn 1 times 458 success
+[ 1463.671238] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671239] set helper 48 56 1 1
+[ 1463.671239] maptbale secotr: [48:56] lbn 1 times 459 success
+[ 1463.671240] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671241] set helper 56 64 1 2
+[ 1463.671241] maptbale secotr: [56:64] lbn 1 times 460 success
+[ 1463.671241] maptbale secotr: [56:64] lbn 2 times 274 success
+[ 1463.671243] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671243] set helper 64 72 2 2
+[ 1463.671243] maptbale secotr: [64:72] lbn 2 times 275 success
+[ 1463.671245] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.671246] set helper 72 80 2 2
+[ 1463.671246] maptbale secotr: [72:80] lbn 2 times 276 success
+[ 1463.676334] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677049] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677050] set helper 0 8 0 0
+[ 1463.677051] maptbale secotr: [0:8] lbn 0 times 369 success
+[ 1463.677054] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677055] set helper 8 16 0 0
+[ 1463.677055] maptbale secotr: [8:16] lbn 0 times 370 success
+[ 1463.677057] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677057] set helper 16 24 0 0
+[ 1463.677058] maptbale secotr: [16:24] lbn 0 times 371 success
+[ 1463.677059] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677060] set helper 24 32 0 1
+[ 1463.677060] maptbale secotr: [24:32] lbn 0 times 372 success
+[ 1463.677060] maptbale secotr: [24:32] lbn 1 times 461 success
+[ 1463.677062] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677062] set helper 32 40 1 1
+[ 1463.677063] maptbale secotr: [32:40] lbn 1 times 462 success
+[ 1463.677064] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677065] set helper 40 48 1 1
+[ 1463.677065] maptbale secotr: [40:48] lbn 1 times 463 success
+[ 1463.677067] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677067] set helper 48 56 1 1
+[ 1463.677067] maptbale secotr: [48:56] lbn 1 times 464 success
+[ 1463.677069] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677070] set helper 56 64 1 2
+[ 1463.677070] maptbale secotr: [56:64] lbn 1 times 465 success
+[ 1463.677070] maptbale secotr: [56:64] lbn 2 times 277 success
+[ 1463.677072] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677072] set helper 64 72 2 2
+[ 1463.677073] maptbale secotr: [64:72] lbn 2 times 278 success
+[ 1463.677074] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.677074] set helper 72 80 2 2
+[ 1463.677075] maptbale secotr: [72:80] lbn 2 times 279 success
+[ 1463.682200] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682957] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682958] set helper 0 8 0 0
+[ 1463.682959] maptbale secotr: [0:8] lbn 0 times 373 success
+[ 1463.682961] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682962] set helper 8 16 0 0
+[ 1463.682962] maptbale secotr: [8:16] lbn 0 times 374 success
+[ 1463.682964] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682964] set helper 16 24 0 0
+[ 1463.682965] maptbale secotr: [16:24] lbn 0 times 375 success
+[ 1463.682966] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682967] set helper 24 32 0 1
+[ 1463.682967] maptbale secotr: [24:32] lbn 0 times 376 success
+[ 1463.682967] maptbale secotr: [24:32] lbn 1 times 466 success
+[ 1463.682969] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682969] set helper 32 40 1 1
+[ 1463.682970] maptbale secotr: [32:40] lbn 1 times 467 success
+[ 1463.682971] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682972] set helper 40 48 1 1
+[ 1463.682972] maptbale secotr: [40:48] lbn 1 times 468 success
+[ 1463.682973] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682974] set helper 48 56 1 1
+[ 1463.682974] maptbale secotr: [48:56] lbn 1 times 469 success
+[ 1463.682975] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682976] set helper 56 64 1 2
+[ 1463.682976] maptbale secotr: [56:64] lbn 1 times 470 success
+[ 1463.682977] maptbale secotr: [56:64] lbn 2 times 280 success
+[ 1463.682978] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682978] set helper 64 72 2 2
+[ 1463.682979] maptbale secotr: [64:72] lbn 2 times 281 success
+[ 1463.682980] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.682980] set helper 72 80 2 2
+[ 1463.682981] maptbale secotr: [72:80] lbn 2 times 282 success
+[ 1463.687899] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688558] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688560] set helper 0 8 0 0
+[ 1463.688561] maptbale secotr: [0:8] lbn 0 times 377 success
+[ 1463.688564] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688564] set helper 8 16 0 0
+[ 1463.688565] maptbale secotr: [8:16] lbn 0 times 378 success
+[ 1463.688566] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688567] set helper 16 24 0 0
+[ 1463.688567] maptbale secotr: [16:24] lbn 0 times 379 success
+[ 1463.688568] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688569] set helper 24 32 0 1
+[ 1463.688569] maptbale secotr: [24:32] lbn 0 times 380 success
+[ 1463.688570] maptbale secotr: [24:32] lbn 1 times 471 success
+[ 1463.688571] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688571] set helper 32 40 1 1
+[ 1463.688572] maptbale secotr: [32:40] lbn 1 times 472 success
+[ 1463.688573] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688574] set helper 40 48 1 1
+[ 1463.688574] maptbale secotr: [40:48] lbn 1 times 473 success
+[ 1463.688575] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688576] set helper 48 56 1 1
+[ 1463.688576] maptbale secotr: [48:56] lbn 1 times 474 success
+[ 1463.688578] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688578] set helper 56 64 1 2
+[ 1463.688578] maptbale secotr: [56:64] lbn 1 times 475 success
+[ 1463.688579] maptbale secotr: [56:64] lbn 2 times 283 success
+[ 1463.688580] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688580] set helper 64 72 2 2
+[ 1463.688581] maptbale secotr: [64:72] lbn 2 times 284 success
+[ 1463.688582] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.688583] set helper 72 80 2 2
+[ 1463.688583] maptbale secotr: [72:80] lbn 2 times 285 success
+[ 1463.693686] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694316] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694351] set helper 0 8 0 0
+[ 1463.694352] maptbale secotr: [0:8] lbn 0 times 381 success
+[ 1463.694355] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694356] set helper 8 16 0 0
+[ 1463.694356] maptbale secotr: [8:16] lbn 0 times 382 success
+[ 1463.694358] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694358] set helper 16 24 0 0
+[ 1463.694359] maptbale secotr: [16:24] lbn 0 times 383 success
+[ 1463.694360] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694361] set helper 24 32 0 1
+[ 1463.694361] maptbale secotr: [24:32] lbn 0 times 384 success
+[ 1463.694362] maptbale secotr: [24:32] lbn 1 times 476 success
+[ 1463.694363] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694363] set helper 32 40 1 1
+[ 1463.694364] maptbale secotr: [32:40] lbn 1 times 477 success
+[ 1463.694365] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694366] set helper 40 48 1 1
+[ 1463.694366] maptbale secotr: [40:48] lbn 1 times 478 success
+[ 1463.694368] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694368] set helper 48 56 1 1
+[ 1463.694368] maptbale secotr: [48:56] lbn 1 times 479 success
+[ 1463.694370] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694371] set helper 56 64 1 2
+[ 1463.694371] maptbale secotr: [56:64] lbn 1 times 480 success
+[ 1463.694371] maptbale secotr: [56:64] lbn 2 times 286 success
+[ 1463.694373] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694373] set helper 64 72 2 2
+[ 1463.694373] maptbale secotr: [64:72] lbn 2 times 287 success
+[ 1463.694375] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.694376] set helper 72 80 2 2
+[ 1463.694376] maptbale secotr: [72:80] lbn 2 times 288 success
+[ 1463.699015] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699941] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699942] set helper 0 8 0 0
+[ 1463.699943] maptbale secotr: [0:8] lbn 0 times 385 success
+[ 1463.699946] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699946] set helper 8 16 0 0
+[ 1463.699947] maptbale secotr: [8:16] lbn 0 times 386 success
+[ 1463.699948] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699949] set helper 16 24 0 0
+[ 1463.699949] maptbale secotr: [16:24] lbn 0 times 387 success
+[ 1463.699950] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699951] set helper 24 32 0 1
+[ 1463.699951] maptbale secotr: [24:32] lbn 0 times 388 success
+[ 1463.699952] maptbale secotr: [24:32] lbn 1 times 481 success
+[ 1463.699953] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699953] set helper 32 40 1 1
+[ 1463.699954] maptbale secotr: [32:40] lbn 1 times 482 success
+[ 1463.699955] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699956] set helper 40 48 1 1
+[ 1463.699956] maptbale secotr: [40:48] lbn 1 times 483 success
+[ 1463.699958] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699958] set helper 48 56 1 1
+[ 1463.699958] maptbale secotr: [48:56] lbn 1 times 484 success
+[ 1463.699960] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699960] set helper 56 64 1 2
+[ 1463.699961] maptbale secotr: [56:64] lbn 1 times 485 success
+[ 1463.699961] maptbale secotr: [56:64] lbn 2 times 289 success
+[ 1463.699962] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699963] set helper 64 72 2 2
+[ 1463.699963] maptbale secotr: [64:72] lbn 2 times 290 success
+[ 1463.699965] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.699965] set helper 72 80 2 2
+[ 1463.699965] maptbale secotr: [72:80] lbn 2 times 291 success
+[ 1463.704669] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705324] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705325] set helper 0 8 0 0
+[ 1463.705327] maptbale secotr: [0:8] lbn 0 times 389 success
+[ 1463.705330] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705330] set helper 8 16 0 0
+[ 1463.705331] maptbale secotr: [8:16] lbn 0 times 390 success
+[ 1463.705332] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705333] set helper 16 24 0 0
+[ 1463.705333] maptbale secotr: [16:24] lbn 0 times 391 success
+[ 1463.705335] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705335] set helper 24 32 0 1
+[ 1463.705335] maptbale secotr: [24:32] lbn 0 times 392 success
+[ 1463.705336] maptbale secotr: [24:32] lbn 1 times 486 success
+[ 1463.705337] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705338] set helper 32 40 1 1
+[ 1463.705338] maptbale secotr: [32:40] lbn 1 times 487 success
+[ 1463.705340] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705340] set helper 40 48 1 1
+[ 1463.705340] maptbale secotr: [40:48] lbn 1 times 488 success
+[ 1463.705342] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705342] set helper 48 56 1 1
+[ 1463.705342] maptbale secotr: [48:56] lbn 1 times 489 success
+[ 1463.705344] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705344] set helper 56 64 1 2
+[ 1463.705344] maptbale secotr: [56:64] lbn 1 times 490 success
+[ 1463.705345] maptbale secotr: [56:64] lbn 2 times 292 success
+[ 1463.705346] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705347] set helper 64 72 2 2
+[ 1463.705347] maptbale secotr: [64:72] lbn 2 times 293 success
+[ 1463.705349] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.705349] set helper 72 80 2 2
+[ 1463.705349] maptbale secotr: [72:80] lbn 2 times 294 success
+[ 1463.709984] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710790] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710791] set helper 0 8 0 0
+[ 1463.710792] maptbale secotr: [0:8] lbn 0 times 393 success
+[ 1463.710795] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710795] set helper 8 16 0 0
+[ 1463.710796] maptbale secotr: [8:16] lbn 0 times 394 success
+[ 1463.710797] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710798] set helper 16 24 0 0
+[ 1463.710798] maptbale secotr: [16:24] lbn 0 times 395 success
+[ 1463.710800] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710800] set helper 24 32 0 1
+[ 1463.710801] maptbale secotr: [24:32] lbn 0 times 396 success
+[ 1463.710801] maptbale secotr: [24:32] lbn 1 times 491 success
+[ 1463.710803] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710803] set helper 32 40 1 1
+[ 1463.710803] maptbale secotr: [32:40] lbn 1 times 492 success
+[ 1463.710805] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710805] set helper 40 48 1 1
+[ 1463.710805] maptbale secotr: [40:48] lbn 1 times 493 success
+[ 1463.710807] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710807] set helper 48 56 1 1
+[ 1463.710808] maptbale secotr: [48:56] lbn 1 times 494 success
+[ 1463.710809] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710809] set helper 56 64 1 2
+[ 1463.710810] maptbale secotr: [56:64] lbn 1 times 495 success
+[ 1463.710810] maptbale secotr: [56:64] lbn 2 times 295 success
+[ 1463.710811] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710812] set helper 64 72 2 2
+[ 1463.710812] maptbale secotr: [64:72] lbn 2 times 296 success
+[ 1463.710814] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.710814] set helper 72 80 2 2
+[ 1463.710814] maptbale secotr: [72:80] lbn 2 times 297 success
+[ 1463.715943] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717131] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717132] set helper 0 8 0 0
+[ 1463.717134] maptbale secotr: [0:8] lbn 0 times 397 success
+[ 1463.717137] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717137] set helper 8 16 0 0
+[ 1463.717137] maptbale secotr: [8:16] lbn 0 times 398 success
+[ 1463.717139] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717139] set helper 16 24 0 0
+[ 1463.717140] maptbale secotr: [16:24] lbn 0 times 399 success
+[ 1463.717141] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717142] set helper 24 32 0 1
+[ 1463.717142] maptbale secotr: [24:32] lbn 0 times 400 success
+[ 1463.717142] maptbale secotr: [24:32] lbn 1 times 496 success
+[ 1463.717144] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717144] set helper 32 40 1 1
+[ 1463.717144] maptbale secotr: [32:40] lbn 1 times 497 success
+[ 1463.717146] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717146] set helper 40 48 1 1
+[ 1463.717147] maptbale secotr: [40:48] lbn 1 times 498 success
+[ 1463.717148] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717148] set helper 48 56 1 1
+[ 1463.717149] maptbale secotr: [48:56] lbn 1 times 499 success
+[ 1463.717150] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717151] set helper 56 64 1 2
+[ 1463.717151] maptbale secotr: [56:64] lbn 1 times 500 success
+[ 1463.717151] maptbale secotr: [56:64] lbn 2 times 298 success
+[ 1463.717153] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717153] set helper 64 72 2 2
+[ 1463.717153] maptbale secotr: [64:72] lbn 2 times 299 success
+[ 1463.717155] NVM_SIM nvm_make_request1164 Debug bio_sector(bio) : 8
+[ 1463.717155] set helper 72 80 2 2
+[ 1463.717155] maptbale secotr: [72:80] lbn 2 times 300 success
+[ 1472.198930] NVM_SIM [nvm_syncer_worker(877)] Wake up after 2500
+[ 1472.200313] NVM_SIM [nvm_get_sorted_head_tail_maptale(929)]: debug tarr 0:0:400
+[ 1472.200315] NVM_SIM [nvm_get_sorted_head_tail_maptale(929)]: debug tarr 1:1:500
+[ 1472.200315] NVM_SIM [nvm_get_sorted_head_tail_maptale(929)]: debug tarr 2:2:300
+[ 1472.200316] NVMSIM nvm_check_head_tail1010 Debug keys a49a1500 index a49a1080 size 3
+[ 1472.200317] NVM_SIM [nvm_block_above_level(887)]: Test into wear
+[ 1472.200317] NVM_SIM [nvm_block_check_flush(965)]: Flush k 0
+[ 1482.447741] NVM_SIM [nvm_syncer_worker(877)] Wake up after 2500
+[ 1482.448954] NVM_SIM [nvm_get_sorted_head_tail_maptale(929)]: debug tarr 0:0:400
+[ 1482.448955] NVM_SIM [nvm_get_sorted_head_tail_maptale(929)]: debug tarr 1:1:500
+[ 1482.448955] NVM_SIM [nvm_get_sorted_head_tail_maptale(929)]: debug tarr 2:2:300
+[ 1482.448957] NVMSIM nvm_check_head_tail1010 Debug keys a49a1140 index a49a1e40 size 3
+[ 1482.448957] NVM_SIM [nvm_block_above_level(887)]: Test into wear
+[ 1482.448958] NVM_SIM [nvm_block_check_flush(965)]: Flush k 0
+[ 1491.798465] nvm: /proc/nvm/nvm0 removed
+[ 1491.798467] NVMSIM: print_maptable(156)
+               ------------Mapping Table-----------------
+[ 1491.798467]     lbn      pbn      accesstime            
+[ 1491.798468]        0       1     400
+[ 1491.798469]        1       2     500
+[ 1491.798469]        2       3     300
+[ 1491.799100] NVMSIM: nvm_pbi_space_free(578): maptable space free 262144 success
+[ 1491.799100] 
+               BitMap Information
+[ 1491.799101] 1
+[ 1491.799101] 1
+[ 1491.799101] 1
+[ 1491.799102] 1
+[ 1491.799102]  
+[ 1491.799102] 1
+[ 1491.799102] 1
+[ 1491.799103] 1
+[ 1491.799103] 1
+[ 1491.799103]   
+[ 1491.799104] 1
+[ 1491.799104] 1
+[ 1491.799104] 1
+[ 1491.799104] 1
+[ 1491.799105]  
+[ 1491.799105] 1
+[ 1491.799105] 1
+[ 1491.799105] 1
+[ 1491.799106] 1
+[ 1491.799106]   
+[ 1491.799106] 1
+[ 1491.799106] 1
+[ 1491.799107] 1
+[ 1491.799107] 1
+[ 1491.799107]  
+[ 1491.799107] 1
+[ 1491.799107] 1
+[ 1491.799108] 1
+[ 1491.799108] 1
+[ 1491.799108]   
+[ 1491.799108] 1
+[ 1491.799109] 1
+[ 1491.799109] 1
+[ 1491.799109] 1
+[ 1491.799109]  
+[ 1491.799110] 1
+[ 1491.799110] 1
+[ 1491.799110] 1
+[ 1491.799110] 1
+[ 1491.799111]     
+[ 1491.799111] 1
+[ 1491.799111] 1
+[ 1491.799111] 1
+[ 1491.799112] 1
+[ 1491.799112]  
+[ 1491.799112] 1
+[ 1491.799112] 1
+[ 1491.799113] 1
+[ 1491.799113] 1
+[ 1491.799113]   
+[ 1491.799113] 1
+[ 1491.799114] 1
+[ 1491.799114] 1
+[ 1491.799114] 1
+[ 1491.799114]  
+[ 1491.799115] 1
+[ 1491.799115] 1
+[ 1491.799115] 1
+[ 1491.799115] 1
+[ 1491.799116]   
+[ 1491.799116] 1
+[ 1491.799116] 1
+[ 1491.799116] 1
+[ 1491.799117] 1
+[ 1491.799117]  
+[ 1491.799117] 1
+[ 1491.799117] 1
+[ 1491.799118] 1
+[ 1491.799118] 1
+[ 1491.799118]   
+[ 1491.799118] 1
+[ 1491.799119] 1
+[ 1491.799119] 1
+[ 1491.799119] 1
+[ 1491.799119]  
+[ 1491.799120] 1
+[ 1491.799120] 1
+[ 1491.799120] 1
+[ 1491.799120] 1
+
+[ 1491.799121] 1
+[ 1491.799121] 1
+[ 1491.799121] 1
+[ 1491.799121] 1
+[ 1491.799122]  
+[ 1491.799122] 1
+[ 1491.799122] 1
+[ 1491.799122] 1
+[ 1491.799123] 1
+[ 1491.799123]   
+[ 1491.799123] 1
+[ 1491.799123] 1
+[ 1491.799124] 1
+[ 1491.799124] 1
+[ 1491.799124]  
+[ 1491.799124] 1
+[ 1491.799125] 1
+[ 1491.799125] 1
+[ 1491.799125] 1
+[ 1491.799125]   
+[ 1491.799126] 0
+[ 1491.799126] 0
+[ 1491.799126] 0
+[ 1491.799126] 0
+[ 1491.799127]  
+[ 1491.799127] 0
+[ 1491.799127] 0
+[ 1491.799127] 0
+[ 1491.799128] 0
+[ 1491.799128]   
+[ 1491.799128] 0
+[ 1491.799128] 0
+[ 1491.799129] 0
+[ 1491.799129] 0
+[ 1491.799129]  
+[ 1491.799129] 0
+[ 1491.799130] 0
+[ 1491.799130] 0
+[ 1491.799130] 0
+[ 1491.799130]     
+[ 1491.799131] 0
+[ 1491.799131] 0
+[ 1491.799131] 0
+[ 1491.799131] 0
+[ 1491.799132]  
+[ 1491.799132] 0
+[ 1491.799132] 0
+[ 1491.799132] 0
+[ 1491.799133] 0
+[ 1491.799133]   
+[ 1491.799133] 0
+[ 1491.799133] 0
+[ 1491.799133] 0
+[ 1491.799134] 0
+[ 1491.799134]  
+[ 1491.799134] 0
+[ 1491.799134] 0
+[ 1491.799135] 0
+[ 1491.799135] 0
+[ 1491.799135]   
+[ 1491.799135] 0
+[ 1491.799136] 0
+[ 1491.799136] 0
+[ 1491.799136] 0
+[ 1491.799136]  
+[ 1491.799137] 0
+[ 1491.799137] 0
+[ 1491.799137] 0
+[ 1491.799137] 0
+[ 1491.799138]   
+[ 1491.799138] 0
+[ 1491.799138] 0
+[ 1491.799138] 0
+[ 1491.799139] 0
+[ 1491.799139]  
+[ 1491.799139] 0
+[ 1491.799139] 0
+[ 1491.799140] 0
+[ 1491.799140] 0
+
+[ 1491.799952] 
+               Used bits: 80     Free bits 8388528 
+[ 1491.800043] NVMSIM: nvm_pbi_space_free(593): BitMap space free 8388608 success
+[ 1491.800050] NVM_SIM [nvm_syncer_worker(877)] Wake up after 2500
+[ 1491.800079] NVMSIM:nvm_syncer_stop:831 buffer syncer stopped
+[ 1491.800080] nvm: /dev/nvm0 is destroyed (4096 MB)
+[ 1491.800183] NVMSIM: unmapping high mem space (offset: 4096 MB, size=4096 MB)is unmapped
+[ 1491.800186] nvm: /proc/nvm/nvmcfg is removed
+[ 1491.800187] nvm: /proc/nvm/nvmstat is removed
+[ 1491.800188] nvm: /proc/nvm is removed
+[ 1491.800188] NVMSIM: nvm_exit(1368) -Exited

@@ -68,9 +68,9 @@ void *g_highmem_curr_addr =
 #define NVM_MAJOR 231
 #define NVMDEV_MEM_MAX_SECTORS (8)
 
-/* idle period timer */ 
-#define NVM_FLUSH_IDLE_TIMEOUT (12)  /*  12 millisecond */
-#define NVM_AFTER_FLUSH_SLEEPTIME (10*HZ) /*  10 seconds */ //HZ = 250
+/* idle period timer */
+#define NVM_FLUSH_IDLE_TIMEOUT (12) /*  12 millisecond */
+#define NVM_AFTER_FLUSH_SLEEPTIME (10 * HZ) /*  10 seconds */  // HZ = 250
 #define NVM_DEV_UPDATE_ACCESS_TIME(NVM)             \
   {                                                 \
     spin_lock(&(NVM)->nvm_stat->stat_lock);         \
@@ -86,7 +86,7 @@ void *g_highmem_curr_addr =
   }
 
 #define NVM_DEV_IS_IDLE(IDLE) ((IDLE) > NVM_FLUSH_IDLE_TIMEOUT)
-
+#define KZALLOC_MAX_BYTES (128 << KB_SHIFT)
 /*
  * NVM    spin_lock(&(NVM)->nvm_stat->stat_lock);         \
     (NVM)->nvm_stat->last_access_jiffies = jiffies; \
@@ -131,15 +131,38 @@ typedef struct nvm_device {
   struct task_struct *syncer;
   spinlock_t syncer_lock;
   spinlock_t flush_lock;  // maynot use FIXME
+  word_t *head;
+  word_t *tail;
+  word_t head_tail_size;
+  word_t flag;
 
   /*Maptable*/
   spinlock_t map_lock;
   word_t *MapTable;
+  word_t *ExtractedPbnMapTable;
+  word_t *ExtractedIndexMaptable;
+  word_t ExtractedSize;
 
   /* Bitmap*/
   word_t *BitMap;
   spinlock_t bit_lock;
 } NVM_DEVICE_T;
+
+/***
+ * nvm_buffer:
+ *      wear leveling
+typedef struct nvm_buffer{
+  struct nvm_device *nvm;
+
+  // wear leveling for maptable
+  word_t *head;
+  word_t *tail;
+  word_t size;
+
+  spinlock_t buffer_lock;
+
+}
+*/
 
 /**
  * Allocate and free the NVM device
@@ -159,21 +182,27 @@ static int nvm_buffer_space_free(NVM_DEVICE_T *device);
 static int nvm_pbi_space_free(NVM_DEVICE_T *device);
 
 static inline uint64_t nvm_device_is_idle(NVM_DEVICE_T *device);
+
+static void *auto_malloc(unsigned long size);
+static void auto_free(void *p,word_t size);
 /*
  **************************************************************************
  * /proc file system entries
  **************************************************************************
  */
-#define PROC_CHAR_SIZZE (1024)  /* should not bigger than A PAGE SIZE*/
+#define PROC_CHAR_SIZZE (1024) /* should not bigger than A PAGE SIZE*/
 static int nvm_proc_create(void);
 static int nvm_proc_destroy(void);
 
 static int nvm_proc_devstat_create(NVM_DEVICE_T *device);
 static int nvm_proc_devstat_destroy(NVM_DEVICE_T *device);
 
-ssize_t nvm_proc_devstat_read(struct file *filp,char *buf,size_t count,loff_t *offp);
-ssize_t nvm_proc_nvmcfg_read(struct file *filp,char *buf,size_t count,loff_t *offp);
-ssize_t nvm_proc_nvmstat_read(struct file *filp,char *buf,size_t count,loff_t *offp);
+ssize_t nvm_proc_devstat_read(struct file *filp, char *buf, size_t count,
+                              loff_t *offp);
+ssize_t nvm_proc_nvmcfg_read(struct file *filp, char *buf, size_t count,
+                             loff_t *offp);
+ssize_t nvm_proc_nvmstat_read(struct file *filp, char *buf, size_t count,
+                              loff_t *offp);
 
 /*
  **************************************************************************
@@ -187,6 +216,8 @@ static int nvm_syncer_worker(void *device);
 
 int nvm_block_above_level(NVM_DEVICE_T *device);
 int nvm_check_head_tail(NVM_DEVICE_T *device);
+
+int nvm_block_check_flush(NVM_DEVICE_T *device);
 /**
  *  NOTE: we can also use ioremap_* functions to directly set memory
  *  page attributes when do remapping,
@@ -254,7 +285,8 @@ int demap_maptable(word_t *map_table, word_t lbn);
 void print_maptable(word_t *map_table, word_t lbn);
 word_t extract_maptbale(word_t *map_table, word_t table_size, word_t **arr,
                         word_t **index);
-
+int nvm_get_extracted_maptable(NVM_DEVICE_T *device);
+void nvm_free_extracted_maptable(NVM_DEVICE_T *device);
 /**
  * Bitmap
  */

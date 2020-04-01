@@ -1,0 +1,227 @@
+[  734.710718] nvmsim: loading out-of-tree module taints kernel.
+[  734.710757] nvmsim: module verification failed: signature and/or required key missing - tainting kernel
+[  734.713535] NVMSIM: [nvm_init() 1293] g_highmem_size 4294967296 bytes g_highmemaddr 4294967296 ; nvm_capacity_mb 4096 MB 
+[  734.713671] NVMSIM: high memory space remapped (offset: 4096 MB, size=4096 MB)
+[  734.713677] nvm: /proc/nvm/nvmstat created
+[  734.713677] nvm: /proc/nvm/nvmcfg created
+[  734.713774] nvm: nvm_stat_alloc(501): NVM Stat space allocation Success
+[  734.713775] NVMSIM: nvm_mem_space_alloc(532):  created [18446653550831337472 : 4096 MBs]
+[  734.713886] NVMSIM: nvm_syncer_init:820 inin syncer threads at 000000008ee7f10c success
+[  734.714268] NVMSIM: init_maptable(106) init maptbale size: 262145 success addr: 42c81000
+[  734.714755] NVMSIM: init_bitmap(363) init BitMap size: 262145 success addr: 42fa9000
+[  734.714766] NVMSIM: /proc/nvm/nvm0 created
+[  734.716759] NVMSIM [nvm_init() 1323]: module loaded
+[  744.919743] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  755.159177] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  765.402705] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  775.645877] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  785.886446] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  796.126241] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  806.366828] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  810.572588] NVM_SIM nvm_make_request1162 Debug bio_sector(bio) : 8
+[  810.572601] NVM_SIM nvm_make_request1162 Debug bio_sector(bio) : 8
+[  810.572601] set helper 0 8 0 0
+[  810.572603] maptbale secotr: [0:8] lbn 0 times 1 success
+[  810.572603] BitMap sector 0 actual in MapTable 0
+[  810.572604] BitMap sector 1 actual in MapTable 0
+[  810.572604] BitMap sector 2 actual in MapTable 0
+[  810.572604] BitMap sector 3 actual in MapTable 0
+[  810.572605] BitMap sector 4 actual in MapTable 0
+[  810.572605] BitMap sector 5 actual in MapTable 0
+[  810.572605] BitMap sector 6 actual in MapTable 0
+[  810.572606] BitMap sector 7 actual in MapTable 0
+[  816.606331] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  816.607714] NVM_SIM nvm_get_sorted_head_tail_maptale927 debug tarr 0:0:1
+[  816.607715] NVMSIM nvm_check_head_tail1008 Debug keys b4683780 index b46832f0 size 1
+[  816.607716] NVM_SIM nvm_block_above_level885 Test into wear
+[  826.832538] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  826.833943] NVM_SIM nvm_get_sorted_head_tail_maptale927 debug tarr 0:0:1
+[  826.833945] NVMSIM nvm_check_head_tail1008 Debug keys b4683410 index b4683a30 size 1
+[  826.833946] NVM_SIM nvm_block_above_level885 Test into wear
+[  837.065496] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  837.066876] NVM_SIM nvm_get_sorted_head_tail_maptale927 debug tarr 0:0:1
+[  837.066878] NVMSIM nvm_check_head_tail1008 Debug keys b4683a30 index b4683410 size 1
+[  837.066878] NVM_SIM nvm_block_above_level885 Test into wear
+[  847.301955] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  847.303365] NVM_SIM nvm_get_sorted_head_tail_maptale927 debug tarr 0:0:1
+[  847.303367] NVMSIM nvm_check_head_tail1008 Debug keys b4683c10 index b4683cf0 size 1
+[  847.303367] NVM_SIM nvm_block_above_level885 Test into wear
+[  852.045901] nvm: /proc/nvm/nvm0 removed
+[  852.045903] NVMSIM: print_maptable(156)
+               ------------Mapping Table-----------------
+[  852.045903]     lbn      pbn      accesstime            
+[  852.045904]        0       1       1
+[  852.046673] NVMSIM: nvm_pbi_space_free(577): maptable space free 262144 success
+[  852.046673] 
+               BitMap Information
+[  852.046674] 1
+[  852.046674] 1
+[  852.046674] 1
+[  852.046675] 1
+[  852.046675]  
+[  852.046675] 1
+[  852.046675] 1
+[  852.046676] 1
+[  852.046676] 1
+[  852.046676]   
+[  852.046676] 0
+[  852.046677] 0
+[  852.046677] 0
+[  852.046677] 0
+[  852.046677]  
+[  852.046678] 0
+[  852.046678] 0
+[  852.046678] 0
+[  852.046678] 0
+[  852.046678]   
+[  852.046679] 0
+[  852.046679] 0
+[  852.046679] 0
+[  852.046679] 0
+[  852.046680]  
+[  852.046680] 0
+[  852.046680] 0
+[  852.046680] 0
+[  852.046681] 0
+[  852.046681]   
+[  852.046681] 0
+[  852.046681] 0
+[  852.046682] 0
+[  852.046682] 0
+[  852.046682]  
+[  852.046682] 0
+[  852.046682] 0
+[  852.046683] 0
+[  852.046683] 0
+[  852.046683]     
+[  852.046684] 0
+[  852.046684] 0
+[  852.046684] 0
+[  852.046684] 0
+[  852.046685]  
+[  852.046685] 0
+[  852.046685] 0
+[  852.046685] 0
+[  852.046686] 0
+[  852.046686]   
+[  852.046686] 0
+[  852.046686] 0
+[  852.046686] 0
+[  852.046687] 0
+[  852.046687]  
+[  852.046687] 0
+[  852.046687] 0
+[  852.046688] 0
+[  852.046688] 0
+[  852.046688]   
+[  852.046688] 0
+[  852.046689] 0
+[  852.046689] 0
+[  852.046689] 0
+[  852.046689]  
+[  852.046689] 0
+[  852.046690] 0
+[  852.046690] 0
+[  852.046690] 0
+[  852.046690]   
+[  852.046691] 0
+[  852.046691] 0
+[  852.046691] 0
+[  852.046691] 0
+[  852.046692]  
+[  852.046692] 0
+[  852.046692] 0
+[  852.046692] 0
+[  852.046692] 0
+
+[  852.046693] 0
+[  852.046693] 0
+[  852.046693] 0
+[  852.046694] 0
+[  852.046694]  
+[  852.046694] 0
+[  852.046694] 0
+[  852.046695] 0
+[  852.046695] 0
+[  852.046695]   
+[  852.046695] 0
+[  852.046695] 0
+[  852.046696] 0
+[  852.046696] 0
+[  852.046696]  
+[  852.046696] 0
+[  852.046697] 0
+[  852.046697] 0
+[  852.046697] 0
+[  852.046697]   
+[  852.046698] 0
+[  852.046698] 0
+[  852.046698] 0
+[  852.046698] 0
+[  852.046698]  
+[  852.046699] 0
+[  852.046699] 0
+[  852.046699] 0
+[  852.046699] 0
+[  852.046700]   
+[  852.046700] 0
+[  852.046700] 0
+[  852.046700] 0
+[  852.046701] 0
+[  852.046701]  
+[  852.046701] 0
+[  852.046701] 0
+[  852.046702] 0
+[  852.046702] 0
+[  852.046702]     
+[  852.046702] 0
+[  852.046702] 0
+[  852.046703] 0
+[  852.046703] 0
+[  852.046703]  
+[  852.046703] 0
+[  852.046704] 0
+[  852.046704] 0
+[  852.046704] 0
+[  852.046704]   
+[  852.046705] 0
+[  852.046705] 0
+[  852.046705] 0
+[  852.046705] 0
+[  852.046706]  
+[  852.046706] 0
+[  852.046706] 0
+[  852.046706] 0
+[  852.046706] 0
+[  852.046722]   
+[  852.046722] 0
+[  852.046723] 0
+[  852.046723] 0
+[  852.046723] 0
+[  852.046723]  
+[  852.046724] 0
+[  852.046724] 0
+[  852.046724] 0
+[  852.046724] 0
+[  852.046725]   
+[  852.046725] 0
+[  852.046725] 0
+[  852.046725] 0
+[  852.046726] 0
+[  852.046726]  
+[  852.046726] 0
+[  852.046726] 0
+[  852.046726] 0
+[  852.046727] 0
+
+[  852.047470] 
+               Used bits: 8     Free bits 8388600 
+[  852.047496] NVMSIM: nvm_pbi_space_free(592): BitMap space free 8388608 success
+[  852.047561] NVM_SIM nvm_syncer_worker875 Wake up after 2500
+[  852.047606] NVMSIM:nvm_syncer_stop:830 buffer syncer stopped
+[  852.047607] nvm: /dev/nvm0 is destroyed (4096 MB)
+[  852.048029] NVMSIM: unmapping high mem space (offset: 4096 MB, size=4096 MB)is unmapped
+[  852.048032] nvm: /proc/nvm/nvmcfg is removed
+[  852.048032] nvm: /proc/nvm/nvmstat is removed
+[  852.048033] nvm: /proc/nvm is removed
+[  852.048034] NVMSIM: nvm_exit(1366) -Exited

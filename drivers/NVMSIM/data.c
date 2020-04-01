@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+
+typedef unsigned int word_t;
+#define KB_SHIFT 10
+#define KZALLOC_MAX_BYTES ((128/sizeof(word_t))<<(KB_SHIFT))
 int main()
 {
 
@@ -28,4 +32,6 @@ int main()
 
         uint32_t s = -1;
         printf("%d\n", s);
+
+        printf("%u\n", KZALLOC_MAX_BYTES);
 }
