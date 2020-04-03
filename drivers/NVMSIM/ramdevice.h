@@ -27,11 +27,11 @@ typedef unsigned int word_t;
  ** high memory configs */
 unsigned g_nvm_type = NVM_CONFIG_HIGHMEM;
 #define NVM_USE_HIGHMEM() (g_nvm_type == NVM_CONFIG_HIGHMEM)
-uint64_t g_highmem_size =
-    0; /* size of the reserved physical mem space (bytes) */
+/* size of the reserved physical mem space (bytes) */
+uint64_t g_highmem_size = 0;
 void *g_highmem_virt_addr = NULL; /* beginning of the reserve HIGH_MEM space */
-void *g_highmem_curr_addr =
-    NULL; /* beginning of the available HIGH_MEM space for alloc*/
+/* beginning of the available HIGH_MEM space for alloc*/
+void *g_highmem_curr_addr = NULL;
 #define NVM_HIGHMEM_AVAILABLE_SPACE \
   (g_highmem_virt_addr + g_highmem_size - g_highmem_curr_addr)
 
@@ -86,7 +86,9 @@ void *g_highmem_curr_addr =
   }
 
 #define NVM_DEV_IS_IDLE(IDLE) ((IDLE) > NVM_FLUSH_IDLE_TIMEOUT)
-#define KZALLOC_MAX_BYTES (128 << KB_SHIFT)
+#define KZALLOC_MAX_BYTES (127 << KB_SHIFT)
+
+#define SORTED_BASE (5) /* 0.2 */
 /*
  * NVM    spin_lock(&(NVM)->nvm_stat->stat_lock);         \
     (NVM)->nvm_stat->last_access_jiffies = jiffies; \
@@ -136,11 +138,11 @@ typedef struct nvm_device {
   word_t head_tail_size;
   word_t flag;
 
-  /*Maptable*/
+  /*MapTable*/
   spinlock_t map_lock;
   word_t *MapTable;
   word_t *ExtractedPbnMapTable;
-  word_t *ExtractedIndexMaptable;
+  word_t *ExtractedIndexMapTable;
   word_t ExtractedSize;
 
   /* Bitmap*/
@@ -181,10 +183,10 @@ static int nvm_mem_space_free(NVM_DEVICE_T *device);
 static int nvm_buffer_space_free(NVM_DEVICE_T *device);
 static int nvm_pbi_space_free(NVM_DEVICE_T *device);
 
-static inline uint64_t nvm_device_is_idle(NVM_DEVICE_T *device);
+static uint64_t nvm_device_is_idle(NVM_DEVICE_T *device);
 
 static void *auto_malloc(unsigned long size);
-static void auto_free(void *p,word_t size);
+static void auto_free(void *p, word_t size);
 /*
  **************************************************************************
  * /proc file system entries
