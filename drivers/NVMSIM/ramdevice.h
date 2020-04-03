@@ -285,7 +285,7 @@ word_t get_maptable(word_t *map_table, word_t lbn);
 int map_table(word_t *map_table, word_t lbn, word_t pbn);
 int demap_maptable(word_t *map_table, word_t lbn);
 void print_maptable(word_t *map_table, word_t lbn);
-word_t extract_maptbale(word_t *map_table, word_t table_size, word_t **arr,
+word_t extract_maptable(word_t *map_table, word_t table_size, word_t **arr,
                         word_t **index);
 int nvm_get_extracted_maptable(NVM_DEVICE_T *device);
 void nvm_free_extracted_maptable(NVM_DEVICE_T *device);

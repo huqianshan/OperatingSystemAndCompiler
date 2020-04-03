@@ -1,0 +1,16 @@
+[ 1641.031475] NVMSIM: [nvm_init() 1350] g_highmem_size 4294967296 bytes g_highmemaddr 4294967296 ; nvm_capacity_mb 4096 MB 
+[ 1641.031571] NVMSIM: high memory space remapped (offset: 4096 MB, size=4096 MB)
+[ 1641.031723] nvm: nvm_stat_alloc(497): NVM Stat space allocation Success
+[ 1641.031724] NVMSIM: nvm_mem_space_alloc(528):  created [18446664596413480960 : 4096 MBs]
+[ 1641.031988] NVMSIM: init_maptable(105) init MapTable size: 262145 success addr: 3b29000
+[ 1641.032200] NVMSIM: init_bitmap(359) init BitMap size: 262145 success addr: 3c2b000
+[ 1641.032432] NVMSIM: [nvm_syncer_init(833)] inin syncer threads at 00000000ea7096b7 success
+[ 1641.032436] NVMSIM: /proc/nvm/nvm0 created
+[ 1641.032605] NVM_SIM [nvm_device_is_idle(810)] Test Get Into Dev Idle last_jiffies 0 now_jiffies 335261 interval 1341044
+[ 1641.034771] NVM_SIM [extract_maptable(250)]: In Extracted function arr:000000006b0a7c7c index: 0000000073aa8df3  n: 3
+[ 1641.034773] NVM_SIM [nvm_get_extracted_maptable(936)]: Test extracted n 3 arr 000000006b0a7c7c index 0000000073aa8df3 
+[ 1641.034777] NVM_SIM [nvm_get_sorted_head_tail_maptale(985)]: Test Find bigK 00000000bc0cac37 first 1 lbn: 1 pbn: 2 acc: 4
+[ 1641.034779] NVMSIM [nvm_check_head_tail(1056)] Debug keys 31542ec0 index 315420b0 size 3
+[ 1641.034780] NVM_SIM [nvm_block_check_flush(1020)]: Flush k 1
+[ 1641.034784] NVM_SIM [nvm_syncer_worker(906)] sleep 10
+[ 1641.035549] NVMSIM [nvm_init() 1380]: module loaded

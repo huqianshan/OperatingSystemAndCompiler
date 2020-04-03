@@ -155,7 +155,7 @@ void print_maptable(word_t *map_table, word_t lbn) {
          "NVMSIM: %s(%d)\n------------Mapping Table-----------------\n",
          __FUNCTION__, __LINE__);
   printk(KERN_INFO "    lbn      pbn      accesstime            \n");
-  for (i = 0; i <= lbn; i++) {
+  for (i = 0; i <= 10; i++) {
     tem = get_maptable(map_table, i);
     pbn = PHY_SEC_NUM(tem);
 
@@ -165,52 +165,55 @@ void print_maptable(word_t *map_table, word_t lbn) {
       printk(KERN_INFO "%8u%8u%8u\n", i, pbn, ACCESS_TIME(tem));
     }
   }
+
+    for (i = 0; i <= lbn; i++) {
+    tem = get_maptable(map_table, i);
+    pbn = PHY_SEC_NUM(tem);
+
+    if (i&&i%5000==0&&pbn != 0)
+    // bug ,=0->0 not show ;solved, pbn begin with [1,size]
+    {
+      printk(KERN_INFO "%8u%8u%8u\n", i, pbn, ACCESS_TIME(tem));
+    }
+  }
 }
 
 static void *auto_malloc(unsigned long size) {
-  word_t max_num = KZALLOC_MAX_BYTES;
+  unsigned long max_num = (unsigned long)KZALLOC_MAX_BYTES;
   void *p;
   if (size < (unsigned long)max_num) {
-
-    if(size<64){
-      size = 64;
-    }
     p = kzalloc(size, GFP_KERNEL);
+   // printk(KERN_INFO"NVM_SIM [%s(%d)]: kzalloc for size %lu at %p\n",
+   // __FUNCTION__,__LINE__,size,p);
     if (p == NULL) {
-      printk(KERN_ERR "NVM_SIM %s%d ERROR: for size %lu autoalloc in kzalloc\n",
-             __FUNCTION__, __LINE__, size);
+      printk(KERN_ERR "NVM_SIM %s%d ERROR: for size %lu autoalloc in kzalloc\n",__FUNCTION__, __LINE__, size);
     }
   } else {
-    p = vmalloc(size);
+    p = vzalloc(size);
+       // printk(KERN_INFO"NVM_SIM [%s(%d)]: Vmalloc for size %lu at %p\n",__FUNCTION__,__LINE__,size,p);
     if (p == NULL) {
       printk(KERN_ERR "NVM_SIM %s%d ERROR: for size %lu autoalloc in vmalloc\n",
              __FUNCTION__, __LINE__, size);
-    } else {
-      memset(p, 0, size);
-    }
+    } 
   }
   return p;
 }
 static void auto_free(void *p, word_t size) {
-  word_t max_num = KZALLOC_MAX_BYTES;
-  if (size < (unsigned long)max_num) {
+  unsigned long max_num = KZALLOC_MAX_BYTES;
+  if (size < max_num) {
+   // printk(KERN_INFO"NVM_SIM [%s(%d)]: kfree size %u p %p\n",__FUNCTION__,__LINE__,size,p);
     kfree(p);
   } else {
+       // printk(KERN_INFO"NVM_SIM [%s(%d)]: vmfree size %u p %p\n", __FUNCTION__,__LINE__,size,p);
     vfree(p);
   }
 }
 
 static void nvm_auto_free(void *p, word_t size) {
-  if (p != NULL) {
-    if (size == 0) {
-      p = NULL;
-      return;
-    }
     auto_free(p, size);
-  }
 }
 
-word_t extract_MapTable(word_t *map_table, word_t table_size, word_t **arr,
+word_t extract_maptable(word_t *map_table, word_t table_size, word_t **arr,
                         word_t **index) {
   word_t n, i, j, tem, pbn;
   word_t *tem_arr, *new_arr;
@@ -232,7 +235,8 @@ word_t extract_MapTable(word_t *map_table, word_t table_size, word_t **arr,
   tem_arr = (word_t *)auto_malloc(sizeof(word_t) * n);
   new_arr = (word_t *)auto_malloc(sizeof(word_t) * n);
   j = 0;
-  for (i = 0;; i < table_size; i++) {
+  for (i = 0; i < table_size; i++)
+  {
     tem = get_maptable(map_table, i);
     pbn = PHY_SEC_NUM(tem);
     if (pbn != 0) {
@@ -250,11 +254,10 @@ word_t extract_MapTable(word_t *map_table, word_t table_size, word_t **arr,
 }
 
 word_t minium(word_t *arr, word_t n) {
-  if (arr == NULL || n <= 0) {
-    return -2;
-  }
-  word_t i;
-  word_t min = arr[0], index = 0;
+
+  word_t i,min,index;
+  min = arr[0];
+  index = 0;
   for (i = 0; i < n; i++) {
     if (min > arr[i]) {
       min = arr[i];
@@ -265,11 +268,9 @@ word_t minium(word_t *arr, word_t n) {
 }
 
 word_t maxium(word_t *arr, word_t n) {
-  if (arr == NULL || n <= 0) {
-    return -2;
-  }
-  word_t i;
-  word_t max = arr[0], index = 0;
+  word_t i,max,index;
+  max = arr[0];
+  index = 0;
   for (i = 0; i < n; i++) {
     if (max < arr[i]) {
       max = arr[i];
@@ -280,14 +281,16 @@ word_t maxium(word_t *arr, word_t n) {
 }
 
 
-word_t bigK_index(word_t *arr, word_t n, word_t k) {
-  word_t *tem, *addr, i, min_index, min;
+word_t *bigK_index(word_t *arr, word_t n, word_t k) {
+  
   if (arr == NULL || n <= 0 || k > n || k <= 0) {
     return NULL;
   }
-
-  tem = (word_t *)auto_malloc(sizeof(word_t) * k);
-  addr = (word_t *)auto_malloc(sizeof(word_t) * k);
+  word_t *tem, *addr, i, min_index, min;
+  // tempory store the pbn
+  tem = auto_malloc(sizeof(word_t) * k);
+  // store the maxium k index in arr
+  addr = auto_malloc(sizeof(word_t) * k);
   for (i = 0; i < k; i++) {
     tem[i] = arr[i];
     addr[i] = i;
@@ -309,13 +312,13 @@ word_t bigK_index(word_t *arr, word_t n, word_t k) {
   return addr;
 }
 
-word_t smallK_index(word_t *arr, word_t n, word_t k) {
+word_t *smallK_index(word_t *arr, word_t n, word_t k) {
   if (arr == NULL || n <= 0 || k > n || k <= 0) {
     return NULL;
   }
   word_t *tem, *addr, i, max_index, max;
-  tem = (word_t *)auto_malloc(sizeof(word_t) * k);
-  addr = (word_t *)auto_malloc(sizeof(word_t) * k);
+  tem = auto_malloc(sizeof(word_t) * k);
+  addr = auto_malloc(sizeof(word_t) * k);
   for (i = 0; i < k; i++) {
     tem[i] = arr[i];
     addr[i] = i;
@@ -559,6 +562,8 @@ static int nvm_pbi_space_alloc(NVM_DEVICE_T *device) {
 
   map_table(device->MapTable, 1, 2);
   map_table(device->MapTable, 1,2);
+  map_table(device->MapTable, 1, 2);
+  map_table(device->MapTable, 1,2);
 
   map_table(device->MapTable, 2, 3);
   device->BitMap = init_bitmap(bit_table_size);
@@ -587,7 +592,7 @@ static int nvm_pbi_space_free(NVM_DEVICE_T *device) {
   }*/
 
   if (device->BitMap != NULL) {
-    printb_bitmap(device->BitMap, 128);
+    //printb_bitmap(device->BitMap, 128);
     print_summary_bitmap(device->BitMap, bit_table_size);
     vfree(device->BitMap);
     printk(KERN_INFO "NVMSIM: %s(%d): BitMap space free %u success\n",
@@ -851,23 +856,59 @@ static int nvm_syncer_worker(void *device) {
      * (1) the num of dirty blocks hits the high watermark, or
      * (2) the device has been idle for a while */
 spin_lock(&deviceT->syncer_lock);
+  
     if ((idle_usec = nvm_device_is_idle(deviceT)) &&
         nvm_block_above_level(deviceT)) {
       if (deviceT->flag == 1) {
         nvm_block_check_flush(device);
       }
     }
- spin_unlock(&deviceT->syncer_lock);
-    /* go to sleep */
-    // FIXME CHECK FOR DEADLOCK maybe bug
-    // set_current_state(TASK_INTERRUPTIBLE);
-    printk(KERN_INFO "NVM_SIM [%s(%d)] sleep %lu\n", __FUNCTION__, __LINE__,
-           10);
-    ssleep(10);
-    // schedule_timeout(500);
-    // printk(KERN_INFO "NVM_SIM [%s(%d)] Wake up after %lu\n", __FUNCTION__,
-    //       __LINE__, NVM_AFTER_FLUSH_SLEEPTIME);
-    // set_current_state(TASK_RUNNING);
+  
+ /*
+ word_t *arr,*index,*big_arr_index;
+ word_t size,i;
+ arr = NULL;
+ index = NULL;
+ size = extract_maptable(deviceT->MapTable, map_table_size, &arr, &index);
+  printk(KERN_INFO
+        "NVM_SIM [%s(%d)]: ExtractedSize %u Good Here arr %p index %p\n",
+        __FUNCTION__, __LINE__, size, arr, index);
+  for (i = 0; i < size;i++){
+    printk(KERN_INFO "NVM_SIM [%s(%d)]: lbn:%u key:%u pbn:%u access:%u\n",
+           __FUNCTION__, __LINE__, index[i], arr[index[i]],
+           PHY_SEC_NUM(arr[index[i]]), ACCESS_TIME(arr[index[i]]));
+  }
+
+  // find minmum item index in arr of size n 
+  word_t min_index,*tarr,j;
+  tarr = auto_malloc(size * sizeof(word_t));
+  for (j = 0; j < size; j++) {
+    tarr[j] = ACCESS_TIME(arr[j]);
+    printk(KERN_INFO "NVM_SIM [%s(%d)]: debug tarr %d:%u:%u\n", __FUNCTION__,
+           __LINE__, j, index[j], tarr[j]);
+  }
+  min_index = minium(tarr, size);
+  printk(KERN_INFO"NVM_SIM [%s(%d)]: minium of arr index %d items %u\n",
+  __FUNCTION__,__LINE__,min_index,arr[min_index]);
+  
+  big_arr_index = bigK_index(tarr, size, 1);
+  printk(KERN_INFO "NVM_SIM [%s(%d)]: big_index:%p big_index[0]:%u pbn:%u\n",
+         __FUNCTION__, __LINE__, big_arr_index, big_arr_index[0],tarr[big_arr_index[0]]);
+  auto_free(big_arr_index, 1);
+
+  auto_free(arr, size);
+  auto_free(index, size);
+  */
+  spin_unlock(&deviceT->syncer_lock);
+  /* go to sleep */
+  // FIXME CHECK FOR DEADLOCK maybe bug
+  // set_current_state(TASK_INTERRUPTIBLE);
+  printk(KERN_INFO "NVM_SIM [%s(%d)] sleep %lu\n", __FUNCTION__, __LINE__, 10);
+  ssleep(10);
+  // schedule_timeout(500);
+  // printk(KERN_INFO "NVM_SIM [%s(%d)] Wake up after %lu\n", __FUNCTION__,
+  //       __LINE__, NVM_AFTER_FLUSH_SLEEPTIME);
+  // set_current_state(TASK_RUNNING);
   } while (!kthread_should_stop());
   return 0;
 }
@@ -876,10 +917,9 @@ int nvm_block_above_level(NVM_DEVICE_T *device) {
   // check flag
   if (nvm_check_head_tail(device) != 0) {
     device->flag = 1;
-    printk(KERN_INFO "NVM_SIM [%s(%d)]: Test into wear\n", __FUNCTION__,
-           __LINE__);
     return 1;
   }
+  device->flag = 0;
   return 0;
 };
 
@@ -891,7 +931,7 @@ int nvm_get_extracted_maptable(NVM_DEVICE_T *device) {
   }
   arr = NULL;
   index = NULL;
-  n = extract_MapTable(device->MapTable, map_table_size, &arr, &index);
+  n = extract_maptable(device->MapTable, map_table_size, &arr, &index);
   printk(KERN_INFO "NVM_SIM [%s(%d)]: Test extracted n %u arr %p index %p \n", __FUNCTION__,
          __LINE__, n,arr,index);
   if ((!n) || (!arr) || (!index)) {
@@ -918,23 +958,20 @@ int nvm_get_sorted_head_tail_maptale(NVM_DEVICE_T *device) {
   arr = device->ExtractedPbnMapTable;
   index = device->ExtractedIndexMapTable;
   n = device->ExtractedSize;
+  tarr = NULL;
   if ((!n) || (!arr) || (!index)) {
     n = 0;
     goto out;
   }
 
   // make an arry with key value of accesstime not key(pbn+accesstime)
-  tarr = (word_t *)auto_malloc((unsigned long)n * sizeof(word_t));
-
+  tarr = auto_malloc(n * sizeof(word_t));
   for (j = 0; j < n; j++) {
     tarr[j] = ACCESS_TIME(arr[j]);
-    printk(KERN_INFO "NVM_SIM [%s(%d)]: debug tarr %d:%u:%u\n", __FUNCTION__,
-           __LINE__, j, index[j], tarr[j]);
   }
 
-  word_t k, *bigK, smallK;
+  word_t k, *bigK, *smallK;
   k = (n / SORTED_BASE) + 1;
-  printk(KERN_INFO "NVM_SIM [%s(%d)]: Test k %u\n", __FUNCTION__, __LINE__, k);
 
   bigK = bigK_index(tarr, n, k);
   smallK = smallK_index(tarr, n, k);
@@ -966,7 +1003,7 @@ void nvm_free_sorted_head_tail_maptale(NVM_DEVICE_T *device) {
 
 int nvm_block_check_flush(NVM_DEVICE_T *device) {
   if (device->flag == 0) {
-    return 0;
+    goto out;
   }
   word_t i, k, tem, bindex, sindex, blbn, slbn, bkey, skey;
   word_t *bigK, *smallK, *index, *arr, *MapTable;
@@ -978,11 +1015,9 @@ int nvm_block_check_flush(NVM_DEVICE_T *device) {
   arr = device->ExtractedPbnMapTable;
   k = device->head_tail_size;
   if ((!bigK) || (!smallK) || (!index) || (!arr)) {
-    return 0;
+    goto out;
   }
-
   printk(KERN_INFO "NVM_SIM [%s(%d)]: Flush k %u\n", __FUNCTION__, __LINE__, k);
-  
   for (i = 0; i < k; i++) {
     // bindex one of the big k index
     bindex = bigK[i];
@@ -993,32 +1028,23 @@ int nvm_block_check_flush(NVM_DEVICE_T *device) {
     slbn = index[sindex];
     skey = arr[sindex];
 
-    printk(KERN_INFO "[%s(%d)] Flush blbn %u skey %u pbn: %u access %u\n",
-           __FUNCTION__, __LINE__, blbn, skey, PHY_SEC_NUM(skey),
-           ACCESS_TIME(skey));
+    printk(KERN_INFO "[%s(%d)] Flush: blbn<->slbn %u<->%u pbn: %u<->%u access %u<->%u\n",
+           __FUNCTION__, __LINE__, blbn,slbn,
+            PHY_SEC_NUM(bkey),PHY_SEC_NUM(skey),ACCESS_TIME(bkey),ACCESS_TIME(skey));
     map_table(MapTable, blbn, PHY_SEC_NUM(skey));
-
-    // here transfer data
-    printk(KERN_INFO "[%s()] Flush slbn %u bkey %u pbn: %u access %u\n", __FUNCTION__,
-           slbn, bkey, PHY_SEC_NUM(bkey), ACCESS_TIME(bkey));
+    //transfer data
     map_table(MapTable, slbn, PHY_SEC_NUM(bkey));
   }
  
+ out:
   device->flag = 0;
-  nvm_free_extracted_maptable(device);
   nvm_free_sorted_head_tail_maptale(device);
+  nvm_free_extracted_maptable(device);
+  
   return k;
 }
 
 int nvm_check_head_tail(NVM_DEVICE_T *device) {
-  /*
-  word_t f;
-  spin_lock(&device->flush_lock);
-  f = device->flag;
-  spin_unlock(&device->flush_lock);
-  if (f != 0) {
-    return 0;
-  }*/
 
   if (nvm_get_extracted_maptable(device) == 0) {
     goto free_extracted;
@@ -1026,7 +1052,7 @@ int nvm_check_head_tail(NVM_DEVICE_T *device) {
   if (nvm_get_sorted_head_tail_maptale(device) == 0) {
     goto free_head_tail;
   }
-  printk(KERN_INFO "NVMSIM %s%d Debug keys %x index %x size %u\n", __FUNCTION__,
+  printk(KERN_INFO "NVMSIM [%s(%d)] Debug keys %x index %x size %u\n", __FUNCTION__,
          __LINE__, device->ExtractedPbnMapTable, device->ExtractedIndexMapTable,
          device->ExtractedSize);
   return 1;
@@ -1035,7 +1061,6 @@ free_head_tail:
 free_extracted:
   nvm_free_extracted_maptable(device);
 out:
-  device->flag = 0;
   return 0;
 }
 
@@ -1129,27 +1154,31 @@ int set_helper(struct nvm_device *device, sector_t sector, word_t len) {
   lbn_begin = sector_begin >> MAP_PER_SECTORS_SHIFT;
   lbn_end = sector_end >> MAP_PER_SECTORS_SHIFT;
 
+  /*
   printk(KERN_INFO
          "NVM_SIM [%s(%d)]:set helper sector_begin %u %u lbn_begin %u %u\n",
          __FUNCTION__, __LINE__, sector_begin, sector_end, lbn_begin, lbn_end);
+  */
   word_t i, rtn;
   // MapTable
   spin_lock(&device->syncer_lock);
   for (i = lbn_begin; i <= lbn_end; i++) {
     // pbn just equal lbn+1
     rtn = map_table(device->MapTable, i, i + 1);
+    /*
     if ((signed)rtn != -1) {
       printk(KERN_INFO "MapTable secotr: [%u:%u] lbn %u times %u success\n",
              sector_begin, sector_end, i, rtn);
-    }
+    }*/
   }
   spin_unlock(&device->syncer_lock);
   // set bitmap
   for (i = sector_begin; i < sector_end; i++) {
     if (BOOL(i, device->BitMap) == 0) {
       SET_BITMAP(i, device->BitMap);
+      /*
       printk(KERN_INFO "BitMap sector %u actual in MapTable %u\n", i,
-             (i >> MAP_PER_SECTORS_SHIFT) + 1);
+             (i >> MAP_PER_SECTORS_SHIFT) + 1);*/
     }
   }
   return 1;
@@ -1182,8 +1211,9 @@ static void nvm_make_request(struct request_queue *q, struct bio *bio) {
   sector = bio->bi_iter.bi_sector;
   capacity = get_capacity(bio->bi_disk);
   num_sectors = bio_sectors(bio);
+  /*
   printk(KERN_INFO "NVM_SIM [%s(%d)]: Debug bio_sector(bio) : %d\n",
-         __FUNCTION__, __LINE__, num_sectors);
+         __FUNCTION__, __LINE__, num_sectors);*/
   if (sector + (bio->bi_iter.bi_size >> SECTOR_SHIFT) > capacity) {
     printk(KERN_ERR "NVM_SIM %s%d Test %u Exceed size %u", __FUNCTION__,
            __LINE__, sector + (bio->bi_iter.bi_size >> SECTOR_SHIFT), capacity);
@@ -1230,8 +1260,10 @@ out:
     nvm_stat->num_requests_write++;
     nvm_stat->num_sectors_write += num_sectors;
   }
+  /*
   printk(KERN_INFO "NVM_SIM [%s(%d)]: Test in End %u\n", __FUNCTION__, __LINE__,
          nvm_stat->num_sectors_write);
+  */
   spin_unlock(&nvm_stat->stat_lock);
   return;
 }
