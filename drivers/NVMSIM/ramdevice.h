@@ -86,9 +86,9 @@ void *g_highmem_curr_addr = NULL;
   }
 
 #define NVM_DEV_IS_IDLE(IDLE) ((IDLE) > NVM_FLUSH_IDLE_TIMEOUT)
-#define KZALLOC_MAX_BYTES (127 << KB_SHIFT)
+#define KZALLOC_MAX_BYTES (128 << KB_SHIFT)
 
-#define SORTED_BASE (5) /* 0.2 */
+#define SORTED_BASE (100) /* 0.2 */
 /*
  * NVM    spin_lock(&(NVM)->nvm_stat->stat_lock);         \
     (NVM)->nvm_stat->last_access_jiffies = jiffies; \

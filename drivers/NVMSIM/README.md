@@ -49,3 +49,6 @@
 ## bitmap code
 
 32 s1 s2 s2 s3 s3 s3 s4 s4 s4 s4
+
+test vmalloc
+
