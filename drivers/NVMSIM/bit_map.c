@@ -80,7 +80,7 @@ void printb(int len)
   printf("\nBitMap Information\n");
   for (i = 0; i < len; i++)
   {
-    tem = BOOL(i);
+    tem = (BOOL(i)!=0);
     printf("%d", tem);
 
     if ((i + 1) % (BIT_WIDTH_IN_BITS * 2) == 0)

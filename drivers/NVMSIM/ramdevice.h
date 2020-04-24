@@ -148,6 +148,10 @@ typedef struct nvm_device {
   /* Bitmap*/
   word_t *BitMap;
   spinlock_t bit_lock;
+
+  /* Inforation Map*/
+  word_t *InfoTable;
+  spinlock_t info_lock;
 } NVM_DEVICE_T;
 
 /***
@@ -344,4 +348,24 @@ void print_summary_bitmap(word_t *bitmap, word_t len);
  * total helper function
  */
 int set_helper(struct nvm_device *device, sector_t sector, word_t len);
+
+
+/**
+ * Access Information table
+ */
+word_t *InfoTable;
+
+#define INFO_PAGE_SIZE_SHIFT (5)
+#define INFO_PAGE_SIZE (1<<INFO_PAGE_SIZE_SHIFT)
+
+word_t *init_infotable(word_t size);
+
+// lbn is phy-block-num, infortable key is lbn>> INFO_PAGE_SIZE_SHIFT
+int update_infotable(word_t *InfoTable, word_t lbn);
+
+word_t get_infotable(word_t *InfoTable, word_t lbn);
+
+int destroy_infotable(word_t *InfoTable);
+
+void print_infotable(word_t *InfoTable,word_t size,word_t step);
 #endif

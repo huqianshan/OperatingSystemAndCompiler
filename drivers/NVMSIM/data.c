@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-//#include <sys/jiffies.h>
 
 
 
@@ -37,7 +36,5 @@ int main()
 
         printf("%u\n", KZALLOC_MAX_BYTES);
 
-        unsigned long long current_j = jiffies;
-        unsigned long long current_m = jiffies_to_msecs(current_j);
-        printf("%llu\n", current_m);
+
 }
