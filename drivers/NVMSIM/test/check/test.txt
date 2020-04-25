@@ -1,4 +1,1 @@
-[  461.137517] test: loading out-of-tree module taints kernel.
-[  461.137519] test: module license 'unspecified' taints kernel.
-[  461.137553] test: module verification failed: signature and/or required key missing - tainting kernel
-[  461.138745] Test [test_init(97)]: Init
+[ 5399.420212] Test [test_init(260)]: Init

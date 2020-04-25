@@ -284,11 +284,14 @@ static int nvm_disk_getgeo(struct block_device *bdev, struct hd_geometry *geo);
 
 // return maptable addr
 word_t *init_maptable(word_t size);
-int update_maptable(word_t *map_table, word_t index, word_t key);
+int update_maptable(word_t *map_table, word_t lbn, word_t pbn);
 word_t get_maptable(word_t *map_table, word_t lbn);
-int map_table(word_t *map_table, word_t lbn, word_t pbn);
+word_t map_table(word_t *map_table, word_t lbn, word_t pbn);
 int demap_maptable(word_t *map_table, word_t lbn);
 void print_maptable(word_t *map_table, word_t lbn);
+void destroy_maptable(word_t *map_table);
+
+
 word_t extract_maptable(word_t *map_table, word_t table_size, word_t **arr,
                         word_t **index);
 int nvm_get_extracted_maptable(NVM_DEVICE_T *device);

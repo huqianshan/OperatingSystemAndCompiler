@@ -159,97 +159,124 @@ void print_infotable(word_t *InfoTable, word_t size, word_t step) {
 /**
  *  MapTable functions
  */
-word_t *init_maptable(word_t size) {
+word_t *init_maptable(word_t size)
+{
   word_t table_num;
-
-  table_num = size + 1;
+  word_t *tem;
   unsigned long v_size;
 
+  table_num = size + 1;
   v_size = (unsigned long)table_num * sizeof(word_t);
-  word_t *tem;
   tem = vzalloc(v_size);
-
-  if (tem == NULL) {
+  if (tem == NULL)
+  {
     printk(KERN_ERR "NVMSIM: %s(%d) init maptable size: %u failed  \n",
            __FUNCTION__, __LINE__, table_num);
-  } else {
-    // memset(tem, 0, v_size);
+  }
+  else
+  {
     printk(KERN_INFO "NVMSIM: %s(%d) init MapTable size: %u success addr: %x\n",
            __FUNCTION__, __LINE__, table_num, tem);
   }
   return tem;
-}
+};
 
-int update_maptable(word_t *map_table, word_t index, word_t key) {
-  if (index > map_table_size) {
-    printk(KERN_ERR "NVMSIM: %s(%d) index %u exceed %u,update maptble failed\n",
-           __FUNCTION__, __LINE__, index, map_table_size);
+int update_maptable(word_t *map_table, word_t lbn, word_t pbn)
+{
+  if (lbn > map_table_size || lbn < 0)
+  {
+    printk(KERN_ERR "NVMSIM: [%s(%d)] Error index %u exceed %u,update maptble failed\n",
+           __FUNCTION__, __LINE__, lbn, map_table_size);
     return 0;
   }
-  map_table[index] = key;
+  map_table[lbn] = pbn;
   return 1;
-}
+};
 
-word_t get_maptable(word_t *map_table, word_t lbn) {
-  if (lbn > map_table_size || (lbn < 0)) {
-    printk(KERN_ERR "NVMSIM: %s(%d) index %u exceed %u,gete maptble failed\n",
+word_t get_maptable(word_t *map_table, word_t lbn)
+{
+  if (lbn > map_table_size || (lbn < 0))
+  {
+    printk(KERN_ERR "NVMSIM: [%s(%d)] Error index %u exceed %u,gete maptble failed\n",
            __FUNCTION__, __LINE__, lbn, map_table_size);
-    return -EINVAL;
+    return 0; //return -EINVAL; bug
   }
   return map_table[lbn];
-}
+};
 
-int map_table(word_t *map_table, word_t lbn, word_t pbn) {
-  word_t key, num, newkey;
+word_t map_table(word_t *map_table, word_t lbn, word_t pbn)
+{
+  word_t raw_pbn;
   // check for return value
-  key = get_maptable(map_table, lbn);
-  // if key=0 indicates lbn not mapping
-  num = ACCESS_TIME(key) + 1;
-
-  newkey = MAKE_KEY(pbn, num);
-  if ((update_maptable(map_table, lbn, newkey) == 0)) {
-    return -1;
-  }
-  return num;
-}
-
-int demap_maptable(word_t *map_table, word_t lbn) {
-  word_t key = get_maptable(map_table, lbn);
-  word_t access_num = ACCESS_TIME(key);
-
-  if (update_maptable(map_table, lbn, access_num) <= 0) {
+  raw_pbn = get_maptable(map_table, lbn);
+  // if pbn=0 indicates lbn not mapping
+  //num = ACCESS_TIME(pbn) + 1;newkey = MAKE_KEY(pbn, num);
+  if ((update_maptable(map_table, lbn, pbn) == 0))
+  {
+    printk(KERN_ERR "NVMSIM: [%s(%d)] Error Map lbn %u for pbn %u failed\n",
+           __FUNCTION__, __LINE__, lbn, pbn);
     return 0;
   }
-  return 1;
+  return raw_pbn;
+};
+
+int demap_maptable(word_t *map_table, word_t lbn)
+{
+  word_t raw_pbn;
+  // check for return value
+  raw_pbn = get_maptable(map_table, lbn);
+  if (raw_pbn == 0)
+  {
+    return 0;
+  }
+  // if pbn=0 indicates lbn not mapping
+  //num = ACCESS_TIME(pbn) + 1;newkey = MAKE_KEY(pbn, num);
+  if ((update_maptable(map_table, lbn, 0) == 0))
+  {
+    printk(KERN_ERR "NVMSIM: [%s(%d)] Error DeMap lbn %u failed its raw pbn %u n",
+           __FUNCTION__, __LINE__, lbn, raw_pbn);
+    return 0;
+  }
+  return raw_pbn;
 }
-void print_maptable(word_t *map_table, word_t lbn) {
-  word_t i, tem, pbn;
+
+void print_maptable(word_t *map_table, word_t lbn)
+{
+  word_t i, pbn;
   printk(KERN_INFO
          "NVMSIM: %s(%d)\n------------Mapping Table-----------------\n",
          __FUNCTION__, __LINE__);
   printk(KERN_INFO "    lbn      pbn      accesstime            \n");
-  for (i = 0; i <= 100; i++) {
-    tem = get_maptable(map_table, i);
-    pbn = PHY_SEC_NUM(tem);
+  for (i = 0; i <= 100; i++)
+  {
+    pbn = get_maptable(map_table, i);
 
     if (pbn != 0)
     // bug ,=0->0 not show ;solved, pbn begin with [1,size]
     {
-      printk(KERN_INFO "%8u%8u%8u\n", i, pbn, ACCESS_TIME(tem));
+      printk(KERN_INFO "%8u%8u%8u\n", i, pbn, 0);
     }
   }
 
-  for (i = 0; i <= lbn; i += 5000) {
-    tem = get_maptable(map_table, i);
-    pbn = PHY_SEC_NUM(tem);
-
+  for (i = 0; i <= lbn; i += 5000)
+  {
+    pbn = get_maptable(map_table, i);
     if (pbn != 0)
     // bug ,=0->0 not show ;solved, pbn begin with [1,size]
     {
-      printk(KERN_INFO "%8u%8u%8u\n", i, pbn, ACCESS_TIME(tem));
+      printk(KERN_INFO "%8u%8u%8u\n", i, pbn, 0);
     }
   }
-}
+};
+
+void destroy_maptable(word_t *map_table)
+{
+  if (map_table != NULL)
+  {
+    vfree(map_table);
+    printk("destroy maptable");
+  }
+};
 
 static void *auto_malloc(unsigned long size) {
   unsigned long max_num;
@@ -1338,26 +1365,27 @@ int set_helper(struct nvm_device *device, sector_t sector, word_t len) {
          __FUNCTION__, __LINE__, sector_begin, sector_end, lbn_begin, lbn_end);
   
   word_t i, rtn;
-  // MapTable
-  spin_lock(&device->syncer_lock);
+  // Access Info Table 
+  //spin_lock(&device->syncer_lock);
   for (i = lbn_begin; i <= lbn_end; i++) {
     if (update_infotable(device->InfoTable, i)) {
       printk(KERN_ERR "NVM_SIM [%s(%d)]: InforTable update %u failed \n",
              __FUNCTION__, __LINE__, i);
     }
-    // pbn just equal lbn+1
-    rtn = map_table(device->MapTable, i, i + 1);
-    if ((signed)rtn != -1) {
-      /*
-      printk(KERN_INFO "MapTable secotr: [%u:%u] lbn %u times %u success\n",
-             sector_begin, sector_end, i, rtn);*/
-    }
   }
-  spin_unlock(&device->syncer_lock);
-  // set bitmap
+  //spin_unlock(&device->syncer_lock);
+  // set bitmap and maptable
   for (i = sector_begin; i < sector_end; i++) {
     if (BOOL(i, device->BitMap) == 0) {
       SET_BITMAP(i, device->BitMap);
+      // pbn just equal lbn+1
+      rtn = map_table(device->MapTable, i, i + 1);
+      if ((signed)rtn != -1)
+      {
+        /*
+      printk(KERN_INFO "MapTable secotr: [%u:%u] lbn %u times %u success\n",
+             sector_begin, sector_end, i, rtn);*/
+      }
       /*
       printk(KERN_INFO "BitMap sector %u actual in MapTable %u\n", i,
              (i >> MAP_PER_SECTORS_SHIFT) + 1);*/
