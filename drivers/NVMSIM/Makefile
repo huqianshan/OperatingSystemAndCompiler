@@ -1,7 +1,7 @@
 
 obj-m := nvmsim.o
 
-nvmsim-objs += ramdevice.o mem.o
+nvmsim-objs += ramdevice.o mem.o infotable.o bitmap.o maptable.o
 
 
 CC = gcc
@@ -33,14 +33,14 @@ clean:
 	rm -rf *.o *.ko *.mod.c Module.* modules.* \
 	       *~ .*~ .\#*~ \#*~ .*.cmd .tmp* bit_map mapping data kth
 
-test: bit_map.c bit_map.h mapping.c mapping.h kth.c kth.c
-	${CC} ${FLAGS} -o bit_map bit_map.c mapping.c kth.c ${LIBS}
+#test: bit_map.c bit_map.h mapping.c mapping.h kth.c kth.c
+#	${CC} ${FLAGS} -o bit_map bit_map.c mapping.c kth.c ${LIBS}
 
-map: mapping.c mapping.h
-	${CC} ${FLAGS} -o mapping mapping.c ${LIBS}
+#map: mapping.c mapping.h
+#	${CC} ${FLAGS} -o mapping mapping.c ${LIBS}
 
-data: data.c 
-	${CC} ${FLAGS} -o data data.c
+#data: data.c 
+#	${CC} ${FLAGS} -o data data.c
 
-kth: kth.c kth.h
-	${CC} ${FLAGS} -o kth kth.c
+#kth: kth.c kth.h
+#	${CC} ${FLAGS} -o kth kth.c

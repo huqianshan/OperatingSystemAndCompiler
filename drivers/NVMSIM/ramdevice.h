@@ -10,10 +10,10 @@
  */
 #define TRUE (1)
 #define FALSE (0)
-typedef unsigned int word_t;
+//typedef unsigned int word_t;
 
-#define MEMCOPY_DEFAULT 1  // use memcopy
-#define MEMCOPY_BARRIER 0  // use barrier
+#define MEMCOPY_DEFAULT 1 // use memcopy
+#define MEMCOPY_BARRIER 0 // use barrier
 
 #define NVM_CONFIG_VMALLOC 0 /* use vmalloc() to allocate memory*/
 #define NVM_CONFIG_HIGHMEM 1 /* use ioremap to map highmemory-based memory*/
@@ -69,8 +69,8 @@ void *g_highmem_curr_addr = NULL;
 #define NVMDEV_MEM_MAX_SECTORS (8)
 
 /* idle period timer */
-#define NVM_FLUSH_IDLE_TIMEOUT (12) /*  12 millisecond */
-#define NVM_AFTER_FLUSH_SLEEPTIME (10 * HZ) /*  10 seconds */  // HZ = 250
+#define NVM_FLUSH_IDLE_TIMEOUT (12)                           /*  12 millisecond */
+#define NVM_AFTER_FLUSH_SLEEPTIME (10 * HZ) /*  10 seconds */ // HZ = 250
 #define NVM_DEV_UPDATE_ACCESS_TIME(NVM)             \
   {                                                 \
     spin_lock(&(NVM)->nvm_stat->stat_lock);         \
@@ -96,7 +96,8 @@ void *g_highmem_curr_addr = NULL;
  * (each corresponding to a PM block)
  */
 
-typedef struct nvm_stat {
+typedef struct nvm_stat
+{
   /* stat_lock does not protect cycles_*[] counters */
   spinlock_t stat_lock; /* protection lock */
 
@@ -112,19 +113,20 @@ typedef struct nvm_stat {
 /**
  * The simulated NVM device
  */
-typedef struct nvm_device {
+typedef struct nvm_device
+{
   char nvm_name[32]; /* device name */
 
-  int nvmdev_number;  // The device number
+  int nvmdev_number; // The device number
   unsigned long
-      nvmdev_capacity;     // The capacity in sectors BUG should in bytes?
-  u8 *nvmdev_data;         // The backing data store
-  spinlock_t nvmdev_lock;  // The lock protecting the data store
-  struct request_queue *nvmdev_queue;  /// Request queue
-  struct gendisk *nvmdev_disk;         /// Disk
+      nvmdev_capacity;                // The capacity in sectors BUG should in bytes?
+  u8 *nvmdev_data;                    // The backing data store
+  spinlock_t nvmdev_lock;             // The lock protecting the data store
+  struct request_queue *nvmdev_queue; /// Request queue
+  struct gendisk *nvmdev_disk;        /// Disk
 
   struct list_head
-      nvmdev_list;  // The collection of lists the device belongs to
+      nvmdev_list; // The collection of lists the device belongs to
 
   NVM_STAT_T *nvm_stat;                /* statistics data */
   struct proc_dir_entry *proc_devstat; /* the proc output */
@@ -132,7 +134,7 @@ typedef struct nvm_device {
   /* Wear leveling*/
   struct task_struct *syncer;
   spinlock_t syncer_lock;
-  spinlock_t flush_lock;  // maynot use FIXME
+  spinlock_t flush_lock; // maynot use FIXME
   word_t *head;
   word_t *tail;
   word_t head_tail_size;
@@ -231,7 +233,8 @@ int nvm_block_check_flush(NVM_DEVICE_T *device);
 void *nvm_highmem_map(void);
 void nvm_highmem_unmap(void);
 static void *hmalloc(uint64_t bytes);
-static int hfree(void *addr) {
+static int hfree(void *addr)
+{
   /* FIXME: no support for dynamic alloc/dealloc in HIGH_MEM space */
   return 0;
 }
@@ -282,93 +285,14 @@ static int nvm_disk_getgeo(struct block_device *bdev, struct hd_geometry *geo);
 // make newkey by pbn and access time
 #define MAKE_KEY(pbn, num) ((pbn << 14) + num)
 
-// return maptable addr
-word_t *init_maptable(word_t size);
-int update_maptable(word_t *map_table, word_t lbn, word_t pbn);
-word_t get_maptable(word_t *map_table, word_t lbn);
-word_t map_table(word_t *map_table, word_t lbn, word_t pbn);
-int demap_maptable(word_t *map_table, word_t lbn);
-void print_maptable(word_t *map_table, word_t lbn);
-void destroy_maptable(word_t *map_table);
-
-
 word_t extract_maptable(word_t *map_table, word_t table_size, word_t **arr,
                         word_t **index);
 int nvm_get_extracted_maptable(NVM_DEVICE_T *device);
 void nvm_free_extracted_maptable(NVM_DEVICE_T *device);
-/**
- * Bitmap
- */
-
-word_t ONE = 1;
-/* The length of a "Bit",equal to int size*/
-#define BIT_WIDTH_IN_BYTES (sizeof(word_t))
-#define BIT_WIDTH_IN_BITS (BIT_WIDTH_IN_BYTES << 3)
-/* the position in "Bit"*/
-#define BIT_OFFSET(pos) (pos % (BIT_WIDTH_IN_BITS))
-/* the position in "int" Bitmap */
-#define INT_OFFSET(pos) (pos / (BIT_WIDTH_IN_BITS))
-/* Set the pos in Bitmap to one */
-#define SET_BITMAP(pos, BitMap) \
-  (BitMap[INT_OFFSET(pos)] |= (ONE << BIT_OFFSET(pos)))
-/* Clear the pos in Bitmap to zero */
-#define CLEAR_BITMAP(pos, BitMap) \
-  (BitMap[INT_OFFSET(pos)] &= (~(ONE << BIT_OFFSET(pos))))
-/* find the pos postion if is equal to One*/
-#define BOOL(pos, BitMap) \
-  ((BitMap[INT_OFFSET(pos)] & (ONE << BIT_OFFSET(pos))) != 0)
-
-/**
- * Bitmap function
- */
-// Num is the total numbers of item.
-word_t *init_bitmap(word_t num);
-
-/**
- * Query for the free block in page
- * return physical block number
- *  pos: lbn
- *  return: pbn; 0 for not found
- */
-word_t query_bitmap(word_t *bitmap, word_t pos);
-
-/**
- * retur ncount of number of 1's in word
- */
-word_t bitCount(word_t x);
-
-/**
- *  print first len bits of the bitmap
- */
-void printb_bitmap(word_t *bitmap, word_t len);
-
-/**
- * print summary information of bitmap
- */
-void print_summary_bitmap(word_t *bitmap, word_t len);
 
 /**
  * total helper function
  */
 int set_helper(struct nvm_device *device, sector_t sector, word_t len);
 
-
-/**
- * Access Information table
- */
-word_t *InfoTable;
-
-#define INFO_PAGE_SIZE_SHIFT (5)
-#define INFO_PAGE_SIZE (1<<INFO_PAGE_SIZE_SHIFT)
-
-word_t *init_infotable(word_t size);
-
-// lbn is phy-block-num, infortable key is lbn>> INFO_PAGE_SIZE_SHIFT
-int update_infotable(word_t *InfoTable, word_t lbn);
-
-word_t get_infotable(word_t *InfoTable, word_t lbn);
-
-int destroy_infotable(word_t *InfoTable);
-
-void print_infotable(word_t *InfoTable,word_t size,word_t step);
 #endif
