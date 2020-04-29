@@ -2,7 +2,7 @@
 obj-m := nvmsim.o
 
 nvmsim-objs += ramdevice.o mem.o infotable.o bitmap.o maptable.o
-
+#test-objs +=test.o infotable.o bitmap.o maptable.o
 
 CC = gcc
 FLAGS = -O -Wall 
@@ -22,16 +22,19 @@ LIBS = -lm
 # with a working directory of the directory containing the kernel
 # source and compile only the modules in the PWD (local) directory.
 
-build: nvmsim test data kth
+build: nvmsim
 
 nvmsim:
 	make -C /lib/modules/$(shell uname -r)/build M=$(CURDIR) modules
+
 #default:
 #	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 clean:
 	rm -rf *.o *.ko *.mod.c Module.* modules.* \
 	       *~ .*~ .\#*~ \#*~ .*.cmd .tmp* bit_map mapping data kth
+
+	make -C /lib/modules/$(shell uname -r)/build M=$(CURDIR) clean
 
 #test: bit_map.c bit_map.h mapping.c mapping.h kth.c kth.c
 #	${CC} ${FLAGS} -o bit_map bit_map.c mapping.c kth.c ${LIBS}

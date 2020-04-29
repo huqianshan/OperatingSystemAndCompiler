@@ -6,6 +6,7 @@
 #define __NVMCONFIG_H
 
 #include <linux/vmalloc.h>
+#include <linux/slab.h>
 
 typedef unsigned int word_t;
 /*
@@ -21,4 +22,8 @@ word_t info_table_size = 262144;
 
 #define INFO_PAGE_SIZE_SHIFT (5)
 #define INFO_PAGE_SIZE (1 << INFO_PAGE_SIZE_SHIFT)
+
+// syncer
+#define KB_SHIFT (10)
+#define KZALLOC_MAX_BYTES (128 << KB_SHIFT)
 #endif

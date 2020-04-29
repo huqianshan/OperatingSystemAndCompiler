@@ -1,0 +1,2 @@
+/home/hjl-2/Desktop/OperatingSystemAndCompiler/drivers/NVMSIM/test/check/test.o /home/hjl-2/Desktop/OperatingSystemAndCompiler/drivers/NVMSIM/test/check/infotable.o /home/hjl-2/Desktop/OperatingSystemAndCompiler/drivers/NVMSIM/test/check/bitmap.o /home/hjl-2/Desktop/OperatingSystemAndCompiler/drivers/NVMSIM/test/check/maptable.o /home/hjl-2/Desktop/OperatingSystemAndCompiler/drivers/NVMSIM/test/check/syncer.o
+

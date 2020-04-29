@@ -191,8 +191,6 @@ static int nvm_pbi_space_free(NVM_DEVICE_T *device);
 
 static uint64_t nvm_device_is_idle(NVM_DEVICE_T *device);
 
-static void *auto_malloc(unsigned long size);
-static void auto_free(void *p, word_t size);
 /*
  **************************************************************************
  * /proc file system entries

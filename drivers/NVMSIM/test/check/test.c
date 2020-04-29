@@ -1,273 +1,221 @@
 #include <linux/kernel.h>
-#include <linux/vmalloc.h>
 #include <linux/module.h>
+#include "test.h"
+#include "syncer.h"
 
-#define DEVICES_NAME "test"
+word_t *MapTable;
+word_t *BitMap;
+word_t *InfoTable;
 
-int info_table_size = 262144;
-typedef unsigned int word_t;
-word_t *init_infotable(word_t size)
+void pbi_test_init(void)
 {
-  word_t v_size;
-  word_t *tem;
-
-  v_size = size * (sizeof(word_t));
-  tem = vzalloc(v_size);
-
-  if (tem == NULL)
-  {
-    printk(KERN_ERR "NVMSIM: [%s(%d)]: init InfoTable size: %u failed  \n",
-           __FUNCTION__, __LINE__, size);
-  }
-  else
-  {
-    printk(KERN_INFO
-           "NVMSIM: [%s(%d)]: init InfoTable size: %u success addr: %x\n",
-           __FUNCTION__, __LINE__, size, tem);
-  }
-  return tem;
+  MapTable = init_maptable(map_table_size);
+  BitMap = init_bitmap(bit_table_size);
+  InfoTable = init_infotable(info_table_size);
 }
 
-int update_infotable(word_t *InfoTable, word_t lbn)
+void pbi_test_alloc(word_t begin, word_t end, word_t repeat)
 {
-  // exceed the info table range
-  if (lbn >= info_table_size)
-  {
-    return 1;
-  }
 
-  InfoTable[lbn] += 1;
-  return 0;
-}
+  word_t i, j;
 
-word_t get_infotable(word_t *InfoTable, word_t lbn)
-{
-  // exceed the info table range
-  if (lbn >= info_table_size || InfoTable == NULL)
-  {
-    return 0;
-  }
-
-  return InfoTable[lbn];
-}
-
-int destroy_infotable(word_t *InfoTable)
-{
-  if (InfoTable != NULL)
-  {
-    vfree(InfoTable);
-    printk(KERN_INFO "NVM_SIM [%s(%d)]: free Infotable \n", __FUNCTION__,
-           __LINE__);
-    return 0;
-  }
-  return 1;
-}
-
-void print_infotable(word_t *InfoTable, word_t size, word_t step)
-{
-  if (size >= info_table_size)
+  if ((!MapTable) || (!BitMap) || (!InfoTable))
   {
     return;
   }
-  word_t i, tem;
-  printk(KERN_INFO "NVM_SIM [%s(%d)]: Information Table Summary \n",
-         __FUNCTION__, __LINE__);
-  printk(KERN_INFO "   LBN    AccessTime\n", __FUNCTION__, __LINE__);
-  for (i = 0; i < size; i += step)
+  for (i = begin; i < end; i += 1)
   {
-    tem = get_infotable(InfoTable, i);
-    if (tem != 0)
+    map_table(MapTable, i, i + 1);
+    SET_BITMAP(i, BitMap);
+    for (j = 0; j < repeat; j++)
     {
-      printk(KERN_INFO " %6u  %6u \n", i, tem);
+      update_infotable(InfoTable, i >> INFO_PAGE_SIZE_SHIFT);
     }
   }
 }
-word_t *t;
 
-void info_init_test(void)
+void pbi_weal_test(void)
 {
-  t = init_infotable(info_table_size);
-  update_infotable(t, 0);
-  update_infotable(t, 1);
-  update_infotable(t, 2);
-  update_infotable(t, 2);
-  update_infotable(t, 33);
-  print_infotable(t, 100, 1);
-}
-
-void info_exit_test(void)
-{
-  if (t == NULL)
-  {
-    printk(KERN_INFO "NVM_SIM [%s(%d)]: t is NULL\n", __FUNCTION__, __LINE__);
-  }
-  else
-  {
-    printk(KERN_INFO "NVM_SIM [%s(%d)]: %p\n", __FUNCTION__, __LINE__, t);
-    word_t tem;
-    tem = get_infotable(t, 33); // t=NULL.&t equals to (&NULL)=
-    printk("%u", tem);
-    tem = get_infotable(t, 3300); // t=NULL.&t equals to (&NULL)=
-    printk("%u", tem);
-    destroy_infotable(t);
-  }
-}
-
-int map_table_size = 8388608;
-word_t *init_maptable(word_t size)
-{
-  word_t table_num;
-  word_t *tem;
-  unsigned long v_size;
-
-  table_num = size + 1;
-  v_size = (unsigned long)table_num * sizeof(word_t);
-  tem = vzalloc(v_size);
-  if (tem == NULL)
-  {
-    printk(KERN_ERR "NVMSIM: %s(%d) init maptable size: %u failed  \n",
-           __FUNCTION__, __LINE__, table_num);
-  }
-  else
-  {
-    printk(KERN_INFO "NVMSIM: %s(%d) init MapTable size: %u success addr: %x\n",
-           __FUNCTION__, __LINE__, table_num, tem);
-  }
-  return tem;
-};
-
-int update_maptable(word_t *map_table, word_t lbn, word_t pbn)
-{
-  if (lbn > map_table_size || lbn < 0)
-  {
-    printk(KERN_ERR "NVMSIM: [%s(%d)] Error index %u exceed %u,update maptble failed\n",
-           __FUNCTION__, __LINE__, lbn, map_table_size);
-    return 0;
-  }
-  map_table[lbn] = pbn;
-  return 1;
-};
-
-word_t get_maptable(word_t *map_table, word_t lbn)
-{
-  if (lbn > map_table_size || (lbn < 0))
-  {
-    printk(KERN_ERR "NVMSIM: [%s(%d)] Error index %u exceed %u,gete maptble failed\n",
-           __FUNCTION__, __LINE__, lbn, map_table_size);
-    return 0; //return -EINVAL; bug
-  }
-  return map_table[lbn];
-};
-
-word_t map_table(word_t *map_table, word_t lbn, word_t pbn)
-{
-  word_t raw_pbn;
-  // check for return value
-  raw_pbn = get_maptable(map_table, lbn);
-  // if pbn=0 indicates lbn not mapping
-  //num = ACCESS_TIME(pbn) + 1;newkey = MAKE_KEY(pbn, num);
-  if ((update_maptable(map_table, lbn, pbn) == 0))
-  {
-    printk(KERN_ERR "NVMSIM: [%s(%d)] Error Map lbn %u for pbn %u failed\n",
-           __FUNCTION__, __LINE__, lbn, pbn);
-    return 0;
-  }
-  return raw_pbn;
-};
-
-int demap_maptable(word_t *map_table, word_t lbn)
-{
-  word_t raw_pbn;
-  // check for return value
-  raw_pbn = get_maptable(map_table, lbn);
-  if (raw_pbn == 0)
-  {
-    return 0;
-  }
-  // if pbn=0 indicates lbn not mapping
-  //num = ACCESS_TIME(pbn) + 1;newkey = MAKE_KEY(pbn, num);
-  if ((update_maptable(map_table, lbn, 0) == 0))
-  {
-    printk(KERN_ERR "NVMSIM: [%s(%d)] Error DeMap lbn %u failed its raw pbn %u n",
-           __FUNCTION__, __LINE__, lbn, raw_pbn);
-    return 0;
-  }
-  return raw_pbn;
-}
-
-void print_maptable(word_t *map_table, word_t lbn)
-{
-  word_t i, pbn;
-  printk(KERN_INFO
-         "NVMSIM: %s(%d)\n------------Mapping Table-----------------\n",
-         __FUNCTION__, __LINE__);
-  printk(KERN_INFO "    lbn      pbn      accesstime            \n");
-  for (i = 0; i <= 100; i++)
-  {
-    pbn = get_maptable(map_table, i);
-
-    if (pbn != 0)
-    // bug ,=0->0 not show ;solved, pbn begin with [1,size]
-    {
-      printk(KERN_INFO "%8u%8u%8u\n", i, pbn, 0);
-    }
-  }
-
-  for (i = 0; i <= lbn; i += 5000)
-  {
-    pbn = get_maptable(map_table, i);
-    if (pbn != 0)
-    // bug ,=0->0 not show ;solved, pbn begin with [1,size]
-    {
-      printk(KERN_INFO "%8u%8u%8u\n", i, pbn, 0);
-    }
-  }
-};
-
-void destroy_maptable(word_t *map_table)
-{
-  if (map_table != NULL)
-  {
-    vfree(map_table);
-    printk("destroy maptable");
-  }
-};
-
-word_t *map;
-void map_init_test(void)
-{
-  map = init_maptable(map_table_size);
-  int i;
-  if (map == NULL)
+  if ((!MapTable) || (!BitMap) || (!InfoTable))
   {
     return;
   }
-  for (i = 0; i < 100; i += 1)
+
+  word_t *tem, rtn;
+  word_t k;
+  k = 1;
+  rtn = extract_big(BitMap, InfoTable, bit_table_size >> 5, k, &tem);
+  if (rtn)
   {
-    map_table(map, i, i + 1);
+    word_t j;
+    for (j = 0; j < k; j++)
+    {
+      printk("lpn %u times:%u avg: %u\n", tem[j], InfoTable[tem[j]], rtn);
+    }
   }
 
-  print_maptable(map, map_table_size);
+  wear_level(BitMap, InfoTable, MapTable, tem, k);
+  auto_free(tem, k * sizeof(word_t));
 }
 
-void map_exit_test(void)
+void pbi_test_destroy(void)
 {
-  destroy_maptable(map);
+  destroy_maptable(MapTable);
+  destroy_infotable(InfoTable);
+  destroy_bitmap(BitMap);
+}
+
+void pbi_test_print(word_t len)
+{
+  if ((!MapTable) || (!BitMap) || (!InfoTable))
+  {
+    return;
+  }
+  print_maptable(MapTable, len);
+  print_bitmap(BitMap, len);
+  print_infotable(InfoTable, len, 1);
+}
+
+void syncer_malloc_test(void)
+{
+  word_t *p;
+  word_t size, word_t_t_size;
+
+  size = 32;
+  word_t_t_size = sizeof(word_t);
+  printk("p %p\n", p);
+  p = auto_malloc(size * word_t_t_size);
+  auto_free(p, size * word_t_t_size);
+  printk("p %p\n", p);
+
+  size = KZALLOC_MAX_BYTES;
+  printk("p %p\n", p);
+  p = auto_malloc(size * word_t_t_size);
+  auto_free(p, size * word_t_t_size);
+  printk("p %p\n", p);
+
+  size = 64 * 1024 * 1024;
+  printk("p %p\n", p);
+  p = auto_malloc(size * word_t_t_size);
+  auto_free(p, size * word_t_t_size);
+  printk("p %p\n", p);
+
+  p = NULL;
+  auto_free(p, 32);
+  auto_free(p, KZALLOC_MAX_BYTES + 1);
+}
+
+void syncer_find_test(void)
+{
+  word_t array[5] = {2, 2, 2, 2, 2};
+  word_t index, key;
+
+  index = minium(array, 5);
+  key = array[index];
+  printk("min index: %u key %u\n", index, key);
+
+  index = maxium(array, 5);
+  key = array[index];
+  printk("max index: %u key %u\n", index, key);
+
+  word_t *karr, k, i;
+  k = 3;
+  karr = bigK_index(array, 5, k);
+  for (i = 0; i < k; i++)
+  {
+    printk("big K:%u %u:%u Real %u\n", k, i, karr[i], array[karr[i]]);
+  }
+
+  //word_t *karr, k, i;
+  k = 5;
+  karr = smallK_index(array, 5, k);
+  for (i = 0; i < k; i++)
+  {
+    printk("small K:%u %u:%u Real %u\n", k, i, karr[i], array[karr[i]]);
+  }
+  auto_free(karr, k * sizeof(word_t));
+}
+
+void syncer_extracted_test(void)
+{
+  word_t *bitmap, *infotable, *maptable;
+  word_t s;
+  s = 5;
+  //bitmap = init_bitmap(s * BIT_WIDTH_IN_BITS);
+  //infotable = init_infotable(s);
+  bitmap = auto_malloc(s * sizeof(word_t));
+  infotable = auto_malloc(s * sizeof(word_t));
+  maptable = auto_malloc(s * sizeof(word_t) * BIT_WIDTH_IN_BITS);
+  if (!bitmap || !infotable || !maptable)
+    return;
+
+  SET_BITMAP(1, bitmap);
+  map_table(maptable, 1, 2);
+  SET_BITMAP(2, bitmap);
+  map_table(maptable, 2, 3);
+  SET_BITMAP(33, bitmap);
+  map_table(maptable, 33, 34);
+  SET_BITMAP(65, bitmap);
+  map_table(maptable, 65, 66);
+  SET_BITMAP(97, bitmap);
+  map_table(maptable, 97, 98);
+  SET_BITMAP(129, bitmap);
+  map_table(maptable, 129, 130);
+
+  infotable[0] = 1;
+  infotable[1] = 2;
+  infotable[2] = 3;
+  infotable[3] = 4;
+  infotable[4] = 5;
+  print_bitmap(bitmap, 32 * s);
+  print_infotable(infotable, s, 1);
+  print_maptable(maptable, 160);
+
+  word_t *tem, rtn;
+  word_t k;
+  k = 1;
+  rtn = extract_big(bitmap, infotable, s, k, &tem);
+  if (rtn)
+  {
+    word_t j;
+    for (j = 0; j < k; j++)
+    {
+      printk("lpn %u times:%u \n", tem[j], infotable[tem[j]]);
+    }
+  }
+  wear_level(bitmap, infotable, maptable, tem, k);
+  print_bitmap(bitmap, 32 * s);
+  print_infotable(infotable, s, 1);
+  print_maptable(maptable, 160);
+
+  auto_free(tem, k * sizeof(word_t));
+
+  auto_free(infotable, s * sizeof(word_t));
+
+  auto_free(bitmap, s * sizeof(word_t));
 }
 
 static int __init test_init(void)
 {
   printk(KERN_INFO "Test [%s(%d)]: Init\n", __FUNCTION__, __LINE__);
-  info_init_test();
-  map_init_test();
+
+  pbi_test_init();
+  pbi_test_alloc(0, 36, 10);
+  pbi_test_print(64);
+
+  pbi_weal_test();
+  pbi_test_print(64);
+
+  //syncer_malloc_test();
+  //syncer_find_test();
+  //syncer_extracted_test();
   return 0;
 }
 
 static void __exit test_exit(void)
 {
   printk(KERN_INFO "Test [%s(%d)]: Exit\n", __FUNCTION__, __LINE__);
-  info_exit_test();
-  map_exit_test();
+  pbi_test_destroy();
   return;
 }
 

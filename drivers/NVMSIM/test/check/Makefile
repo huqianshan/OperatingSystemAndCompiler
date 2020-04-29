@@ -1,20 +1,22 @@
-obj-m:=test.o
-#test-objs
+obj-m:=check.o
 
-CC=gcc
-EXTRA_CFLAGS= -g -O0
-LIBS=-lm
+check-objs += test.o infotable.o bitmap.o maptable.o syncer.o
+CC = gcc
+FLAGS = -O -Wall 
+LIBS = -lm
 
 KVERS=$(shell uname -r)
 
 
-build: test
+build: check
 
-test:
+check:
 	make -C /lib/modules/$(KVERS)/build M=$(CURDIR) modules
 
 clean:
 	rm -rf *.o *.ko *.mod.c Module.* modules.* \
 	       *~ .*~ .\#*~ \#*~ .*.cmd .tmp*
+
+	make -C /lib/modules/$(KVERS)/build M=$(CURDIR) clean
 
 

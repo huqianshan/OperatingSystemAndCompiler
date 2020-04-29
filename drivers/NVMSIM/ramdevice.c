@@ -91,51 +91,6 @@ static const struct block_device_operations nvmdev_fops = {
     .getgeo = nvm_disk_getgeo,
 };
 
-static void *auto_malloc(unsigned long size)
-{
-  unsigned long max_num;
-  max_num = (unsigned long)KZALLOC_MAX_BYTES;
-  void *p;
-  if (size < max_num)
-  {
-    p = kzalloc(size, GFP_KERNEL);
-    if (p == NULL)
-    {
-      printk(KERN_ERR "NVM_SIM %s%d ERROR: for size %lu autoalloc in kzalloc\n",
-             __FUNCTION__, __LINE__, size);
-    }
-  }
-  else
-  {
-    p = vzalloc(size);
-    printk(KERN_INFO "NVM_SIM [%s(%d)]: Vmalloc for size %lu at %p\n",
-           __FUNCTION__, __LINE__, size, p);
-    if (p == NULL)
-    {
-      printk(KERN_ERR "NVM_SIM %s%d ERROR: for size %lu autoalloc in vmalloc\n",
-             __FUNCTION__, __LINE__, size);
-    }
-  }
-  return p;
-}
-static void auto_free(void *p, word_t size)
-{
-  unsigned long max_num;
-
-  max_num = KZALLOC_MAX_BYTES;
-  if (size < max_num)
-  {
-    // printk(KERN_INFO"NVM_SIM [%s(%d)]: kfree size %u p
-    // %p\n",__FUNCTION__,__LINE__,size,p);
-    kfree(p);
-  }
-  else
-  {
-    printk(KERN_INFO "NVM_SIM [%s(%d)]: vmfree size %u p %p\n", __FUNCTION__,
-           __LINE__, size, p);
-    vfree(p);
-  }
-}
 
 static void nvm_auto_free(void *p, word_t size)
 {
@@ -195,115 +150,6 @@ out:
   return n;
 }
 
-word_t minium(word_t *arr, word_t n)
-{
-  word_t i, min, index;
-  min = arr[0];
-  index = 0;
-  for (i = 0; i < n; i++)
-  {
-    if (min > arr[i])
-    {
-      min = arr[i];
-      index = i;
-    }
-  }
-  return index;
-}
-
-word_t maxium(word_t *arr, word_t n)
-{
-  word_t i, max, index;
-  max = arr[0];
-  index = 0;
-  for (i = 0; i < n; i++)
-  {
-    if (max < arr[i])
-    {
-      max = arr[i];
-      index = i;
-    }
-  }
-  return index;
-}
-
-word_t *bigK_index(word_t *arr, word_t n, word_t k)
-{
-  if (arr == NULL || n <= 0 || k > n || k <= 0)
-  {
-    return NULL;
-  }
-  word_t *tem, *addr, i, min_index, min;
-  // tempory store the pbn
-  tem = (word_t *)auto_malloc(sizeof(word_t) * k);
-  // store the maxium k index in arr
-  addr = (word_t *)auto_malloc(sizeof(word_t) * k);
-  if ((!tem) || (!addr))
-  {
-    return NULL;
-  }
-  for (i = 0; i < k; i++)
-  {
-    tem[i] = arr[i];
-    addr[i] = i;
-  }
-
-  min_index = minium(tem, k);
-  min = tem[min_index];
-  for (i = k; i < n; i++)
-  {
-    if (arr[i] > min)
-    {
-      tem[min_index] = arr[i];
-      addr[min_index] = i;
-      min_index = minium(tem, k);
-      min = tem[min_index];
-    }
-  }
-  if (tem != NULL)
-  {
-    auto_free(tem, sizeof(word_t) * k);
-  }
-  return addr;
-}
-
-word_t *smallK_index(word_t *arr, word_t n, word_t k)
-{
-  if (arr == NULL || n <= 0 || k > n || k <= 0)
-  {
-    return NULL;
-  }
-  word_t *tem, *addr, i, max_index, max;
-  tem = (word_t *)auto_malloc(sizeof(word_t) * k);
-  addr = (word_t *)auto_malloc(sizeof(word_t) * k);
-  if ((!tem) || (!addr))
-  {
-    return NULL;
-  }
-  for (i = 0; i < k; i++)
-  {
-    tem[i] = arr[i];
-    addr[i] = i;
-  }
-
-  max_index = maxium(tem, k);
-  max = tem[max_index];
-  for (i = k; i < n; i++)
-  {
-    if (arr[i] < max)
-    {
-      tem[max_index] = arr[i];
-      addr[max_index] = i;
-      max_index = maxium(tem, k);
-      max = tem[max_index];
-    }
-  }
-  if (tem != NULL)
-  {
-    auto_free(tem, sizeof(word_t) * k);
-  }
-  return addr;
-}
 
 /*
  **************************************************************************
@@ -1263,17 +1109,19 @@ int set_helper(struct nvm_device *device, sector_t sector, word_t len)
   lbn_begin = sector_begin >> MAP_PER_SECTORS_SHIFT;
   lbn_end = sector_end >> MAP_PER_SECTORS_SHIFT;
 
+  /*
   printk(KERN_INFO
          "NVM_SIM [%s(%d)]:set helper sector_begin %u %u lbn_begin %u %u\n",
          __FUNCTION__, __LINE__, sector_begin, sector_end, lbn_begin, lbn_end);
-
+  */
   word_t i, rtn;
   // Access Info Table
   //spin_lock(&device->syncer_lock);
   for (i = lbn_begin; i <= lbn_end; i++)
   {
     if (update_infotable(device->InfoTable, i))
-    {
+    { 
+      
       printk(KERN_ERR "NVM_SIM [%s(%d)]: InforTable update %u failed \n",
              __FUNCTION__, __LINE__, i);
     }
