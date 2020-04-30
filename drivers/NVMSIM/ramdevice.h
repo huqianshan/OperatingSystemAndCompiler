@@ -86,9 +86,8 @@ void *g_highmem_curr_addr = NULL;
   }
 
 #define NVM_DEV_IS_IDLE(IDLE) ((IDLE) > NVM_FLUSH_IDLE_TIMEOUT)
-#define KZALLOC_MAX_BYTES (128 << KB_SHIFT)
 
-#define SORTED_BASE (100) /* 0.2 */
+
 /*
  * NVM    spin_lock(&(NVM)->nvm_stat->stat_lock);         \
     (NVM)->nvm_stat->last_access_jiffies = jiffies; \
@@ -132,6 +131,7 @@ typedef struct nvm_device
   struct proc_dir_entry *proc_devstat; /* the proc output */
 
   /* Wear leveling*/
+  word_t avg_times;
   struct task_struct *syncer;
   spinlock_t syncer_lock;
   spinlock_t flush_lock; // maynot use FIXME
@@ -291,6 +291,6 @@ void nvm_free_extracted_maptable(NVM_DEVICE_T *device);
 /**
  * total helper function
  */
-int set_helper(struct nvm_device *device, sector_t sector, word_t len);
+int write_helper(struct nvm_device *device, sector_t sector, word_t len);
 
 #endif

@@ -1,7 +1,7 @@
 
 obj-m := nvmsim.o
 
-nvmsim-objs += ramdevice.o mem.o infotable.o bitmap.o maptable.o
+nvmsim-objs += ramdevice.o mem.o infotable.o bitmap.o maptable.o syncer.o
 #test-objs +=test.o infotable.o bitmap.o maptable.o
 
 CC = gcc

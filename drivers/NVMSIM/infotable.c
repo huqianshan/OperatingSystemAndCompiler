@@ -1,5 +1,3 @@
-
-
 #include "infotable.h"
 
 /**

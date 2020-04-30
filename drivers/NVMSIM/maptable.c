@@ -88,15 +88,15 @@ void print_maptable(word_t *map_table, word_t lbn)
     printk(KERN_INFO
            "NVMSIM: %s(%d)\n------------Mapping Table-----------------\n",
            __FUNCTION__, __LINE__);
-    printk(KERN_INFO "    lbn      pbn      accesstime            \n");
-    for (i = 0; i <= 100; i++)
+    printk(KERN_INFO "    lbn      pbn                 \n");
+    for (i = 0; i <= 64; i++)
     {
         pbn = get_maptable(map_table, i);
 
         if (pbn != 0)
         // bug ,=0->0 not show ;solved, pbn begin with [1,size]
         {
-            printk(KERN_INFO "%8u%8u%8u\n", i, pbn, 0);
+            printk(KERN_INFO "%8u%8u\n", i, pbn);
         }
     }
 
@@ -106,7 +106,7 @@ void print_maptable(word_t *map_table, word_t lbn)
         if (pbn != 0)
         // bug ,=0->0 not show ;solved, pbn begin with [1,size]
         {
-            printk(KERN_INFO "%8u%8u%8u\n", i, pbn, 0);
+            printk(KERN_INFO "%8u%8u\n", i, pbn);
         }
     }
 };

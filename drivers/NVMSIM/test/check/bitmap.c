@@ -149,6 +149,7 @@ word_t total_bitmap(word_t *bitmap)
 {
     word_t size, tem, i, total;
 
+    total = 0;
     size = (bit_table_size / BIT_WIDTH_IN_BITS) + 1;
     for (i = 0; i < size; i++)
     {
