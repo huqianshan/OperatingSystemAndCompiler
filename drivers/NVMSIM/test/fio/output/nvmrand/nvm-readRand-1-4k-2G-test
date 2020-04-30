@@ -1,0 +1,32 @@
+my_nvm_read_test: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=1
+fio-3.1
+Starting 1 thread
+
+my_nvm_read_test: (groupid=0, jobs=1): err= 0: pid=3848: Thu Apr 30 20:20:57 2020
+   read: IOPS=335k, BW=1309MiB/s (1372MB/s)(2048MiB/1565msec)
+    slat (nsec): min=1283, max=525853, avg=2064.28, stdev=4410.94
+    clat (nsec): min=362, max=259271, avg=501.19, stdev=1912.53
+     lat (nsec): min=1694, max=537134, avg=2616.65, stdev=5030.16
+    clat percentiles (nsec):
+     |  1.00th=[  370],  5.00th=[  374], 10.00th=[  374], 20.00th=[  382],
+     | 30.00th=[  394], 40.00th=[  398], 50.00th=[  402], 60.00th=[  406],
+     | 70.00th=[  410], 80.00th=[  422], 90.00th=[  486], 95.00th=[  580],
+     | 99.00th=[  868], 99.50th=[ 1400], 99.90th=[22144], 99.95th=[24960],
+     | 99.99th=[88576]
+   bw (  MiB/s): min= 1147, max= 1445, per=99.74%, avg=1305.22, stdev=149.76, samples=3
+   iops        : min=293730, max=370001, avg=334135.67, stdev=38337.68, samples=3
+  lat (nsec)   : 500=91.21%, 750=7.31%, 1000=0.70%
+  lat (usec)   : 2=0.36%, 4=0.10%, 10=0.03%, 20=0.15%, 50=0.11%
+  lat (usec)   : 100=0.02%, 250=0.01%, 500=0.01%
+  cpu          : usr=26.66%, sys=72.70%, ctx=158, majf=0, minf=2
+  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
+     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwt: total=524288,0,0, short=0,0,0, dropped=0,0,0
+     latency   : target=0, window=0, percentile=100.00%, depth=1
+
+Run status group 0 (all jobs):
+   READ: bw=1309MiB/s (1372MB/s), 1309MiB/s-1309MiB/s (1372MB/s-1372MB/s), io=2048MiB (2147MB), run=1565-1565msec
+
+Disk stats (read/write):
+  nvm0: ios=0/0, merge=0/0, ticks=0/0, in_queue=0, util=0.00%
