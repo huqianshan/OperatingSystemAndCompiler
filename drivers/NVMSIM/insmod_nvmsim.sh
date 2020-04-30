@@ -1,8 +1,10 @@
 #!/bin/bash
+
+
 sudo dmesg -c
 make clean;
-make nvmsim;
-sudo insmod nvmsim.ko
-lsmod | grep nvm
-cat /proc/devices | grep nvm
-dmesg | grep NVM > ./test/logs/nvmsim_begin_`date -d last-day +%Y-%m-%d-%H-%M-%S`.txt
+make;
+sudo insmod $1.ko
+lsmod | grep $1
+cat /proc/devices | grep $1
+#dmesg | grep NVM > ./test/logs/nvmsim_begin_`date -d last-day +%Y-%m-%d-%H-%M-%S`.txt

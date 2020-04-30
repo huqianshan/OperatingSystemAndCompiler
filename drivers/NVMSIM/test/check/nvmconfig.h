@@ -26,5 +26,4 @@ word_t info_table_size = 262144;
 // syncer
 #define KB_SHIFT (10)
 #define KZALLOC_MAX_BYTES (128 << KB_SHIFT)
-#define SORTED_BASE (50) /* 0.02 */
 #endif
